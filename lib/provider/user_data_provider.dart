@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class UserDataProvider extends ChangeNotifier {
+  String _name = 'N/A';
+  String _nurseID = '';
+  String _password = '';
+  String _role = '';
+
+  String get name => _name;
+  String get nurseID => _nurseID;
+  String get password => _password;
+  String get role => _role;
+
+  // Load user data from SharedPreferences
+  Future<void> loadUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _name = prefs.getString('name') ?? 'N/A';
+    _nurseID = prefs.getString('nurseID') ?? 'N/A';
+    _password = prefs.getString('password') ?? 'N/A';
+    _role = prefs.getString('role') ?? 'N/A';
+    notifyListeners(); // Notify listeners after data is loaded
+  }
+
+  // Update user data in SharedPreferences
+  Future<void> updateUserName(String name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', name);
+    await loadUserData(); // Reload data and notify listeners
+  }
+
+  Future<void> updateUserPassword(String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('password', password);
+    await loadUserData(); // Reload data and notify listeners
+  }
+
+  Future<void> updateUserNurseID(String nurseID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('nurseID', nurseID);
+    await loadUserData(); // Reload data and notify listeners
+  }
+
+  Future<void> updateUserRole(String nurseID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('role', role);
+    await loadUserData(); // Reload data and notify listeners
+  }
+
+  // Save a boolean preference and notify listeners
+  Future<void> savePreference(String key, bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, value); // Save the boolean value
+    notifyListeners(); // Notify listeners that preference has changed
+  }
+}

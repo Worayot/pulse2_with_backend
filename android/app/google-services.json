@@ -1,0 +1,106 @@
+{
+  "project_info": {
+    "project_number": "122811449387",
+    "firebase_url": "https://mews-project-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mews-project",
+    "storage_bucket": "mews-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122811449387:android:e52a6bae296f0707c96a6e",
+        "android_client_info": {
+          "package_name": "com.example.my_flutter_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHcFjVbFiMm0Jb-Lg6ZUGA44hxoe975Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122811449387:android:2c056c8edfdaf67cc96a6e",
+        "android_client_info": {
+          "package_name": "com.example.p"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHcFjVbFiMm0Jb-Lg6ZUGA44hxoe975Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122811449387:android:a54da450b356aa7fc96a6e",
+        "android_client_info": {
+          "package_name": "com.example.test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHcFjVbFiMm0Jb-Lg6ZUGA44hxoe975Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122811449387:android:5103125d98cc3a57c96a6e",
+        "android_client_info": {
+          "package_name": "com.example.test_fastapi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHcFjVbFiMm0Jb-Lg6ZUGA44hxoe975Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122811449387:android:e29097411bb1ca0ac96a6e",
+        "android_client_info": {
+          "package_name": "com.sci.pulse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHcFjVbFiMm0Jb-Lg6ZUGA44hxoe975Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
