@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/func/fetch_mews.dart';
+import 'package:pulse/services/fetch_mews.dart';
 import 'package:pulse/mainpage/patient_data/no_patient_screen.dart';
 import 'package:pulse/universal_setting/sizes.dart';
 import 'package:pulse/utils/home_expandable_cards.dart';

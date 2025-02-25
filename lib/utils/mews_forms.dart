@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pulse/func/calculateMEWs.dart';
-import 'package:pulse/func/requests/sendMEWsParameters.dart';
 import 'package:pulse/results/result_screens.dart';
 
 class MEWsForms extends StatefulWidget {
@@ -25,6 +24,7 @@ class _MEWsFormsState extends State<MEWsForms> {
   final TextEditingController respiratoryRateController =
       TextEditingController();
   final TextEditingController urineController = TextEditingController();
+  final TextEditingController cvpController = TextEditingController();
   final FocusNode sysBpFocusNode = FocusNode();
   final FocusNode diasBpFocusNode = FocusNode();
   String consciousnessValue = "-";
@@ -70,14 +70,19 @@ class _MEWsFormsState extends State<MEWsForms> {
                       textAlign: TextAlign.center,
                       "calculateMEWs".tr(),
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 22),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 22,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
                   Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: Text("consciousness".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold))),
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                    child: Text(
+                      "consciousness".tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   SizedBox(
                     height: 40,
                     child: DropdownButtonFormField<String>(
@@ -91,7 +96,9 @@ class _MEWsFormsState extends State<MEWsForms> {
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 4, horizontal: 8),
+                          vertical: 4,
+                          horizontal: 8,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                           borderSide: BorderSide.none,
@@ -109,8 +116,9 @@ class _MEWsFormsState extends State<MEWsForms> {
                         const DropdownMenuItem(
                           value: "-",
                           child: Padding(
-                              padding: EdgeInsets.only(left: 8),
-                              child: Text("-")),
+                            padding: EdgeInsets.only(left: 8),
+                            child: Text("-"),
+                          ),
                         ),
                         DropdownMenuItem(
                           value: "Conscious",
@@ -138,13 +146,17 @@ class _MEWsFormsState extends State<MEWsForms> {
                   Row(
                     children: [
                       Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Text("temperature".tr(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold))),
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          "temperature".tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                       const Spacer(),
-                      const Text("(°C)",
-                          style: TextStyle(fontWeight: FontWeight.bold))
+                      const Text(
+                        "(°C)",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -154,16 +166,20 @@ class _MEWsFormsState extends State<MEWsForms> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text('°C',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        suffix: const Text(
+                          '°C',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 16), // Adjusts height/padding
+                          vertical: 8,
+                          horizontal: 16,
+                        ), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(15), // Rounded corners
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Rounded corners
                           borderSide:
                               BorderSide.none, // Removes visible border line
                         ),
@@ -179,18 +195,21 @@ class _MEWsFormsState extends State<MEWsForms> {
                     ),
                   ),
                   Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: Row(
-                        children: [
-                          Text(
-                            "heartRate".tr(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const Spacer(),
-                          const Text("(bpm)",
-                              style: TextStyle(fontWeight: FontWeight.bold))
-                        ],
-                      )),
+                    padding: const EdgeInsets.only(top: 5, bottom: 5),
+                    child: Row(
+                      children: [
+                        Text(
+                          "heartRate".tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const Spacer(),
+                        const Text(
+                          "(bpm)",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
                   SizedBox(
                     height: 40, // Adjust height here
                     child: TextField(
@@ -198,8 +217,10 @@ class _MEWsFormsState extends State<MEWsForms> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: "-",
-                        suffix: const Text("bpm",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        suffix: const Text(
+                          "bpm",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
@@ -207,8 +228,9 @@ class _MEWsFormsState extends State<MEWsForms> {
                           horizontal: 16, // Adjusts height/padding
                         ),
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(15), // Rounded corners
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Rounded corners
                           borderSide: BorderSide.none,
                         ),
                         enabledBorder: OutlineInputBorder(
@@ -225,13 +247,17 @@ class _MEWsFormsState extends State<MEWsForms> {
                   Row(
                     children: [
                       Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Text("respiratoryRate".tr(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold))),
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          "respiratoryRate".tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                       const Spacer(),
-                      const Text("(bpm)",
-                          style: TextStyle(fontWeight: FontWeight.bold))
+                      const Text(
+                        "(bpm)",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -240,17 +266,21 @@ class _MEWsFormsState extends State<MEWsForms> {
                       controller: respiratoryRateController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        suffix: const Text("bpm",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        suffix: const Text(
+                          "bpm",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         hintText: '-',
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 16), // Adjusts height/padding
+                          vertical: 8,
+                          horizontal: 16,
+                        ), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(15), // Rounded corners
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Rounded corners
                           borderSide:
                               BorderSide.none, // Removes visible border line
                         ),
@@ -268,13 +298,17 @@ class _MEWsFormsState extends State<MEWsForms> {
                   Row(
                     children: [
                       Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: Text("bloodPressure".tr(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold))),
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Text(
+                          "bloodPressure".tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                       const Spacer(),
-                      const Text("(mmHg)",
-                          style: TextStyle(fontWeight: FontWeight.bold))
+                      const Text(
+                        "(mmHg)",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                   Row(
@@ -284,31 +318,39 @@ class _MEWsFormsState extends State<MEWsForms> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const Padding(
-                                padding: EdgeInsets.only(bottom: 5),
-                                child: Text("Systolic",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold))),
+                              padding: EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "Systolic",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             SizedBox(
                               height: 40,
                               child: TextField(
                                 focusNode: sysBpFocusNode,
                                 onChanged: (value) {
                                   if (value.length == 3) {
-                                    FocusScope.of(context)
-                                        .requestFocus(diasBpFocusNode);
+                                    FocusScope.of(
+                                      context,
+                                    ).requestFocus(diasBpFocusNode);
                                   }
                                 },
                                 controller: sysBloodPressureController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   hintText: '-',
-                                  suffix: const Text("mmHg",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                  suffix: const Text(
+                                    "mmHg",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   filled: true,
                                   fillColor: Colors.white,
                                   contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 16),
+                                    vertical: 8,
+                                    horizontal: 16,
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: BorderSide.none,
@@ -333,10 +375,12 @@ class _MEWsFormsState extends State<MEWsForms> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             const Padding(
-                                padding: EdgeInsets.only(bottom: 5),
-                                child: Text("Diastolic",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold))),
+                              padding: EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                "Diastolic",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             SizedBox(
                               height: 40,
                               child: TextField(
@@ -345,13 +389,18 @@ class _MEWsFormsState extends State<MEWsForms> {
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   hintText: '-',
-                                  suffix: const Text("mmHg",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                  suffix: const Text(
+                                    "mmHg",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   filled: true,
                                   fillColor: Colors.white,
                                   contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 16),
+                                    vertical: 8,
+                                    horizontal: 16,
+                                  ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: BorderSide.none,
@@ -375,15 +424,17 @@ class _MEWsFormsState extends State<MEWsForms> {
                   Row(
                     children: [
                       Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Text("spO2 (${"whileGivingOxygen".tr()})",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold))),
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          "spO2 (${"whileGivingOxygen".tr()})",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                       const Spacer(),
                       const Text(
                         "(%)",
                         style: TextStyle(fontWeight: FontWeight.bold),
-                      )
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -393,16 +444,20 @@ class _MEWsFormsState extends State<MEWsForms> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text("%",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        suffix: const Text(
+                          "%",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 16), // Adjusts height/padding
+                          vertical: 8,
+                          horizontal: 16,
+                        ), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(15), // Rounded corners
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Rounded corners
                           borderSide:
                               BorderSide.none, // Removes visible border line
                         ),
@@ -420,13 +475,17 @@ class _MEWsFormsState extends State<MEWsForms> {
                   Row(
                     children: [
                       Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Text("urine".tr(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold))),
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          "urine".tr(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                       const Spacer(),
-                      const Text("(mL/hr)",
-                          style: TextStyle(fontWeight: FontWeight.bold))
+                      const Text(
+                        "(mL/hr)",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -436,16 +495,63 @@ class _MEWsFormsState extends State<MEWsForms> {
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text("mL/hr",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        suffix: const Text(
+                          "mL/hr",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 16), // Adjusts height/padding
+                          vertical: 8,
+                          horizontal: 16,
+                        ), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(15), // Rounded corners
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Rounded corners
+                          borderSide:
+                              BorderSide.none, // Removes visible border line
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          "CVP",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 40, // Adjust height here
+                    child: TextField(
+                      controller: cvpController,
+                      // keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        hintText: '-',
+
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ), // Adjusts height/padding
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ), // Rounded corners
                           borderSide:
                               BorderSide.none, // Removes visible border line
                         ),
@@ -477,15 +583,17 @@ class _MEWsFormsState extends State<MEWsForms> {
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(dialogContext)
-                                            .pop(false); // User pressed cancel
+                                        Navigator.of(
+                                          dialogContext,
+                                        ).pop(false); // User pressed cancel
                                       },
                                       child: Text("cancel".tr()),
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(dialogContext)
-                                            .pop(true); // User confirmed
+                                        Navigator.of(
+                                          dialogContext,
+                                        ).pop(true); // User confirmed
                                       },
                                       child: Text("confirm".tr()),
                                     ),
@@ -503,6 +611,7 @@ class _MEWsFormsState extends State<MEWsForms> {
                                   spo2Controller.text = "";
                                   respiratoryRateController.text = "";
                                   urineController.text = "";
+                                  cvpController.text = "";
                                   consciousnessValue =
                                       "-"; // Reset dropdown safely
                                 });
@@ -514,8 +623,9 @@ class _MEWsFormsState extends State<MEWsForms> {
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.red, // Text color
-                              decoration: TextDecoration
-                                  .underline, // Underline to indicate it's clickable
+                              decoration:
+                                  TextDecoration
+                                      .underline, // Underline to indicate it's clickable
                               decorationColor: Colors.red,
                             ),
                           ),
@@ -527,7 +637,8 @@ class _MEWsFormsState extends State<MEWsForms> {
                             backgroundColor: const Color(0xFF3362CC),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
-                                  15), // Set border radius here
+                                15,
+                              ), // Set border radius here
                             ),
                           ),
                           onPressed: () async {
@@ -541,25 +652,32 @@ class _MEWsFormsState extends State<MEWsForms> {
                             String conscious = consciousnessValue;
 
                             int MEWs = calculateMEWs(
-                                consciousness: conscious,
-                                heartRate: (hr != '-' && hr != ' ')
-                                    ? int.tryParse(hr)
-                                    : null,
-                                temperature: (temp != '-' && temp != ' ')
-                                    ? double.tryParse(temp)
-                                    : null,
-                                respiratoryRate: (rr != '-' && rr != ' ')
-                                    ? int.tryParse(rr)
-                                    : null,
-                                systolicBp: (sBp != '-' && sBp != ' ')
-                                    ? int.tryParse(sBp)
-                                    : null,
-                                spo2: (spO2 != '-' && spO2 != ' ')
-                                    ? int.tryParse(spO2)
-                                    : null,
-                                urine: (urine != '-' && urine != ' ')
-                                    ? int.tryParse(urine)
-                                    : null);
+                              consciousness: conscious,
+                              heartRate:
+                                  (hr != '-' && hr != ' ')
+                                      ? int.tryParse(hr)
+                                      : null,
+                              temperature:
+                                  (temp != '-' && temp != ' ')
+                                      ? double.tryParse(temp)
+                                      : null,
+                              respiratoryRate:
+                                  (rr != '-' && rr != ' ')
+                                      ? int.tryParse(rr)
+                                      : null,
+                              systolicBp:
+                                  (sBp != '-' && sBp != ' ')
+                                      ? int.tryParse(sBp)
+                                      : null,
+                              spo2:
+                                  (spO2 != '-' && spO2 != ' ')
+                                      ? int.tryParse(spO2)
+                                      : null,
+                              urine:
+                                  (urine != '-' && urine != ' ')
+                                      ? int.tryParse(urine)
+                                      : null,
+                            );
 
                             Navigator.pop(context);
                             showResultDialog(context, MEWs);
@@ -567,7 +685,9 @@ class _MEWsFormsState extends State<MEWsForms> {
                           child: Text(
                             'calculate'.tr(),
                             style: const TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                       ],
@@ -592,7 +712,7 @@ class _MEWsFormsState extends State<MEWsForms> {
               Navigator.of(context).pop();
             },
           ),
-        )
+        ),
       ],
     );
   }
