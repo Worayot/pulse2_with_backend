@@ -32,10 +32,10 @@ class UserServices {
 
   //! Not tested
   Future<bool> getUsersList(String userId) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/$userId');
+    final url = Uri.parse('$baseUrl/sett-fetch/users_load/$userId');
 
     try {
-      final response = await http.post(
+      final response = await http.get(
         url,
         headers: {"Content-Type": "application/json"},
         // body: jsonEncode(parameters),
@@ -63,6 +63,78 @@ class UserServices {
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(user),
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully received note: ${response.body}");
+        return true; // Success
+      } else {
+        print("Failed to receive note: ${response.body}");
+        return false; // Failure
+      }
+    } catch (e) {
+      print("Error getting note: $e");
+      return false;
+    }
+  }
+
+  //! Not tested
+  Future<bool> getUserData(String userId) async {
+    final url = Uri.parse('$baseUrl/sett-fetch/get_user_data/$userId');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {"Content-Type": "application/json"},
+        // body: jsonEncode(user),
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully received note: ${response.body}");
+        return true; // Success
+      } else {
+        print("Failed to receive note: ${response.body}");
+        return false; // Failure
+      }
+    } catch (e) {
+      print("Error getting note: $e");
+      return false;
+    }
+  }
+
+  //! Not tested
+  Future<bool> saveUserData(String userId, User user) async {
+    final url = Uri.parse('$baseUrl/sett-fetch/save_user/$userId');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(user),
+      );
+
+      if (response.statusCode == 200) {
+        print("Successfully received note: ${response.body}");
+        return true; // Success
+      } else {
+        print("Failed to receive note: ${response.body}");
+        return false; // Failure
+      }
+    } catch (e) {
+      print("Error getting note: $e");
+      return false;
+    }
+  }
+
+  //! Not tested
+  Future<bool> deleteUser(String userId) async {
+    final url = Uri.parse('$baseUrl/sett-fetch/del_user/$userId');
+
+    try {
+      final response = await http.delete(
+        url,
+        headers: {"Content-Type": "application/json"},
+        // body: jsonEncode(user),
       );
 
       if (response.statusCode == 200) {

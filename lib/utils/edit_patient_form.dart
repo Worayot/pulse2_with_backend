@@ -15,15 +15,16 @@ class EditPatientForm extends StatefulWidget {
   final String hn;
   final String bedNum;
   final String ward;
-  const EditPatientForm(
-      {super.key,
-      required this.name,
-      required this.surname,
-      required this.age,
-      required this.gender,
-      required this.hn,
-      required this.bedNum,
-      required this.ward});
+  const EditPatientForm({
+    super.key,
+    required this.name,
+    required this.surname,
+    required this.age,
+    required this.gender,
+    required this.hn,
+    required this.bedNum,
+    required this.ward,
+  });
 
   @override
   State<EditPatientForm> createState() => _EditPatientFormState();
@@ -124,7 +125,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     Text(
                       "editPatientData".tr(),
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 20),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
                     ),
                     const Spacer(),
                     IconButton(
@@ -150,21 +153,23 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         Expanded(
                           child: SizedBox(
                             child: infoTextField(
-                                title: "name".tr(),
-                                fontSize: tws.getInfoBoxTextSize(),
-                                controller: nameController,
-                                boxColor: const Color(0xffE0EAFF),
-                                minWidth: 140),
+                              title: "name".tr(),
+                              fontSize: tws.getInfoBoxTextSize(),
+                              controller: nameController,
+                              boxColor: const Color(0xffE0EAFF),
+                              minWidth: 140,
+                            ),
                           ),
                         ),
                         Expanded(
                           child: SizedBox(
                             child: infoTextField(
-                                title: "surname".tr(),
-                                fontSize: tws.getInfoBoxTextSize(),
-                                controller: surnameController,
-                                boxColor: const Color(0xffE0EAFF),
-                                minWidth: 140),
+                              title: "surname".tr(),
+                              fontSize: tws.getInfoBoxTextSize(),
+                              controller: surnameController,
+                              boxColor: const Color(0xffE0EAFF),
+                              minWidth: 140,
+                            ),
                           ),
                         ),
                       ],
@@ -175,11 +180,12 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         Expanded(
                           child: SizedBox(
                             child: infoTextField(
-                                title: "age".tr(),
-                                fontSize: tws.getInfoBoxTextSize(),
-                                controller: ageController,
-                                boxColor: const Color(0xffE0EAFF),
-                                minWidth: 140),
+                              title: "age".tr(),
+                              fontSize: tws.getInfoBoxTextSize(),
+                              controller: ageController,
+                              boxColor: const Color(0xffE0EAFF),
+                              minWidth: 140,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -204,21 +210,23 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         Expanded(
                           child: SizedBox(
                             child: infoTextField(
-                                title: "hnNo".tr(),
-                                fontSize: tws.getInfoBoxTextSize(),
-                                controller: hnController,
-                                boxColor: const Color(0xffE0EAFF),
-                                minWidth: 140),
+                              title: "hnNo".tr(),
+                              fontSize: tws.getInfoBoxTextSize(),
+                              controller: hnController,
+                              boxColor: const Color(0xffE0EAFF),
+                              minWidth: 140,
+                            ),
                           ),
                         ),
                         Expanded(
                           child: SizedBox(
                             child: infoTextField(
-                                title: "bedNumber".tr(),
-                                fontSize: tws.getInfoBoxTextSize(),
-                                controller: bedNumController,
-                                boxColor: const Color(0xffE0EAFF),
-                                minWidth: 140),
+                              title: "bedNumber".tr(),
+                              fontSize: tws.getInfoBoxTextSize(),
+                              controller: bedNumController,
+                              boxColor: const Color(0xffE0EAFF),
+                              minWidth: 140,
+                            ),
                           ),
                         ),
                       ],
@@ -226,11 +234,12 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     SizedBox(
                       width: double.infinity,
                       child: infoTextField(
-                          title: "ward".tr(),
-                          fontSize: tws.getInfoBoxTextSize(),
-                          controller: wardController,
-                          boxColor: const Color(0xffE0EAFF),
-                          minWidth: 140),
+                        title: "ward".tr(),
+                        fontSize: tws.getInfoBoxTextSize(),
+                        controller: wardController,
+                        boxColor: const Color(0xffE0EAFF),
+                        minWidth: 140,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -244,17 +253,22 @@ class _EditPatientFormState extends State<EditPatientForm> {
                               return const CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text(
-                                  'Error loading role: ${snapshot.error}');
+                                'Error loading role: ${snapshot.error}',
+                              );
                             } else if (snapshot.data == "admin") {
                               return TextButton(
                                 onPressed: () async {
                                   bool result = await showWarningDialog(
-                                      context); // Wait for user choice
+                                    context,
+                                  ); // Wait for user choice
                                   if (result) {
                                     print(
-                                        "✅ User confirmed: Deleting patient...");
+                                      "✅ User confirmed: Deleting patient...",
+                                    );
+                                    //!
                                     Navigator.pop(
-                                        context); // Only pop if it makes sense in this context
+                                      context,
+                                    ); // Only pop if it makes sense in this context
                                     // TODO: Add actual deletion logic here
                                   } else {
                                     print("❌ User canceled deletion.");
@@ -290,19 +304,25 @@ class _EditPatientFormState extends State<EditPatientForm> {
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
                             onPressed: submitData,
-                            label: Text('save'.tr(),
-                                style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
+                            label: Text(
+                              'save'.tr(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xff407BFF),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      12), // Set border radius
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20)),
+                              backgroundColor: const Color(0xff407BFF),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  12,
+                                ), // Set border radius
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),

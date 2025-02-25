@@ -20,7 +20,6 @@ class _PatientInSystemState extends State<PatientInSystem> {
   final List<bool> _isExpanded = [];
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  List<Map<String, dynamic>> _allPatients = [];
   List<dynamic> monitoredPatientIDs = [];
 
   @override
@@ -186,6 +185,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
             const SizedBox(height: 8),
             Expanded(
               child: StreamBuilder<List<Map<String, dynamic>>>(
+                // child: StreamBuilder<QuerySnapshot>(
                 stream: getPatientsStream(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

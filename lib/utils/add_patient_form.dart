@@ -40,16 +40,16 @@ class _AddPatientFormState extends State<AddPatientForm> {
       );
 
       bool success = await _patientService.addPatient(patient);
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Patient added successfully!")),
-        );
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Failed to add patient.")));
-      }
+      // if (success) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(content: Text("Patient added successfully!")),
+      //   );
+      //   Navigator.pop(context);
+      // } else {
+      //   ScaffoldMessenger.of(
+      //     context,
+      //   ).showSnackBar(const SnackBar(content: Text("Failed to add patient.")));
+      // }
     }
   }
 
