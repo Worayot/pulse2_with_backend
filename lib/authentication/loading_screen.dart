@@ -1,39 +1,78 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pulse/authentication/login.dart';
 import 'package:pulse/func/pref/pref.dart';
 import 'package:pulse/mainpage/navigation.dart';
+import 'package:pulse/services/user_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoadingScreen extends StatefulWidget {
-  const LoadingScreen({super.key});
+  final String userId;
+  final String password;
+  const LoadingScreen({
+    super.key,
+    required this.userId,
+    required this.password,
+  });
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  final storage = FlutterSecureStorage();
+
+  Map<String, dynamic>? accountData = {};
   @override
   void initState() {
     super.initState();
     // Save preferences and navigate once done
-    _savePreferences();
+    _initialize();
   }
 
-  // Function to save preferences and navigate
+  Future<void> _initialize() async {
+    await fetchUserAccount();
+    await _savePreferences();
+  }
+
+  Future<void> fetchUserAccount() async {
+    UserServices userServices = UserServices();
+    accountData = await userServices.loadAccount(widget.userId);
+
+    if (accountData != null) {
+      print("Successfully loaded account data.");
+    } else {
+      print("Failed to load account data.");
+    }
+  }
+
+  // Save encrypted password
+  Future<void> savePassword(String password) async {
+    await storage.write(key: 'password', value: password);
+  }
+
   Future<void> _savePreferences() async {
-    //! Change values to database's values
-    await saveStringPreference('name', 'วรยศ เลี่ยมแก้ว', context);
-    await saveStringPreference('nurseID', '000001', context);
-    await saveStringPreference('role', 'admin', context);
-    // await saveStringPreference('role', 'nurse', context);
-    // await Future.delayed(Duration(seconds: 5));
-    // Navigate after preferences have been saved
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const NavigationPage()),
-      (route) => false, // Remove all previous routes
-    );
+    if (accountData != null && accountData!.isNotEmpty) {
+      await saveStringPreference('fullname', accountData!['fullname'], context);
+      await saveStringPreference('nurseID', accountData!['uid'], context);
+      await saveStringPreference('role', accountData!['role'], context);
+      await savePassword(widget.password);
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const NavigationPage()),
+        (route) => false,
+      );
+    } else {
+      print("Error loading user's data");
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -68,7 +107,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
                               child: const LinearProgressIndicator(
                                 minHeight: 10,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                    Color(0xff1125A4)),
+                                  Color(0xff1125A4),
+                                ),
                                 backgroundColor: Color(0xffB0D3EF),
                               ),
                             ),
@@ -91,12 +131,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   Text(
                     '${'welcome'.tr()}!',
                     style: const TextStyle(
-                        fontSize: 28, fontWeight: FontWeight.bold),
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Text(
-                    name,
-                    style: const TextStyle(fontSize: 20),
-                  ),
+                  Text(name, style: const TextStyle(fontSize: 20)),
                 ],
               ),
               Positioned(

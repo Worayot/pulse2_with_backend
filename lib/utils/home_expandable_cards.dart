@@ -1,22 +1,26 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pulse/func/pref/pref.dart';
 import 'package:pulse/mainpage/patient_data/patient_ind_data.dart';
 import 'package:pulse/utils/action_button.dart';
 import 'package:pulse/utils/edit_patient_form.dart';
 import 'package:pulse/utils/patient_details.dart';
 import 'package:pulse/utils/toggle_icon_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeExpandableCards extends StatefulWidget {
   final List filteredPatients;
   final BuildContext context;
   final List isExpanded;
+  final List<bool> isPlus;
 
   const HomeExpandableCards({
     super.key,
     required this.filteredPatients,
     required this.context,
     required this.isExpanded,
+    required this.isPlus,
   });
 
   @override
@@ -25,7 +29,13 @@ class HomeExpandableCards extends StatefulWidget {
 
 class _HomeExpandableCardsState extends State<HomeExpandableCards> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    List<bool> isPlus = widget.isPlus;
     Size size = MediaQuery.of(context).size;
     List isExpanded = widget.isExpanded;
     List filteredPatients = widget.filteredPatients;
@@ -41,12 +51,8 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
         String hn = patient["hospital_number"];
         String bedNum = patient["bed_number"];
         String ward = patient["ward"];
-        // String MEWs = patient.MEWs.toString();
         String MEWs = patient["MEWs"] ?? '-';
         String pId = patient['patient_id'];
-        // String time = DateFormat(
-        //   'dd/MM/yyyy HH.mm',
-        // ).format(patient.lastUpdate);
         String time = patient['inspectionTime'];
 
         return Padding(
@@ -107,8 +113,6 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                       child: IgnorePointer(
                         child: Image.asset(
                           "assets/images/therapy3.png",
-                          // width: 100, // Adjust the image size
-                          // height: 100, // Adjust the image size
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -144,12 +148,9 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                             Shadow(
                                               color: Colors.black.withOpacity(
                                                 0.25,
-                                              ), // Shadow color with opacity
-                                              offset: const Offset(
-                                                0.8,
-                                                0.8,
-                                              ), // Horizontal and vertical offset
-                                              blurRadius: 1, // Blur radius
+                                              ),
+                                              offset: const Offset(0.8, 0.8),
+                                              blurRadius: 1,
                                             ),
                                           ],
                                         ),
@@ -165,8 +166,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                               ),
                                             ),
                                             TextSpan(
-                                              text:
-                                                  bedNum, // Another styled text
+                                              text: bedNum,
                                               style: const TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.bold,
@@ -186,23 +186,16 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                 ),
                                 ToggleIconButton(
                                   addPatientFunc: () async {
-                                    // await addPatientID(pId);
-                                    setState(
-                                      () {},
-                                    ); // Force a rebuild after adding
+                                    await addPatientID(pId);
+                                    setState(() {});
                                     print('Added $pId');
                                   },
                                   removePatientFunc: () async {
-                                    // await removePatientID(pId);
-                                    setState(
-                                      () {},
-                                    ); // Force a rebuild after removal
+                                    await removePatientID(pId);
+                                    setState(() {});
                                     print('Removed $pId');
                                   },
-                                  buttonState: true,
-                                  // monitoredPatientIDs.contains(pId)
-                                  //     ? false
-                                  //     : true,
+                                  buttonState: isPlus[index],
                                 ),
                                 const SizedBox(width: 8),
                                 buildActionButton(
@@ -222,6 +215,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return EditPatientForm(
+                                            patientId: pId,
                                             name: name,
                                             surname: surname,
                                             age: age,
@@ -234,28 +228,24 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                       );
                                     },
                                     style: OutlinedButton.styleFrom(
-                                      backgroundColor:
-                                          Colors.white, // White background
+                                      backgroundColor: Colors.white,
                                       side: const BorderSide(
                                         color: Colors.white,
-                                      ), // Blue border
+                                      ),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          8,
-                                        ), // Rounded corners
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 2,
                                         vertical: 4,
-                                      ), // Padding
+                                      ),
                                     ),
                                     child: Text(
                                       "edit".tr(),
                                       style: const TextStyle(
-                                        color: Color(0xff3362CC), // Blue text
-                                        fontSize: 16, // Font size
-                                        fontWeight:
-                                            FontWeight.bold, // Font weight
+                                        color: Color(0xff3362CC),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
@@ -282,15 +272,13 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                           isExpanded[index] = !isExpanded[index];
                         });
                       },
-                    ), // This stays in place
+                    ),
                     Icon(
                       isExpanded[index] ? Icons.expand_less : Icons.expand_more,
                     ),
                   ],
                 ),
               ),
-
-              // Assess Text and Icon
             ],
           ),
         );

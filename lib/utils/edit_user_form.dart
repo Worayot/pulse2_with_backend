@@ -1,48 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pulse/models/user.dart';
+import 'package:pulse/services/user_services.dart';
 import 'package:pulse/universal_setting/sizes.dart';
 import 'package:pulse/utils/info_text_field.dart';
 
-class User {
-  final String name;
-  final String surname;
-  final String nurseID;
-  final String role;
-
-  User(
-      {required this.name,
-      required this.surname,
-      required this.nurseID,
-      required this.role});
-}
-
 class EditUserForm extends StatefulWidget {
-  const EditUserForm({super.key});
+  final User user;
+  const EditUserForm({super.key, required this.user});
 
   @override
   State<EditUserForm> createState() => _EditUserFormState();
 }
 
 class _EditUserFormState extends State<EditUserForm> {
-  User user = User(
-      name: "Worayot", surname: "Liamkaew", nurseID: "1000", role: "Admin");
-
   final TextEditingController nameController = TextEditingController(text: "");
-  final TextEditingController surnameController =
-      TextEditingController(text: "");
-  final TextEditingController nurseIDController =
-      TextEditingController(text: "");
+  final TextEditingController surnameController = TextEditingController(
+    text: "",
+  );
+  final TextEditingController nurseIDController = TextEditingController(
+    text: "",
+  );
 
   String selectedRole = '';
 
   @override
   void initState() {
     super.initState();
-    nameController.text = user.name;
-    surnameController.text = user.surname;
-    nurseIDController.text = user.nurseID;
-    selectedRole = user.role; // Initialize selectedRole in initState
+    User user = widget.user;
+    List<String> nameParts = user.fullname.split(' ');
+    nameController.text = nameParts[0];
+    surnameController.text = nameParts[1];
+    nurseIDController.text = user.nurseId;
+    String role = user.role;
+    if (role.isNotEmpty) {
+      if (role == 'user') {
+        selectedRole = 'Nurse';
+      } else {
+        selectedRole = 'Admin';
+      }
+    }
+    // selectedRole = user.role;
   }
 
   @override
@@ -81,6 +80,14 @@ class _EditUserFormState extends State<EditUserForm> {
       );
       return;
     } else {
+      User newUserData = User(
+        fullname: '$name $surname',
+        nurseId: nurseID,
+        password: widget.user.password,
+        role: selectedRole,
+      );
+      UserServices().saveUserData(widget.user.nurseId, newUserData);
+
       Navigator.pop(context);
     }
   }
@@ -107,7 +114,9 @@ class _EditUserFormState extends State<EditUserForm> {
                     Text(
                       "editUserData".tr(),
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 20),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
                     ),
                     const Spacer(),
                     IconButton(
@@ -133,20 +142,22 @@ class _EditUserFormState extends State<EditUserForm> {
                         SizedBox(
                           width: size.width / 2 - size.width / 8 - 6,
                           child: infoTextField(
-                              title: "name".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: nameController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140),
+                            title: "name".tr(),
+                            fontSize: tws.getInfoBoxTextSize(),
+                            controller: nameController,
+                            boxColor: const Color(0xffE0EAFF),
+                            minWidth: 140,
+                          ),
                         ),
                         SizedBox(
                           width: size.width / 2 - size.width / 8 - 6,
                           child: infoTextField(
-                              title: "surname".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: surnameController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140),
+                            title: "surname".tr(),
+                            fontSize: tws.getInfoBoxTextSize(),
+                            controller: surnameController,
+                            boxColor: const Color(0xffE0EAFF),
+                            minWidth: 140,
+                          ),
                         ),
                       ],
                     ),
@@ -190,8 +201,9 @@ class _EditUserFormState extends State<EditUserForm> {
                             ),
                             labelText:
                                 selectedRole.isEmpty ? 'selectRole'.tr() : "",
-                            labelStyle:
-                                TextStyle(fontSize: tws.getInfoBoxTextSize()),
+                            labelStyle: TextStyle(
+                              fontSize: tws.getInfoBoxTextSize(),
+                            ),
                           ),
                           items: [
                             DropdownMenuItem(
@@ -227,30 +239,35 @@ class _EditUserFormState extends State<EditUserForm> {
                     SizedBox(
                       width: double.infinity,
                       child: infoTextField(
-                          title: "nurseID".tr(),
-                          fontSize: tws.getInfoBoxTextSize(),
-                          controller: nurseIDController,
-                          boxColor: const Color(0xffE0EAFF),
-                          minWidth: 140),
+                        title: "nurseID".tr(),
+                        fontSize: tws.getInfoBoxTextSize(),
+                        controller: nurseIDController,
+                        boxColor: const Color(0xffE0EAFF),
+                        minWidth: 140,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerRight,
                       child: ElevatedButton.icon(
                         onPressed: submitData,
-                        label: Text('save'.tr(),
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
+                        label: Text(
+                          'save'.tr(),
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff407BFF),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  12), // Set border radius
-                            ),
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20)),
+                          backgroundColor: const Color(0xff407BFF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              12,
+                            ), // Set border radius
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                        ),
                       ),
                     ),
                   ],

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pulse/models/patient.dart';
+import 'package:pulse/services/patient_services.dart';
 import 'package:pulse/universal_setting/sizes.dart';
 import 'package:pulse/func/pref/pref.dart';
 import 'package:pulse/utils/gender_dropdown.dart';
 import 'package:pulse/utils/info_text_field.dart';
 import 'package:pulse/utils/warning_dialog.dart';
+// import 'package:pulse/services/'
 
 class EditPatientForm extends StatefulWidget {
+  final String patientId;
   final String name;
   final String surname;
   final String age;
@@ -17,6 +21,7 @@ class EditPatientForm extends StatefulWidget {
   final String ward;
   const EditPatientForm({
     super.key,
+    required this.patientId,
     required this.name,
     required this.surname,
     required this.age,
@@ -65,7 +70,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
     super.dispose();
   }
 
-  void submitData() {
+  Future<void> submitData() async {
     String name = nameController.text.trim();
     String surname = surnameController.text.trim();
     String age = ageController.text.trim();
@@ -90,7 +95,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(true); // User confirmed
+                  Navigator.of(context).pop(true);
                 },
                 child: Text("ok".tr()),
               ),
@@ -100,13 +105,24 @@ class _EditPatientFormState extends State<EditPatientForm> {
       );
       return;
     } else {
+      PatientService patientService = PatientService();
+      Patient patient = Patient(
+        patientId: widget.patientId,
+        fullname: '$name $surname',
+        age: age,
+        gender: _selectedGender ?? 'N/A',
+        bedNumber: bedNum,
+        ward: ward,
+        hospitalNumber: hn,
+      );
+
+      patientService.updatePatient(widget.patientId, patient);
       Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.sizeOf(context);
     TextWidgetSize tws = TextWidgetSize(context: context);
     return Dialog(
       child: Container(
@@ -262,16 +278,21 @@ class _EditPatientFormState extends State<EditPatientForm> {
                                     context,
                                   ); // Wait for user choice
                                   if (result) {
-                                    print(
-                                      "✅ User confirmed: Deleting patient...",
+                                    // print(
+                                    //   "✅ User confirmed: Deleting patient...",
+                                    // );
+                                    await removePatientID(widget.patientId);
+                                    PatientService patientService =
+                                        PatientService();
+                                    patientService.deletePatient(
+                                      widget.patientId,
                                     );
-                                    //!
+                                    // await deleteUser();
                                     Navigator.pop(
                                       context,
                                     ); // Only pop if it makes sense in this context
-                                    // TODO: Add actual deletion logic here
                                   } else {
-                                    print("❌ User canceled deletion.");
+                                    // print("❌ User canceled deletion.");
                                   }
                                 },
                                 child: Text(

@@ -37,9 +37,9 @@ Future<Map<String, dynamic>> fetchLatestPatientData(String patientId) async {
                 mewsDoc.data() as Map<String, dynamic>;
             return {'mews': mewsData['mews'] ?? '-', 'time': formattedTime};
           } else {
-            print(
-              'Patient ID: $patientId, No MEWS document found with ID: $mewsId',
-            );
+            // print(
+            //   'Patient ID: $patientId, No MEWS document found with ID: $mewsId',
+            // );
             return {'mews': '-', 'time': formattedTime};
           }
         } catch (mewsError) {
@@ -53,7 +53,7 @@ Future<Map<String, dynamic>> fetchLatestPatientData(String patientId) async {
         return {'mews': '-', 'time': formattedTime};
       }
     } else {
-      print('Patient ID: $patientId, No note data found.');
+      // print('Patient ID: $patientId, No note data found.');
       return {'mews': '-', 'time': '-'};
     }
   } catch (noteError) {

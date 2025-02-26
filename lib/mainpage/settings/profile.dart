@@ -1,6 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pulse/models/user.dart';
+import 'package:pulse/services/user_services.dart';
 import 'package:pulse/utils/custom_header.dart';
 import 'package:pulse/func/pref/pref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,13 +37,17 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   Future<void> _loadProfileData() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _name = prefs.getString('name') ?? "N/A";
-      _role = prefs.getString('role') ?? "N/A";
-      _password = prefs.getString('password') ?? "N/A";
-      _nurseID = prefs.getString('nurseID') ?? "N/A";
+    final storage = FlutterSecureStorage();
 
-      // Initialize the controllers with saved data
+    String? storedPassword = await storage.read(key: 'password'); // Await here
+
+    setState(() {
+      _name = prefs.getString('fullname') ?? "N/A";
+      _role = prefs.getString('role') ?? "N/A";
+      _nurseID = prefs.getString('nurseID') ?? "N/A";
+      _password = storedPassword ?? ""; // Handle null case
+
+      // Initialize controllers with saved data
       _nameController.text = _name;
       _passwordController.text = _password;
     });
@@ -52,16 +59,36 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   // }
 
   void _toggleEditMode(String field) {
+    UserServices userServices = UserServices();
     setState(() {
       if (field == 'name') {
         _isEditingName = !_isEditingName;
         if (!_isEditingName) {
           _saveName('name', _nameController.text);
+          userServices.saveUserData(
+            _nurseID,
+            User(
+              fullname: _name,
+              nurseId: _nurseID,
+              password: _password,
+              role: _role,
+            ),
+          );
         }
       } else if (field == 'password') {
         _isEditingPassword = !_isEditingPassword;
         if (!_isEditingPassword) {
           _savePassword('password', _passwordController.text);
+
+          userServices.saveUserData(
+            _nurseID,
+            User(
+              fullname: _name,
+              nurseId: _nurseID,
+              password: _password,
+              role: _role,
+            ),
+          );
         }
       }
     });
@@ -150,11 +177,14 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                       const SizedBox(height: 16),
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 35), // White box outer padding
+                          horizontal: 35,
+                        ), // White box outer padding
                         child: Container(
                           height: size.height * 0.5,
                           padding: const EdgeInsets.symmetric(
-                              vertical: 12.0, horizontal: 10),
+                            vertical: 12.0,
+                            horizontal: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.75),
                             borderRadius: BorderRadius.circular(12),
@@ -175,7 +205,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   onTap: () => _toggleEditMode('name'),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
+                                      vertical: 8.0,
+                                    ),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -188,57 +219,67 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                               Text(
                                                 'name-surname'.tr(),
                                                 style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
                                               ),
                                               const SizedBox(height: 4),
                                               SizedBox(
                                                 height: 20,
-                                                child: _isEditingName
-                                                    ? TextField(
-                                                        controller:
-                                                            _nameController,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          border:
-                                                              UnderlineInputBorder(),
-                                                          contentPadding:
-                                                              EdgeInsets.only(
-                                                                  bottom: 13),
-                                                        ),
-                                                      )
-                                                    : Text(
-                                                        _name,
-                                                        style: const TextStyle(
+                                                child:
+                                                    _isEditingName
+                                                        ? TextField(
+                                                          controller:
+                                                              _nameController,
+                                                          decoration: const InputDecoration(
+                                                            border:
+                                                                UnderlineInputBorder(),
+                                                            contentPadding:
+                                                                EdgeInsets.only(
+                                                                  bottom: 13,
+                                                                ),
+                                                          ),
+                                                        )
+                                                        : Text(
+                                                          _name,
+                                                          style: const TextStyle(
                                                             fontSize: 16,
                                                             color:
-                                                                Colors.black54),
-                                                      ),
-                                              )
+                                                                Colors.black54,
+                                                          ),
+                                                        ),
+                                              ),
                                             ],
                                           ),
                                         ),
                                         Align(
                                           alignment: Alignment.centerRight,
-                                          child: _isEditingName
-                                              ? Transform.translate(
-                                                  offset: const Offset(8.0,
-                                                      0.0), // Move 8 pixels to the right
-                                                  child: IconButton(
-                                                    onPressed: () => _saveName(
-                                                        'name',
-                                                        _nameController.text),
-                                                    icon: const Icon(
+                                          child:
+                                              _isEditingName
+                                                  ? Transform.translate(
+                                                    offset: const Offset(
+                                                      8.0,
+                                                      0.0,
+                                                    ), // Move 8 pixels to the right
+                                                    child: IconButton(
+                                                      onPressed:
+                                                          () => _saveName(
+                                                            'name',
+                                                            _nameController
+                                                                .text,
+                                                          ),
+                                                      icon: const Icon(
                                                         FontAwesomeIcons
-                                                            .chevronRight),
+                                                            .chevronRight,
+                                                      ),
+                                                      color: Colors.black,
+                                                    ),
+                                                  )
+                                                  : const Icon(
+                                                    Icons.edit,
                                                     color: Colors.black,
                                                   ),
-                                                )
-                                              : const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.black,
-                                                ),
                                         ),
                                       ],
                                     ),
@@ -250,7 +291,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   onTap: () => _toggleEditMode('password'),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
+                                      vertical: 8.0,
+                                    ),
                                     child: Row(
                                       children: [
                                         Expanded(
@@ -261,60 +303,69 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                               Text(
                                                 'password'.tr(),
                                                 style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
                                               ),
                                               const SizedBox(height: 4),
                                               SizedBox(
                                                 height: 20,
-                                                child: _isEditingPassword
-                                                    ? TextField(
-                                                        controller:
-                                                            _passwordController,
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          border:
-                                                              UnderlineInputBorder(),
-                                                          contentPadding:
-                                                              EdgeInsets.only(
-                                                                  bottom: 13),
-                                                        ),
-                                                      )
-                                                    : Text(
-                                                        _password,
-                                                        style: const TextStyle(
-                                                            fontSize: 16,
+                                                child:
+                                                    _isEditingPassword
+                                                        ? TextField(
+                                                          controller:
+                                                              _passwordController,
+                                                          decoration: const InputDecoration(
+                                                            border:
+                                                                UnderlineInputBorder(),
+                                                            contentPadding:
+                                                                EdgeInsets.only(
+                                                                  bottom: 13,
+                                                                ),
+                                                          ),
+                                                        )
+                                                        : Text(
+                                                          '*' *
+                                                              _password.length,
+                                                          style: const TextStyle(
+                                                            fontSize: 20,
                                                             color:
-                                                                Colors.black54),
-                                                      ),
-                                              )
+                                                                Colors.black54,
+                                                          ),
+                                                        ),
+                                              ),
                                             ],
                                           ),
                                         ),
                                         // Align icons
                                         Align(
                                           alignment: Alignment.centerRight,
-                                          child: _isEditingPassword
-                                              ? Transform.translate(
-                                                  offset: const Offset(8.0,
-                                                      0.0), // Move 8 pixels to the right
-                                                  child: IconButton(
-                                                    onPressed: () =>
-                                                        _savePassword(
+                                          child:
+                                              _isEditingPassword
+                                                  ? Transform.translate(
+                                                    offset: const Offset(
+                                                      8.0,
+                                                      0.0,
+                                                    ), // Move 8 pixels to the right
+                                                    child: IconButton(
+                                                      onPressed:
+                                                          () => _savePassword(
                                                             'password',
                                                             _passwordController
-                                                                .text),
-                                                    icon: const Icon(
+                                                                .text,
+                                                          ),
+                                                      icon: const Icon(
                                                         FontAwesomeIcons
-                                                            .chevronRight),
+                                                            .chevronRight,
+                                                      ),
+                                                      color: Colors.black,
+                                                    ),
+                                                  )
+                                                  : const Icon(
+                                                    Icons.edit,
                                                     color: Colors.black,
                                                   ),
-                                                )
-                                              : const Icon(
-                                                  Icons.edit,
-                                                  color: Colors.black,
-                                                ),
                                         ),
                                       ],
                                     ),
@@ -332,16 +383,18 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           Text(
                                             'role'.tr(),
                                             style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
                                           ),
                                           const SizedBox(height: 4),
                                           Text(
                                             _role.tr(),
                                             style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black54),
+                                              fontSize: 16,
+                                              color: Colors.black54,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -349,7 +402,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                   ],
                                 ),
                                 const SizedBox(height: 9), // Adjusted spacing
-
                                 // Nurse ID
                                 Row(
                                   children: [
@@ -361,17 +413,20 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                           Text(
                                             'nurseID'.tr(),
                                             style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black),
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
                                           ),
                                           const SizedBox(
-                                              height: 4), // Balanced spacing
+                                            height: 4,
+                                          ), // Balanced spacing
                                           Text(
                                             _nurseID,
                                             style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black54),
+                                              fontSize: 16,
+                                              color: Colors.black54,
+                                            ),
                                           ),
                                         ],
                                       ),

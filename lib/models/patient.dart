@@ -46,4 +46,18 @@ class Patient {
       'patient_id': patientId,
     };
   }
+
+  @override
+  String toString() {
+    return 'Patient { '
+        'fullname: $fullname, '
+        'age: $age, '
+        'bedNumber: $bedNumber, '
+        'gender: $gender, '
+        'ward: $ward, '
+        'hospitalNumber: $hospitalNumber, '
+        'patientId: $patientId, '
+        'createdAt: $createdAt '
+        '}';
+  }
 }

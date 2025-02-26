@@ -1,36 +1,35 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:pulse/models.dart/note.dart';
-import 'package:pulse/models.dart/parameters.dart';
-import '../models.dart/user.dart';
+import 'package:pulse/models/note.dart';
+import 'package:pulse/models/parameters.dart';
+import '../models/user.dart';
 import 'url.dart';
 
 class UserServices {
-  //! Not tested
-  Future<bool> loadAccount(String userId) async {
+  //* Tested
+  Future<Map<String, dynamic>?> loadAccount(String userId) async {
     final url = Uri.parse('$baseUrl/sett-fetch/account_load/$userId');
 
     try {
       final response = await http.get(
         url,
         headers: {"Content-Type": "application/json"},
-        // body: jsonEncode(patientId),
       );
 
       if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
-        return true; // Success
+        print("Successfully received response: ${response.body}");
+        return jsonDecode(response.body); // Return parsed JSON data
       } else {
-        print("Failed to receive note: ${response.body}");
-        return false; // Failure
+        print("Failed to receive data: ${response.body}");
+        return null; // Return null if failed
       }
     } catch (e) {
-      print("Error getting note: $e");
-      return false;
+      print("Error getting account data: $e");
+      return null;
     }
   }
 
-  //! Not tested
+  //! Not tested, Won't be used
   Future<bool> getUsersList(String userId) async {
     final url = Uri.parse('$baseUrl/sett-fetch/users_load/$userId');
 
@@ -56,7 +55,7 @@ class UserServices {
 
   //! Not tested
   Future<bool> addUser(User user) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/add_notes');
+    final url = Uri.parse('$baseUrl/sett-fetch/add_user');
 
     try {
       final response = await http.post(
@@ -78,7 +77,7 @@ class UserServices {
     }
   }
 
-  //! Not tested
+  //? May not be used.
   Future<bool> getUserData(String userId) async {
     final url = Uri.parse('$baseUrl/sett-fetch/get_user_data/$userId');
 
@@ -102,22 +101,29 @@ class UserServices {
     }
   }
 
-  //! Not tested
-  Future<bool> saveUserData(String userId, User user) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/save_user/$userId');
+  //! Error
+  saveUserData(String userId, User user) async {
+    final url = Uri.parse('$baseUrl/sett-fetch/save_user');
+
+    print(user);
 
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(user),
+
+        // body: jsonEncode(user.toJson()),
+        body: jsonEncode({
+          'user': user.toJson(),
+          'user_id': userId, // Added userId to request body
+        }),
       );
 
       if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
+        print("Successfully edited user's data: ${response.body}");
         return true; // Success
       } else {
-        print("Failed to receive note: ${response.body}");
+        print("Failed to edit user's data: ${response.body}");
         return false; // Failure
       }
     } catch (e) {
@@ -126,7 +132,7 @@ class UserServices {
     }
   }
 
-  //! Not tested
+  //* Tested
   Future<bool> deleteUser(String userId) async {
     final url = Uri.parse('$baseUrl/sett-fetch/del_user/$userId');
 

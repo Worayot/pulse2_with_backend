@@ -1,9 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:pulse/models/patient.dart';
+import 'package:pulse/services/patient_services.dart';
 import 'package:pulse/universal_setting/sizes.dart';
 import 'package:pulse/func/get_color.dart';
 import 'package:pulse/mainpage/patient_data/no_patient_screen.dart';
@@ -11,19 +14,7 @@ import 'package:pulse/utils/action_button.dart';
 import 'package:pulse/utils/circle_with_num.dart';
 import 'package:pulse/utils/table_row.dart';
 import 'package:pulse/utils/time_manager.dart';
-
-class Patient {
-  final String name;
-  final String surname;
-  final DateTime? nextMonitoring;
-  final List<Map<String, dynamic>>? previousData;
-
-  Patient(
-      {required this.name,
-      required this.surname,
-      this.nextMonitoring,
-      this.previousData});
-}
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientPage extends StatefulWidget {
   const PatientPage({super.key});
@@ -33,83 +24,117 @@ class PatientPage extends StatefulWidget {
 }
 
 class _PatientPageState extends State<PatientPage> {
-  final List<Patient> _patients = [
-    Patient(
-        name: "Mike",
-        surname: "Johnson",
-        nextMonitoring: DateTime.now(),
-        previousData: [
-          {"4:30": "2"},
-          {"5:30": "1"}
-        ]),
-    Patient(
-        name: "John",
-        surname: "Doe",
-        nextMonitoring: DateTime.now().add(const Duration(hours: 3)),
-        previousData: [
-          {"11:01": "5"},
-          {"12:30": "4"},
-          {"13:30": "3"},
-          {"14:30": "2"},
-          {"15:30": "-"}
-        ]),
-    Patient(
-        name: "Chicky",
-        surname: "The Cutie",
-        nextMonitoring: DateTime.now(),
-        previousData: [
-          {"1:30": "3"},
-        ]),
-    Patient(
-        name: "Jane",
-        surname: "Smith",
-        nextMonitoring: DateTime.now().add(const Duration(hours: 2)),
-        previousData: [
-          {"1:30": "5"},
-          {"2:30": "4"},
-          {"3:30": "-"},
-        ]),
-    Patient(
-        name: "Mike",
-        surname: "Johnson",
-        nextMonitoring: DateTime.now(),
-        previousData: []),
-    Patient(
-        name: "Mike",
-        surname: "Johnson",
-        nextMonitoring: DateTime.now(),
-        previousData: [
-          {"5:30": '-'}
-        ]),
-    Patient(
-        name: "วรยศ",
-        surname: "เลี่ยมแก้ว",
-        nextMonitoring: DateTime.now(),
-        previousData: [
-          {"1:30": "7"},
-        ]),
-    Patient(
-        name: "Hello",
-        surname: "World",
-        nextMonitoring: DateTime.now(),
-        previousData: [
-          {"3:30": "5"},
-          {"4:30": "4"},
-          {"1:30": "3"},
-          {"2:30": "2"},
-          {"3:30": "1"},
-          {"4:30": "0"},
-          {"5:30": "-"}
-        ]),
-  ];
+  final patientServices = PatientService();
+  List<Patient> _patients = [];
+  String myUserId = '';
+  Map<String, dynamic>? monitoredPatientData = {};
 
-  final List<bool> _expandedStates = [];
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      myUserId = prefs.getString('nurseID') ?? "N/A";
+    });
+  }
+
+  Future<void> fetchMonitoredPatient() async {
+    monitoredPatientData = await patientServices.getMonitoredPatient(myUserId);
+
+    if (monitoredPatientData != null) {
+      print("Successfully retrieved Monitored Patient Data.");
+    } else {
+      print("No monitored patient data available or error occurred.");
+    }
+  }
+
+  Future<List<DocumentSnapshot>> fetchPatientsFromMonitoredData(
+    Map<String, dynamic> monitoredPatientData,
+  ) async {
+    List<DocumentSnapshot> patientDocs = [];
+
+    if (monitoredPatientData['message'] == 'Links retrieved successfully' &&
+        monitoredPatientData['data'] is List) {
+      List<String> patientIds =
+          (monitoredPatientData['data'] as List)
+              .map((item) => item['data']['patient_id'].toString())
+              .toList();
+
+      try {
+        if (patientIds.isNotEmpty) {
+          QuerySnapshot querySnapshot =
+              await FirebaseFirestore.instance
+                  .collection('patients')
+                  .where(FieldPath.documentId, whereIn: patientIds)
+                  .get();
+
+          patientDocs = querySnapshot.docs;
+        } else {
+          print('No patient IDs to fetch.');
+        }
+      } catch (e) {
+        print('Error fetching patients: $e');
+      }
+    } else {
+      print('Invalid Monitored Patient Data format.');
+    }
+
+    return patientDocs;
+  }
+
+  Future<void> _initializeData() async {
+    await _loadProfileData();
+    await fetchMonitoredPatient();
+    List<DocumentSnapshot> data = await fetchPatientsFromMonitoredData(
+      monitoredPatientData!,
+    );
+    List<Patient> patients = [];
+    Patient patient;
+    for (DocumentSnapshot doc in data) {
+      // Extract data from Firestore document
+      var patientData = doc.data() as Map<String, dynamic>;
+
+      // Extract values from the data
+      String? gender = patientData['gender'];
+      String? bedNumber = patientData['bed_number'];
+      String? ward = patientData['ward'];
+      String? age = patientData['age'];
+      String? hospitalNumber = patientData['hospital_number'];
+      String? fullname = patientData['fullname'];
+      Timestamp createdAt = patientData['created_at'];
+
+      // Create a Patient instance using the extracted values
+      patient = Patient(
+        age: age ?? '', // Handle null or empty data
+        bedNumber: bedNumber ?? '',
+        fullname: fullname ?? '',
+        gender: gender ?? '',
+        ward: ward ?? '',
+        hospitalNumber: hospitalNumber ?? '',
+        createdAt:
+            createdAt.toDate().toString(), // Assuming createdAt is a Timestamp
+      );
+
+      patients.add(patient);
+    }
+    patients.sort((a, b) => a.fullname.compareTo(b.fullname));
+    setState(() {
+      _patients = patients;
+    });
+  }
+
+  List<bool> _expandedStates = [];
 
   @override
   void initState() {
     super.initState();
-    // Initialize all cards as collapsed
-    _expandedStates.addAll(List<bool>.filled(_patients.length, false));
+    _initializeData().then((_) {
+      setState(() {
+        _expandedStates = List<bool>.filled(
+          _patients.length,
+          false,
+        ); // Dynamically update expanded states
+      });
+    });
   }
 
   @override
@@ -148,11 +173,14 @@ class _PatientPageState extends State<PatientPage> {
                     Patient patient = _patients[index];
 
                     DateTime monitorTime =
-                        patient.nextMonitoring ?? DateTime.now();
-                    String formattedDatetime =
-                        DateFormat('HH.mm').format(monitorTime);
-                    Duration timeDifference =
-                        monitorTime.difference(DateTime.now());
+                        // patient.nextMonitoring ??
+                        DateTime.now();
+                    String formattedDatetime = DateFormat(
+                      'HH.mm',
+                    ).format(monitorTime);
+                    Duration timeDifference = monitorTime.difference(
+                      DateTime.now(),
+                    );
 
                     int hours = timeDifference.inHours;
                     int minutes = timeDifference.inMinutes % 60;
@@ -173,7 +201,8 @@ class _PatientPageState extends State<PatientPage> {
 
                     bool isExpanded = _expandedStates[index];
                     List<Map<String, dynamic>> data =
-                        patient.previousData ?? [];
+                        // patient.previousData ??
+                        [];
                     int data_length = data.length;
                     List<String> times = [];
                     List<String> previous_MEWs = [];
@@ -209,23 +238,25 @@ class _PatientPageState extends State<PatientPage> {
                               padding: const EdgeInsets.only(top: 10),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(
-                                    16), // Match the container's radius
+                                  16,
+                                ), // Match the container's radius
                                 child: InkWell(
                                   onTap: () {
                                     setState(() {
-                                      _expandedStates[index] = !_expandedStates[
-                                          index]; // Toggle state
+                                      _expandedStates[index] =
+                                          !_expandedStates[index]; // Toggle state
                                     });
                                   },
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 250),
                                     curve: Curves.easeInOut,
                                     padding: const EdgeInsets.only(top: 16),
-                                    height: _expandedStates[index]
-                                        ? (screenHeight * 0.033 + 8) *
-                                                data_length +
-                                            96
-                                        : 90,
+                                    height:
+                                        _expandedStates[index]
+                                            ? (screenHeight * 0.033 + 8) *
+                                                    data_length +
+                                                96
+                                            : 90,
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       color: const Color(0xff98B1E8),
@@ -235,25 +266,28 @@ class _PatientPageState extends State<PatientPage> {
                                       physics:
                                           const NeverScrollableScrollPhysics(),
                                       child: Column(
-                                        mainAxisSize: MainAxisSize
-                                            .min, // Adjust height dynamically
+                                        mainAxisSize:
+                                            MainAxisSize
+                                                .min, // Adjust height dynamically
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           const SizedBox(
-                                              height:
-                                                  70), // Static height for header
+                                            height: 70,
+                                          ), // Static height for header
                                           if (isExpanded) ...[
                                             Column(
                                               children: List.generate(
-                                                  data_length, (i) {
-                                                return TableRowWidget(
-                                                  MEWs: previous_MEWs[i],
-                                                  time: times[i],
-                                                );
-                                              }),
+                                                data_length,
+                                                (i) {
+                                                  return TableRowWidget(
+                                                    MEWs: previous_MEWs[i],
+                                                    time: times[i],
+                                                  );
+                                                },
+                                              ),
                                             ),
-                                            const SizedBox(height: 10)
+                                            const SizedBox(height: 10),
                                           ],
                                         ],
                                       ),
@@ -278,8 +312,8 @@ class _PatientPageState extends State<PatientPage> {
                                 InkWell(
                                   onTap: () {
                                     setState(() {
-                                      _expandedStates[index] = !_expandedStates[
-                                          index]; // Toggle state
+                                      _expandedStates[index] =
+                                          !_expandedStates[index]; // Toggle state
                                     });
                                   },
                                   child: Row(
@@ -288,7 +322,9 @@ class _PatientPageState extends State<PatientPage> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.only(
-                                            left: 4.0, right: 12),
+                                          left: 4.0,
+                                          right: 12,
+                                        ),
                                         child: CircleWithNumber(
                                           number: latest_MEWs,
                                           color: getColor(latest_MEWs),
@@ -300,7 +336,8 @@ class _PatientPageState extends State<PatientPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              "${patient.name} ${patient.surname}",
+                                              // "${patient.name} ${patient.surname}",
+                                              patient.fullname,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: screenWidth * 0.04,
@@ -308,8 +345,10 @@ class _PatientPageState extends State<PatientPage> {
                                                   Shadow(
                                                     color: Colors.black
                                                         .withOpacity(0.25),
-                                                    offset:
-                                                        const Offset(0.4, 0.4),
+                                                    offset: const Offset(
+                                                      0.4,
+                                                      0.4,
+                                                    ),
                                                     blurRadius: 0.5,
                                                   ),
                                                 ],
@@ -318,13 +357,15 @@ class _PatientPageState extends State<PatientPage> {
                                             Text(
                                               "nextInspectionTime".tr(),
                                               style: TextStyle(
-                                                  fontSize: screenWidth * 0.03),
+                                                fontSize: screenWidth * 0.03,
+                                              ),
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
                                               "$formattedDatetime${"n".tr()} $formattedTime",
                                               style: TextStyle(
-                                                  fontSize: screenWidth * 0.03),
+                                                fontSize: screenWidth * 0.03,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -332,8 +373,11 @@ class _PatientPageState extends State<PatientPage> {
                                       buildActionButton(
                                         FontAwesomeIcons.solidClock,
                                         () {
-                                          showTimeManager(context, screenWidth,
-                                              screenHeight);
+                                          showTimeManager(
+                                            context,
+                                            screenWidth,
+                                            screenHeight,
+                                          );
                                         },
                                         Colors.white,
                                         const Color(0xff3362CC),
@@ -360,7 +404,8 @@ class _PatientPageState extends State<PatientPage> {
                                       });
                                     },
                                     child: Text(
-                                        "assess".tr()), // This stays in place
+                                      "assess".tr(),
+                                    ), // This stays in place
                                   ),
                                   Icon(
                                     isExpanded
@@ -382,7 +427,7 @@ class _PatientPageState extends State<PatientPage> {
                   SizedBox(height: size.height * 0.15),
                   const NoPatientWidget(),
                 ],
-              )
+              ),
           ],
         ),
       ),

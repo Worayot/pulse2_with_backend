@@ -128,7 +128,11 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => const LoadingScreen(),
+                builder:
+                    (context) => LoadingScreen(
+                      userId: _nurseIDController.text,
+                      password: _passwordController.text,
+                    ),
               ), // For example, navigating to the Login screen
               (Route<dynamic> route) => false, // Removes all previous screens
             );

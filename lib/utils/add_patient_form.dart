@@ -6,7 +6,7 @@ import 'package:pulse/universal_setting/sizes.dart';
 import 'package:pulse/utils/gender_dropdown.dart';
 import 'package:pulse/utils/info_text_field.dart';
 
-import '../models.dart/patient.dart';
+import '../models/patient.dart';
 
 class AddPatientForm extends StatefulWidget {
   const AddPatientForm({super.key});
@@ -40,16 +40,16 @@ class _AddPatientFormState extends State<AddPatientForm> {
       );
 
       bool success = await _patientService.addPatient(patient);
-      // if (success) {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(content: Text("Patient added successfully!")),
-      //   );
-      //   Navigator.pop(context);
-      // } else {
-      //   ScaffoldMessenger.of(
-      //     context,
-      //   ).showSnackBar(const SnackBar(content: Text("Failed to add patient.")));
-      // }
+      if (success) {
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(content: Text("Patient added successfully!")),
+        // );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Failed to add patient.")));
+      }
     }
   }
 

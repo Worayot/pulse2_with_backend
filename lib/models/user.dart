@@ -23,9 +23,14 @@ class User {
   Map<String, dynamic> toJson() {
     return {
       'fullname': fullname,
-      'nurseId': nurseId,
+      'nurse_id': nurseId,
       'password': password,
       'role': role,
     };
+  }
+
+  @override
+  String toString() {
+    return '$fullname $nurseId $password $role';
   }
 }

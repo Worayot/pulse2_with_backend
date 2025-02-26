@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:pulse/mainpage/patient_data/patient_in_system.dart';
-import 'package:pulse/models.dart/patient.dart';
+import 'package:pulse/models/patient.dart';
 import 'package:pulse/utils/report_widget.dart';
 
 void showPatientDetails(BuildContext context, var patient) {

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'url.dart';
-import '../models.dart/patient.dart';
+import '../models/patient.dart';
 
 class PatientService {
   //* Tested
@@ -52,8 +52,8 @@ class PatientService {
     }
   }
 
-  //! Not tested
-  Future<bool> updatePatient(String patientId, Patient patientData) async {
+  //* Tested
+  updatePatient(String patientId, Patient patientData) async {
     final url = Uri.parse('$baseUrl/home-fetch/update_patient/$patientId');
 
     try {
@@ -76,25 +76,26 @@ class PatientService {
   }
 
   //! Not tested
-  Future<bool> getMonitoredPatient(String userId) async {
+  Future<Map<String, dynamic>?> getMonitoredPatient(String userId) async {
     final url = Uri.parse('$baseUrl/home-fetch/get-links-by-user/$userId');
 
     try {
       final response = await http.get(
         url,
         headers: {"Content-Type": "application/json"},
-        // body: jsonEncode(patientData.toJson()),
       );
 
       if (response.statusCode == 200) {
-        return true; // Success
+        // Parse the response body if it's JSON
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData; // Return the parsed data
       } else {
         print("Failed to get monitored patient: ${response.body}");
-        return false; // Failure
+        return null; // Return null on failure
       }
     } catch (e) {
       print("Error monitoring patient: $e");
-      return false;
+      return null; // Return null in case of error
     }
   }
 
