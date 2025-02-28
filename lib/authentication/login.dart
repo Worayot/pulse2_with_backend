@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:pulse/authentication/loading_screen.dart';
+import 'package:pulse/services/url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -22,10 +23,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   String _errorMessage = '';
   final _storage = const FlutterSecureStorage();
-  final loginUrl = Uri.parse('http://0.0.0.0:8000/authenticate/login');
-  final cookieUrl = Uri.parse(
-    'http://0.0.0.0:8000/authenticate/create-session-cookie',
-  );
+  final loginUrl = Uri.parse('$baseUrl/authenticate/login');
+  final cookieUrl = Uri.parse('$baseUrl/authenticate/create-session-cookie');
 
   @override
   void initState() {
