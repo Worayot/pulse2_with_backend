@@ -113,6 +113,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                                 return AssessTableRowWidget(
                                   combinedData: combinedData[i],
                                   myUserID: myUserID,
+                                  patientID: patientID,
                                 );
                               }),
                             ),
@@ -197,6 +198,23 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                   ),
                 ),
               ],
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 75,
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+
+                children: [
+                  Text('assess'.tr()),
+                  isExpanded
+                      ? Icon(Icons.expand_less)
+                      : Icon(Icons.expand_more),
+                ],
+              ),
             ),
           ),
         ],

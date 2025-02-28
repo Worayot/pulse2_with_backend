@@ -30,9 +30,9 @@ class MEWsService {
     }
   }
 
-  //? Not tested
-  addMEWs(String inspectionID, Parameters parameters) async {
-    final url = Uri.parse('$baseUrl/noti-fetch/add_mews/$inspectionID');
+  //* Tested
+  addMEWs(String mewsID, Parameters parameters) async {
+    final url = Uri.parse('$baseUrl/noti-fetch/add_mews/$mewsID');
 
     try {
       final response = await http.post(

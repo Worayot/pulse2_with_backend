@@ -7,20 +7,22 @@ import 'package:pulse/utils/note_editor.dart';
 class AssessTableRowWidget extends StatelessWidget {
   final Map<String, dynamic> combinedData;
   final String myUserID;
+  final String patientID;
   // Constructor with required parameters
   const AssessTableRowWidget({
     super.key,
     required this.combinedData,
     required this.myUserID,
+    required this.patientID,
   });
 
   @override
   Widget build(BuildContext context) {
-    // final String time = combinedData['formatted_time'].split(' ')[0];
-    final String time = combinedData['formatted_time'];
+    final String time = combinedData['formatted_time'].split(' ')[0];
+    // final String time = combinedData['formatted_time'];
     final dynamic MEWs = combinedData['mews'];
     // final String auditorID = combinedData['auditor'];
-    // final String mewsID = combinedData['mews_id'];
+    final String mewsID = combinedData['mews_id'];
     final String noteID = combinedData['note_id'];
     final String note = combinedData['note'];
     // final String auditorID = combinedData['auditor'];
@@ -87,7 +89,7 @@ class AssessTableRowWidget extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return const MEWsForms();
+                    return MEWsForms(patientID: patientID, mewsID: mewsID);
                   },
                 );
               },

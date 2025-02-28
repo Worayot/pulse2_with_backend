@@ -2,10 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pulse/func/calculateMEWs.dart';
+import 'package:pulse/models/parameters.dart';
 import 'package:pulse/results/result_screens.dart';
+import 'package:pulse/services/mews_services.dart';
 
 class MEWsForms extends StatefulWidget {
-  const MEWsForms({super.key});
+  final String patientID;
+  final String mewsID;
+  const MEWsForms({super.key, required this.patientID, required this.mewsID});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -650,37 +654,46 @@ class _MEWsFormsState extends State<MEWsForms> {
                             String rr = respiratoryRateController.text.trim();
                             String urine = urineController.text.trim();
                             String conscious = consciousnessValue;
+                            String cvp = cvpController.text.trim();
+
+                            hr = (hr == ' ') ? '-' : hr;
+                            temp = (temp == ' ') ? '-' : temp;
+                            sBp = (sBp == ' ') ? '-' : sBp;
+                            dBp = (dBp == ' ') ? '-' : dBp;
+                            spO2 = (spO2 == ' ') ? '-' : spO2;
+                            rr = (rr == ' ') ? '-' : rr;
+                            urine = (urine == ' ') ? '-' : urine;
+                            cvp = (cvp == ' ') ? '-' : cvp;
 
                             int MEWs = calculateMEWs(
                               consciousness: conscious,
-                              heartRate:
-                                  (hr != '-' && hr != ' ')
-                                      ? int.tryParse(hr)
-                                      : null,
+                              heartRate: (hr != '-') ? int.tryParse(hr) : null,
                               temperature:
-                                  (temp != '-' && temp != ' ')
-                                      ? double.tryParse(temp)
-                                      : null,
+                                  (temp != '-') ? double.tryParse(temp) : null,
                               respiratoryRate:
-                                  (rr != '-' && rr != ' ')
-                                      ? int.tryParse(rr)
-                                      : null,
+                                  (rr != '-') ? int.tryParse(rr) : null,
                               systolicBp:
-                                  (sBp != '-' && sBp != ' ')
-                                      ? int.tryParse(sBp)
-                                      : null,
-                              spo2:
-                                  (spO2 != '-' && spO2 != ' ')
-                                      ? int.tryParse(spO2)
-                                      : null,
+                                  (sBp != '-') ? int.tryParse(sBp) : null,
+                              spo2: (spO2 != '-') ? int.tryParse(spO2) : null,
                               urine:
-                                  (urine != '-' && urine != ' ')
-                                      ? int.tryParse(urine)
-                                      : null,
+                                  (urine != '-') ? int.tryParse(urine) : null,
                             );
 
                             Navigator.pop(context);
                             showResultDialog(context, MEWs);
+                            Parameters parameters = Parameters(
+                              patientId: widget.patientID,
+                              consciousness: conscious,
+                              heartRate: hr,
+                              urine: urine,
+                              spo2: spO2,
+                              temperature: temp,
+                              respiratoryRate: rr,
+                              bloodPressure: '$sBp/$dBp',
+                              mews: MEWs.toString(),
+                              cvp: cvp,
+                            );
+                            MEWsService().addMEWs(widget.mewsID, parameters);
                           },
                           child: Text(
                             'calculate'.tr(),
