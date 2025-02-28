@@ -4,6 +4,122 @@ import 'package:http/http.dart' as http;
 import 'url.dart';
 import '../models/patient.dart';
 
+class FirebasePatientService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  /// Stream monitored patients linked to the given user ID
+  Stream<List<Map<String, dynamic>>> fetchMonitoredPatients(String userId) {
+    return _firestore
+        .collection('patient_user_links')
+        .where('user_id', isEqualTo: userId)
+        .snapshots()
+        .asyncMap((querySnapshot) async {
+          List<Map<String, dynamic>> monitoredPatients = [];
+
+          if (querySnapshot.docs.isNotEmpty) {
+            for (var doc in querySnapshot.docs) {
+              Map<String, dynamic> patientData =
+                  doc.data() as Map<String, dynamic>;
+              String patientId = patientData['patient_id'];
+
+              // Fetch patient details from the 'patients' collection
+              Map<String, dynamic>? patientDetails = await fetchPatientData(
+                patientId,
+              );
+
+              // Fetch inspection notes for this patient
+              List<Map<String, dynamic>> inspectionNotes =
+                  await fetchInspectionNotes(patientId);
+
+              // Add patient details and inspection notes to the monitored patient data
+              if (patientDetails != null) {
+                patientData['patient_details'] = patientDetails;
+              }
+              patientData['inspection_notes'] = inspectionNotes;
+              monitoredPatients.add(patientData);
+            }
+
+            print(
+              "Successfully retrieved monitored patients with inspection notes and MEWS data.",
+            );
+          } else {
+            print("No monitored patient data found.");
+          }
+
+          return monitoredPatients;
+        });
+  }
+
+  /// Fetch patient data from the 'patients' collection
+  Future<Map<String, dynamic>?> fetchPatientData(String patientId) async {
+    try {
+      final DocumentSnapshot docSnapshot =
+          await _firestore.collection('patients').doc(patientId).get();
+
+      if (docSnapshot.exists) {
+        return docSnapshot.data() as Map<String, dynamic>;
+      } else {
+        print("No patient data found for patientId $patientId");
+        return null; // No patient data found
+      }
+    } catch (e) {
+      print("Error fetching patient data for patientId $patientId: $e");
+      return null; // Error fetching patient data
+    }
+  }
+
+  /// Fetch inspection notes for a specific patient
+  Future<List<Map<String, dynamic>>> fetchInspectionNotes(
+    String patientId,
+  ) async {
+    List<Map<String, dynamic>> inspectionNotes = [];
+
+    try {
+      final QuerySnapshot querySnapshot =
+          await _firestore
+              .collection('inspection_notes')
+              .where('patient_id', isEqualTo: patientId)
+              .get();
+
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> noteData = doc.data() as Map<String, dynamic>;
+        String? mewsId = noteData['mews_id'];
+
+        if (mewsId != null && mewsId.isNotEmpty) {
+          // Fetch MEWS data
+          Map<String, dynamic>? mewsData = await fetchMewsData(mewsId);
+          noteData['mews'] = mewsData; // Attach MEWS data to the note
+        } else {
+          noteData['mews'] = null; // No MEWS data available
+        }
+
+        inspectionNotes.add(noteData);
+      }
+    } catch (e) {
+      print("Error fetching inspection notes for patient $patientId: $e");
+    }
+
+    return inspectionNotes;
+  }
+
+  /// Fetch MEWS data using mews_id
+  Future<Map<String, dynamic>?> fetchMewsData(String mewsId) async {
+    try {
+      final DocumentSnapshot docSnapshot =
+          await _firestore.collection('mews').doc(mewsId).get();
+
+      if (docSnapshot.exists) {
+        return docSnapshot.data() as Map<String, dynamic>;
+      } else {
+        return null; // No MEWS data found
+      }
+    } catch (e) {
+      print("Error fetching MEWS data for mews_id $mewsId: $e");
+      return null;
+    }
+  }
+}
+
 class PatientService {
   //* Tested
   Future<bool> addPatient(Patient patientData) async {
@@ -75,7 +191,7 @@ class PatientService {
     }
   }
 
-  //! Not tested
+  //* Tested
   Future<Map<String, dynamic>?> getMonitoredPatient(String userId) async {
     final url = Uri.parse('$baseUrl/home-fetch/get-links-by-user/$userId');
 
@@ -88,6 +204,7 @@ class PatientService {
       if (response.statusCode == 200) {
         // Parse the response body if it's JSON
         Map<String, dynamic> responseData = jsonDecode(response.body);
+        // print(responseData);
         return responseData; // Return the parsed data
       } else {
         print("Failed to get monitored patient: ${response.body}");

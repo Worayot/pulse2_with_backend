@@ -1,12 +1,11 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:pulse/authentication/login.dart';
 import 'package:pulse/func/pref/pref.dart';
 import 'package:pulse/mainpage/navigation.dart';
 import 'package:pulse/services/user_services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pulse/utils/loading_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pulse/func/notification_scheduler.dart';
 
 class LoadingScreen extends StatefulWidget {
   final String userId;
@@ -23,8 +22,10 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen> {
   final storage = FlutterSecureStorage();
+  String name = 'N/A';
 
   Map<String, dynamic>? accountData = {};
+
   @override
   void initState() {
     super.initState();
@@ -41,7 +42,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     UserServices userServices = UserServices();
     accountData = await userServices.loadAccount(widget.userId);
 
-    if (accountData != null) {
+    if (accountData != null && accountData!.isNotEmpty) {
       print("Successfully loaded account data.");
     } else {
       print("Failed to load account data.");
@@ -55,11 +56,28 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   Future<void> _savePreferences() async {
     if (accountData != null && accountData!.isNotEmpty) {
-      await saveStringPreference('fullname', accountData!['fullname'], context);
-      await saveStringPreference('nurseID', accountData!['uid'], context);
-      await saveStringPreference('role', accountData!['role'], context);
+      String fullname =
+          accountData!['fullname'] ?? 'N/A'; // Default to 'N/A' if null
+      String nurseId =
+          accountData!['nurse_id'] ?? 'N/A'; // Default to 'N/A' if null
+      String role = accountData!['role'] ?? 'N/A'; // Default to 'N/A' if null
+
+      // Save preferences
+      await saveStringPreference('fullname', fullname, context);
+      await saveStringPreference('nurseID', nurseId, context);
+      await saveStringPreference('role', role, context);
       await savePassword(widget.password);
 
+      setState(() {
+        name = fullname; // Ensure the name is updated to the correct value
+      });
+
+      // Call the function to schedule notifications for this user
+      await fetchAndScheduleNotification(
+        accountData!['nurse_id'],
+      ); // Pass userId to fetch notifications
+
+      // Navigate to the main page
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const NavigationPage()),
@@ -75,83 +93,30 @@ class _LoadingScreenState extends State<LoadingScreen> {
     }
   }
 
+  // Notification scheduling logic (You need to implement this function in your schedule_notification.dart)
+  Future<void> fetchAndScheduleNotification(String userId) async {
+    // Mock notification time fetch
+    // Replace this with your logic to fetch user-specific notification time from Firestore or any backend
+    var notificationTime = DateTime.now().add(
+      Duration(seconds: 10),
+    ); // Just for testing
+
+    await _scheduleNotification(notificationTime);
+  }
+
+  Future<void> _scheduleNotification(DateTime notificationTime) async {
+    // This is where you would schedule your notification using a package like flutter_local_notifications
+    print('Scheduling notification for: $notificationTime');
+
+    // Assuming you are using flutter_local_notifications, the notification scheduling would go here.
+    // This is a simple mock for demonstration purposes.
+    // await Future.delayed(Duration(seconds: 2));
+    print('Notification scheduled for: $notificationTime');
+  }
+
   @override
   Widget build(BuildContext context) {
-    String name = "วรยศ เลี่ยมแก้ว";
-    Size size = MediaQuery.of(context).size;
-
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Stack(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(60),
-                        child: Container(
-                          width: size.width / 1.3,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            color: Color(0xffCCE9FF),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: const LinearProgressIndicator(
-                                minHeight: 10,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Color(0xff1125A4),
-                                ),
-                                backgroundColor: Color(0xffB0D3EF),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 50,
-                        bottom: 10,
-                        child: ClipRect(
-                          child: Image.asset(
-                            'assets/images/turtle.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  Text(
-                    '${'welcome'.tr()}!',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(name, style: const TextStyle(fontSize: 20)),
-                ],
-              ),
-              Positioned(
-                right: 0,
-                top: size.height / 2 - 110,
-                child: ClipRect(
-                  child: Image.asset(
-                    'assets/images/waiter.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    //! Change this to user's name
+    return LoadingBar(context: context, name: name).build();
   }
 }

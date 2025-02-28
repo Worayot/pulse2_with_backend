@@ -260,11 +260,11 @@ class _PatientInSystemState extends State<PatientInSystem> {
                     isPlus.clear();
                     isPlus.addAll(newIsPlus);
                   }
-                  print('Filtered Patients: ${filteredPatients.length}');
-                  print('Is Expanded List: ${_isExpanded.length}');
-                  print('Is Expanded List Contents: $_isExpanded');
-                  print('isPlus: $isPlus');
-                  print('monitor: $monitoredPatientIDs');
+                  // print('Filtered Patients: ${filteredPatients.length}');
+                  // print('Is Expanded List: ${_isExpanded.length}');
+                  // print('Is Expanded List Contents: $_isExpanded');
+                  // print('isPlus: $isPlus');
+                  // print('monitor: $monitoredPatientIDs');
 
                   return HomeExpandableCards(
                     filteredPatients: filteredPatients,

@@ -7,6 +7,8 @@ plugins {
 }
 
 android {
+    compileSdkVersion 33
+
     namespace = "com.example.test_fastapi"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
@@ -26,9 +28,13 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdkVersion 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    buildFeatures {
+        notifications = true
     }
 
     buildTypes {

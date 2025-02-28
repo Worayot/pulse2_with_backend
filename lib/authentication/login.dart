@@ -104,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (idToken != null) {
           print("Firebase ID Token: $idToken");
+          await Future.delayed(Duration(seconds: 5));
 
           // Step 2: Send ID Token to FastAPI to create a session
           final sessionResponse = await http.post(
