@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:pulse/authentication/login.dart';
 import 'package:pulse/firebase_options.dart';
 import 'package:pulse/func/notification_scheduler.dart';
+
 import 'package:pulse/mainpage/navigation.dart';
 import 'package:pulse/provider/user_data_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -93,7 +95,8 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      home: const NavigationPage(),
+      // home: const NavigationPage(),
+      home: const LoginPage(),
     );
   }
 }
