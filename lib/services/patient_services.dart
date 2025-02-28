@@ -83,6 +83,8 @@ class FirebasePatientService {
 
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> noteData = doc.data() as Map<String, dynamic>;
+        noteData['note_id'] = doc.id; // Add document ID (doc name)
+
         String? mewsId = noteData['mews_id'];
 
         if (mewsId != null && mewsId.isNotEmpty) {

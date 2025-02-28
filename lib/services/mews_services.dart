@@ -6,7 +6,7 @@ import 'package:pulse/models/parameters.dart';
 import 'url.dart';
 
 class MEWsService {
-  //! Not tested
+  //! Not used
   Future<bool> getNoteByMEWsId(String mewsId) async {
     final url = Uri.parse('$baseUrl/home-fetch/delete-patient/$mewsId');
 
@@ -30,9 +30,9 @@ class MEWsService {
     }
   }
 
-  //! Not tested
-  Future<bool> addMEWs(String inspectionId, Parameters parameters) async {
-    final url = Uri.parse('$baseUrl/noti-fetch/add_mews/$inspectionId');
+  //? Not tested
+  addMEWs(String inspectionID, Parameters parameters) async {
+    final url = Uri.parse('$baseUrl/noti-fetch/add_mews/$inspectionID');
 
     try {
       final response = await http.post(
@@ -54,15 +54,18 @@ class MEWsService {
     }
   }
 
-  //! Not tested
-  Future<bool> addNote(String noteId, Note note) async {
-    final url = Uri.parse('$baseUrl/noti-fetch/add_notes/$noteId');
+  //* Tested
+  addNote(String noteID, Note note) async {
+    final url = Uri.parse('$baseUrl/noti-fetch/add_notes/$noteID');
 
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(note),
+        body: jsonEncode({
+          // "note_id": noteId,
+          ...note.toJson(), // Assuming Note has a `toJson()` method
+        }),
       );
 
       if (response.statusCode == 200) {

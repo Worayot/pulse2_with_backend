@@ -4,18 +4,26 @@ import 'package:pulse/func/get_color.dart';
 import 'package:pulse/utils/mews_forms.dart';
 import 'package:pulse/utils/note_editor.dart';
 
-class TableRowWidget extends StatelessWidget {
-  final dynamic MEWs;
-  final String time;
+class AssessTableRowWidget extends StatelessWidget {
+  final Map<String, dynamic> combinedData;
+  final String myUserID;
   // Constructor with required parameters
-  const TableRowWidget({
+  const AssessTableRowWidget({
     super.key,
-    required this.MEWs,
-    required this.time,
+    required this.combinedData,
+    required this.myUserID,
   });
 
   @override
   Widget build(BuildContext context) {
+    // final String time = combinedData['formatted_time'].split(' ')[0];
+    final String time = combinedData['formatted_time'];
+    final dynamic MEWs = combinedData['mews'];
+    // final String auditorID = combinedData['auditor'];
+    // final String mewsID = combinedData['mews_id'];
+    final String noteID = combinedData['note_id'];
+    final String note = combinedData['note'];
+    // final String auditorID = combinedData['auditor'];
     final Size size = MediaQuery.of(context).size;
     final double screenWidth = size.width;
     final double screenHeight = size.height;
@@ -30,8 +38,9 @@ class TableRowWidget extends StatelessWidget {
             height: screenHeight * 0.033,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(4), // Rounded corners (optional)
+              borderRadius: BorderRadius.circular(
+                4,
+              ), // Rounded corners (optional)
             ),
             child: Center(
               child: Text(
@@ -42,10 +51,13 @@ class TableRowWidget extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   shadows: [
                     Shadow(
-                      color: Colors.black
-                          .withOpacity(0.25), // Shadow color with opacity
+                      color: Colors.black.withOpacity(
+                        0.25,
+                      ), // Shadow color with opacity
                       offset: const Offset(
-                          0.4, 0.4), // Horizontal and vertical offset
+                        0.4,
+                        0.4,
+                      ), // Horizontal and vertical offset
                       blurRadius: 0.5, // Blur radius
                     ),
                   ],
@@ -73,10 +85,11 @@ class TableRowWidget extends StatelessWidget {
               ),
               onPressed: () {
                 showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const MEWsForms();
-                    });
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const MEWsForms();
+                  },
+                );
               },
               child: Text(
                 "assessScore".tr(),
@@ -95,8 +108,9 @@ class TableRowWidget extends StatelessWidget {
             height: screenHeight * 0.033,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(4), // Rounded corners (optional)
+              borderRadius: BorderRadius.circular(
+                4,
+              ), // Rounded corners (optional)
             ),
             child: Center(
               child: Row(
@@ -110,10 +124,13 @@ class TableRowWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
-                          color: Colors.black
-                              .withOpacity(0.25), // Shadow color with opacity
+                          color: Colors.black.withOpacity(
+                            0.25,
+                          ), // Shadow color with opacity
                           offset: const Offset(
-                              0.8, 0.8), // Horizontal and vertical offset
+                            0.8,
+                            0.8,
+                          ), // Horizontal and vertical offset
                           blurRadius: 1, // Blur radius
                         ),
                       ],
@@ -127,15 +144,18 @@ class TableRowWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
-                          color: Colors.black
-                              .withOpacity(0.2), // Shadow color with opacity
+                          color: Colors.black.withOpacity(
+                            0.2,
+                          ), // Shadow color with opacity
                           offset: const Offset(
-                              0.8, 0.8), // Horizontal and vertical offset
+                            0.8,
+                            0.8,
+                          ), // Horizontal and vertical offset
                           blurRadius: 1, // Blur radius
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -160,12 +180,11 @@ class TableRowWidget extends StatelessWidget {
               ),
               onPressed: () {
                 showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return NoteEditor(
-                        onSave: () {},
-                      );
-                    });
+                  context: context,
+                  builder: (BuildContext context) {
+                    return NoteEditor(note: note, noteID: noteID);
+                  },
+                );
               },
               child: Text(
                 "note".tr(),

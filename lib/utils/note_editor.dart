@@ -1,13 +1,42 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:pulse/models/note.dart';
+import 'package:pulse/services/mews_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class NoteEditor extends StatelessWidget {
-  final VoidCallback onSave;
+class NoteEditor extends StatefulWidget {
+  final String note;
+  final String noteID;
 
-  const NoteEditor({
-    super.key,
-    required this.onSave,
-  });
+  const NoteEditor({super.key, required this.note, required this.noteID});
+
+  @override
+  State<NoteEditor> createState() => _NoteEditorState();
+}
+
+class _NoteEditorState extends State<NoteEditor> {
+  late TextEditingController _noteController;
+  String myUserID = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _noteController = TextEditingController(text: widget.note);
+    loadProfileData();
+  }
+
+  Future<void> loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      myUserID = prefs.getString('nurseID') ?? "N/A";
+    });
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +72,11 @@ class NoteEditor extends StatelessWidget {
                     const SizedBox(height: 60),
 
                     // Text Editor Field
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: TextField(
-                        decoration: InputDecoration(
+                        controller: _noteController,
+                        decoration: const InputDecoration(
                           border: UnderlineInputBorder(),
                         ),
                       ),
@@ -57,32 +87,38 @@ class NoteEditor extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 20.0, right: 20),
                       child: Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: onSave,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color(0xff407BFF), // Blue background
-                              foregroundColor: Colors.white, // White text
-                              // side: const BorderSide(
-                              //   color: Colors.white, // White border color
-                              //   width: 1, // Border width
-                              // ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(8), // Rounded corners
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            MEWsService().addNote(
+                              widget.noteID,
+                              Note(
+                                text: _noteController.text,
+                                auditor: myUserID,
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12), // Padding
+                            );
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff407BFF),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Text(
-                              'saveAgain'.tr(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
                             ),
-                          )),
+                          ),
+                          child: Text(
+                            'saveAgain'.tr(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -98,7 +134,7 @@ class NoteEditor extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-          )
+          ),
         ],
       ),
     );

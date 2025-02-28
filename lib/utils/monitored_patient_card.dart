@@ -24,7 +24,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
   Widget build(BuildContext context) {
     var patientData = widget.patientData;
     String patientID = patientData['patient_id'];
-    String userID = patientData['user_id'];
+    String myUserID = patientData['user_id'];
     Map<String, dynamic> patientDetails = patientData['patient_details'];
     String gender = patientDetails['gender'];
     String bedNumber = patientDetails['bed_number'];
@@ -37,30 +37,34 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
     Size size = MediaQuery.of(context).size;
     int dataLength = dataRows.length;
-
-    String latestTime = '-';
-    String latestMews = '-';
-
-    List<String> times = [];
-    List<dynamic> previousMEWs = [];
+    // print(myUserID);
+    List<Map<String, dynamic>> combinedData = [];
 
     if (dataRows.isNotEmpty) {
-      print(dataRows);
-      String formattedTime = '';
       for (var map in dataRows) {
         Timestamp timestamp = map['time'];
         DateTime dateTime = timestamp.toDate();
-        formattedTime = DateFormat('HH.mm').format(dateTime);
+        String formattedTime = DateFormat('HH.mm').format(dateTime);
         String timeDelta = timeDeltaFromNow(dateTime: dateTime);
-        times.add('$formattedTime${'n'.tr()} ($timeDelta)');
-      }
 
-      for (int i = 0; i < dataLength; i++) {
-        previousMEWs.add(dataRows[i]['mews']['mews']);
+        combinedData.add({
+          "formatted_time": '$formattedTime${'n'.tr()} ($timeDelta)',
+          "mews": map['mews']['mews'],
+          "mews_id": map['mews_id'],
+          "note_id": map['note_id'],
+          "note": map['text'],
+          "auditor": map['audit_by'],
+        });
       }
-      latestMews = previousMEWs.last;
-      latestTime = times.last;
     }
+
+    // Get latest values
+    String latestTime =
+        combinedData.isNotEmpty ? combinedData.last["formatted_time"] : "-";
+    String latestMews =
+        combinedData.isNotEmpty ? combinedData.last["mews"].toString() : "-";
+
+    // print(combinedData.isNotEmpty ? combinedData[0] : 'None');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -106,10 +110,9 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                           if (isExpanded) ...[
                             Column(
                               children: List.generate(dataLength, (i) {
-                                // return Text("temp");
-                                return TableRowWidget(
-                                  MEWs: previousMEWs[i],
-                                  time: '${times[i].split(' ')[0]}${'n'.tr()}',
+                                return AssessTableRowWidget(
+                                  combinedData: combinedData[i],
+                                  myUserID: myUserID,
                                 );
                               }),
                             ),

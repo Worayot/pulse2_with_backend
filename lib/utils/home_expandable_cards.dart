@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pulse/func/pref/pref.dart';
-import 'package:pulse/mainpage/patient_data/patient_ind_data.dart';
+import 'package:pulse/mainpage/patient_related/patient_ind_data.dart';
 import 'package:pulse/utils/action_button.dart';
 import 'package:pulse/utils/edit_patient_form.dart';
 import 'package:pulse/utils/patient_details.dart';

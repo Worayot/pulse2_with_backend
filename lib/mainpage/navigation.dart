@@ -2,9 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pulse/func/pref/pref.dart';
-import 'package:pulse/mainpage/home.dart';
-import 'package:pulse/mainpage/patient_data/export.dart';
-import 'package:pulse/mainpage/patient_data/monitored_patient.dart';
+import 'package:pulse/mainpage/patient_related/patient_in_system_initilizer.dart';
+import 'package:pulse/mainpage/patient_related/export.dart';
+import 'package:pulse/mainpage/patient_related/monitored_patient.dart';
 // import 'package:pulse/mainpage/patient_data/monitored_patient_original.dart';
 import 'package:pulse/mainpage/settings/setting.dart';
 import 'package:pulse/utils/navbar.dart';
@@ -25,7 +25,7 @@ class _NavigationPageState extends State<NavigationPage> {
     const NotificationPage(),
     const PatientPage(),
     const ExportPage(),
-    SettingsPage()
+    SettingsPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -56,45 +56,53 @@ class _NavigationPageState extends State<NavigationPage> {
         onItemSelected: _onItemTapped, // Handle item selection
         items: <BottomNavyBarItem>[
           BottomNavyBarItem(
-              icon: Icon(FontAwesomeIcons.house, size: iconSize),
-              title: Text(
-                "\t${'patientsInSystem'.tr()}",
-                style: TextStyle(
-                    fontSize: screenWidth * 0.035), // Relative text size
-              ),
-              activeColor: const Color(0xffFEFEFE),
-              inactiveColor: const Color(0xffC6D8FF),
-              boxWidth: 190),
+            icon: Icon(FontAwesomeIcons.house, size: iconSize),
+            title: Text(
+              "\t${'patientsInSystem'.tr()}",
+              style: TextStyle(
+                fontSize: screenWidth * 0.035,
+              ), // Relative text size
+            ),
+            activeColor: const Color(0xffFEFEFE),
+            inactiveColor: const Color(0xffC6D8FF),
+            boxWidth: 190,
+          ),
           BottomNavyBarItem(
-              icon: Icon(FontAwesomeIcons.users, size: iconSize),
-              title: Text(
-                "\t${'patientInMonitoring'.tr()}",
-                style: TextStyle(
-                    fontSize: screenWidth * 0.035), // Relative text size
-              ),
-              activeColor: const Color(0xffFEFEFE),
-              inactiveColor: const Color(0xffC6D8FF),
-              boxWidth: 190),
+            icon: Icon(FontAwesomeIcons.users, size: iconSize),
+            title: Text(
+              "\t${'patientInMonitoring'.tr()}",
+              style: TextStyle(
+                fontSize: screenWidth * 0.035,
+              ), // Relative text size
+            ),
+            activeColor: const Color(0xffFEFEFE),
+            inactiveColor: const Color(0xffC6D8FF),
+            boxWidth: 190,
+          ),
           BottomNavyBarItem(
-              icon: Icon(FontAwesomeIcons.fileArrowDown, size: iconSize),
-              title: Text(
-                'data'.tr(),
-                style: TextStyle(
-                    fontSize: screenWidth * 0.035), // Relative text size
-              ),
-              activeColor: const Color(0xffFEFEFE),
-              inactiveColor: const Color(0xffC6D8FF),
-              boxWidth: 120),
+            icon: Icon(FontAwesomeIcons.fileArrowDown, size: iconSize),
+            title: Text(
+              'data'.tr(),
+              style: TextStyle(
+                fontSize: screenWidth * 0.035,
+              ), // Relative text size
+            ),
+            activeColor: const Color(0xffFEFEFE),
+            inactiveColor: const Color(0xffC6D8FF),
+            boxWidth: 120,
+          ),
           BottomNavyBarItem(
-              icon: Icon(FontAwesomeIcons.gear, size: iconSize),
-              title: Text(
-                'settings'.tr(),
-                style: TextStyle(
-                    fontSize: screenWidth * 0.035), // Relative text size
-              ),
-              activeColor: const Color(0xffFEFEFE),
-              inactiveColor: const Color(0xffC6D8FF),
-              boxWidth: 120),
+            icon: Icon(FontAwesomeIcons.gear, size: iconSize),
+            title: Text(
+              'settings'.tr(),
+              style: TextStyle(
+                fontSize: screenWidth * 0.035,
+              ), // Relative text size
+            ),
+            activeColor: const Color(0xffFEFEFE),
+            inactiveColor: const Color(0xffC6D8FF),
+            boxWidth: 120,
+          ),
         ],
         height: bottomBarHeight, // Adjusting bottom bar height responsively
       ),

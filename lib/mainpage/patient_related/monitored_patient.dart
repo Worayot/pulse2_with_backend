@@ -1,20 +1,11 @@
 // ignore_for_file: library_private_types_in_public_api
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:pulse/models/patient.dart';
 import 'package:pulse/services/patient_services.dart';
 import 'package:pulse/universal_setting/sizes.dart';
-import 'package:pulse/func/get_color.dart';
-import 'package:pulse/mainpage/patient_data/no_patient_screen.dart';
-import 'package:pulse/utils/action_button.dart';
-import 'package:pulse/utils/circle_with_num.dart';
+import 'package:pulse/mainpage/patient_related/no_patient_screen.dart';
 import 'package:pulse/utils/monitored_patient_card.dart';
-import 'package:pulse/utils/assess_table_row.dart';
-import 'package:pulse/utils/time_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientPage extends StatefulWidget {
