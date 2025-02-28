@@ -101,7 +101,7 @@ class _NoteEditorState extends State<NoteEditor> {
                               noteID: widget.noteID,
                               note: Note(
                                 text: _noteController.text,
-                                auditor: myUserID,
+                                auditorID: myUserID,
                               ),
                             );
                             Navigator.pop(context);

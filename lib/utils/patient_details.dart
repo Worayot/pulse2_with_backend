@@ -11,7 +11,6 @@ void showPatientDetails(BuildContext context, var patient) {
   List nameParts = fullname.split(' ');
   String name = nameParts[0];
   String surname = nameParts[1];
-  // print(object);
 
   showDialog(
     context: context,
@@ -115,6 +114,7 @@ void showPatientDetails(BuildContext context, var patient) {
                             height: screenHeight * 0.6,
                             child: ReportWidget(
                               tableHeight: screenHeight * 0.5,
+                              patientID: patient['patient_id'],
                             ),
                           ),
                         ],

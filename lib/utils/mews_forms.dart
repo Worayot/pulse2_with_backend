@@ -688,7 +688,6 @@ class _MEWsFormsState extends State<MEWsForms> {
                             Navigator.pop(context);
                             widget.onPop();
 
-                            showResultDialog(context, MEWs);
                             Parameters parameters = Parameters(
                               patientId: widget.patientID,
                               consciousness: conscious,
@@ -700,6 +699,11 @@ class _MEWsFormsState extends State<MEWsForms> {
                               bloodPressure: '$sBp/$dBp',
                               mews: MEWs.toString(),
                               cvp: cvp,
+                            );
+                            showResultDialog(
+                              context: context,
+                              MEWs: MEWs,
+                              noteID: widget.noteID,
                             );
                             MEWsService().addMEWs(widget.noteID, parameters);
                           },

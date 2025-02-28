@@ -1,8 +1,13 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pulse/func/pref/pref.dart';
 import 'package:pulse/mainpage/patient_related/patient_ind_data.dart';
+import 'package:pulse/models/patient_user_link.dart';
+import 'package:pulse/services/patient_services.dart';
 import 'package:pulse/utils/action_button.dart';
 import 'package:pulse/utils/edit_patient_form.dart';
 import 'package:pulse/utils/patient_details.dart';
@@ -13,14 +18,12 @@ class HomeExpandableCards extends StatefulWidget {
   final List filteredPatients;
   final BuildContext context;
   final List isExpanded;
-  final List<bool> isPlus;
 
   const HomeExpandableCards({
     super.key,
     required this.filteredPatients,
     required this.context,
     required this.isExpanded,
-    required this.isPlus,
   });
 
   @override
@@ -28,15 +31,69 @@ class HomeExpandableCards extends StatefulWidget {
 }
 
 class _HomeExpandableCardsState extends State<HomeExpandableCards> {
+  late StreamSubscription<List<String>>
+  _streamSubscription; // Updated type to match the data (List<String>)
+  late List<String> _linkedPatient; // Initialize it with an empty list
+  String userID = '';
+
+  Future<void> loadUID() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (mounted) {
+      // Check if the widget is still in the tree
+      setState(() {
+        userID = prefs.getString('nurseID') ?? "N/A";
+      });
+    }
+  }
+
+  void _startListeningToStream() {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference patientsCollection = firestore.collection(
+      'patient_user_links',
+    );
+
+    // Subscribe to the Firestore stream
+    _streamSubscription = patientsCollection
+        .snapshots()
+        .map((querySnapshot) {
+          List<String> patientIds = []; // List to store only patient_ids
+          for (var document in querySnapshot.docs) {
+            // Safely cast the document data to a Map<String, dynamic> and check for 'patient_id'
+            var data = document.data() as Map<String, dynamic>?;
+            if (data != null) {
+              var patientId = data['patient_id'];
+              if (patientId != null) {
+                patientIds.add(
+                  patientId as String,
+                ); // Add patient_id to the list
+              }
+            }
+          }
+          return patientIds; // Return a list of patient_ids
+        })
+        .listen((linkedPatients) {
+          // Update the list with new patient_ids
+          if (mounted) {
+            setState(() {
+              _linkedPatient = linkedPatients;
+            });
+          }
+        });
+  }
+
   @override
   void initState() {
     super.initState();
+    loadUID();
+    _linkedPatient =
+        []; // Initialize _linkedPatient to avoid LateInitializationError
+    _startListeningToStream();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<bool> isPlus = widget.isPlus;
-    Size size = MediaQuery.of(context).size;
+    // Size size = MediaQuery.of(context).size;
     List isExpanded = widget.isExpanded;
     List filteredPatients = widget.filteredPatients;
     return ListView.builder(
@@ -52,7 +109,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
         String bedNum = patient["bed_number"];
         String ward = patient["ward"];
         String MEWs = patient["MEWs"] ?? '-';
-        String pId = patient['patient_id'];
+        String patientID = patient['patient_id'];
         String time = patient['inspectionTime'];
 
         return Padding(
@@ -186,16 +243,20 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                 ),
                                 ToggleIconButton(
                                   addPatientFunc: () async {
-                                    await addPatientID(pId);
-                                    setState(() {});
-                                    print('Added $pId');
+                                    PatientUserLink link = PatientUserLink(
+                                      patientID: patientID,
+                                      userID: userID,
+                                    );
+                                    await PatientService().takeIn(link: link);
                                   },
                                   removePatientFunc: () async {
-                                    await removePatientID(pId);
-                                    setState(() {});
-                                    print('Removed $pId');
+                                    await PatientService().takeOut(
+                                      userId: userID,
+                                      patientId: patientID,
+                                    );
                                   },
-                                  buttonState: isPlus[index],
+                                  buttonState:
+                                      !_linkedPatient.contains(patientID),
                                 ),
                                 const SizedBox(width: 8),
                                 buildActionButton(
@@ -215,7 +276,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                         context: context,
                                         builder: (BuildContext context) {
                                           return EditPatientForm(
-                                            patientId: pId,
+                                            patientId: patientID,
                                             name: name,
                                             surname: surname,
                                             age: age,
@@ -262,8 +323,10 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
 
               Positioned(
                 top: 69, // Adjust the position to fit your layout
-                left: size.width / 2.6,
+                left: 0,
+                right: 0,
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     InkWell(
                       child: Text("details".tr()),

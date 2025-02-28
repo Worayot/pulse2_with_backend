@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
+import 'package:pulse/models/patient_user_link.dart';
 import 'url.dart';
 import '../models/patient.dart';
 
@@ -146,7 +147,7 @@ class PatientService {
     }
   }
 
-  //! Not tested
+  //* Tested
   Future<bool> deletePatient(String patientId) async {
     final url = Uri.parse('$baseUrl/home-fetch/delete-patient/$patientId');
 
@@ -218,15 +219,15 @@ class PatientService {
     }
   }
 
-  //! Not tested
-  Future<bool> takeIn(String userId, String patientId) async {
-    final url = Uri.parse('$baseUrl/home-fetch/take-in');
+  //* Tested
+  takeIn({required PatientUserLink link}) async {
+    final url = Uri.parse('$baseUrl/home-fetch/take-in/');
 
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({'patient_id': patientId, 'user_id': userId}),
+        body: jsonEncode(link.toJson()), // Only one jsonEncode needed
       );
 
       if (response.statusCode == 200) {
@@ -241,8 +242,8 @@ class PatientService {
     }
   }
 
-  //! Not tested
-  Future<bool> takeOut(String userId, String patientId) async {
+  //* Tested
+  takeOut({required String userId, required String patientId}) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
@@ -253,8 +254,8 @@ class PatientService {
       // Query for the document with matching userId and patientId
       QuerySnapshot querySnapshot =
           await linkCollection
-              .where('userId', isEqualTo: userId)
-              .where('patientId', isEqualTo: patientId)
+              .where('user_id', isEqualTo: userId)
+              .where('patient_id', isEqualTo: patientId)
               .get();
 
       // Check if any documents were found
@@ -307,25 +308,26 @@ class PatientService {
   }
 
   //! Not tested
-  Future<bool> getPatientReport(String patientId) async {
+  Future<Map<String, dynamic>?> getPatientReport(String patientId) async {
     final url = Uri.parse('$baseUrl/home-fetch/report/$patientId');
 
     try {
       final response = await http.get(
         url,
         headers: {"Content-Type": "application/json"},
-        // body: jsonEncode(patientData.toJson()),
       );
 
       if (response.statusCode == 200) {
-        return true; // Success
+        // Parse the response body if it's JSON
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        return responseData; // Return parsed response
       } else {
         print("Failed to get patient report: ${response.body}");
-        return false; // Failure
+        return null; // Failure, no data to return
       }
     } catch (e) {
       print("Error getting patient report: $e");
-      return false;
+      return null; // Error, no data to return
     }
   }
 

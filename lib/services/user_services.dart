@@ -53,7 +53,7 @@ class UserServices {
     }
   }
 
-  //! Not tested
+  //* Tested
   Future<bool> addUser(User user) async {
     final url = Uri.parse('$baseUrl/sett-fetch/add_user');
 
@@ -101,11 +101,9 @@ class UserServices {
     }
   }
 
-  //! Error
+  //* Tested
   saveUserData(String userId, User user) async {
     final url = Uri.parse('$baseUrl/sett-fetch/save_user');
-
-    print(user);
 
     try {
       final response = await http.post(

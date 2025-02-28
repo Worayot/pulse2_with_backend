@@ -18,43 +18,16 @@ class PatientInSystem extends StatefulWidget {
 }
 
 class _PatientInSystemState extends State<PatientInSystem> {
-  List<String> monitoredPatientIDs = [];
   bool isLoading = true;
   final List<bool> _isExpanded = [];
-  final List<bool> isPlus = [];
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-
-  Future<void> _loadMonitoredPatients() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      monitoredPatientIDs = await prefs.getStringList('patient_ids') ?? [];
-      // print('Loaded monitored patients: $monitoredPatientIDs');
-    } catch (e) {
-      print('Error loading preferences: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load patient list: $e')),
-      );
-    }
-  }
-
-  Future<void> _loadData() async {
-    try {
-      // print('Before loading: $monitoredPatientIDs');
-      await _loadMonitoredPatients();
-      // print('After loading: $monitoredPatientIDs');
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
 
   @override
   void initState() {
     super.initState();
 
-    _loadData();
+    // _loadData();
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text.toLowerCase();
@@ -232,46 +205,22 @@ class _PatientInSystemState extends State<PatientInSystem> {
                   final patients = snapshot.data!;
                   final filteredPatients = _getFilteredPatients(patients);
 
-                  // Synchronize _isExpanded with filteredPatients
-                  if (_isExpanded.length != filteredPatients.length) {
-                    // Create a new list to preserve the state of existing patients
-                    List<bool> newIsExpanded = [];
-                    List<bool> newIsPlus = [];
-                    for (var patient in filteredPatients) {
-                      int index = patients.indexOf(patient);
-                      bool isMonitored = monitoredPatientIDs.contains(
-                        patient['patient_id'],
-                      );
-                      print(
-                        'Patient ID: ${patient['patient_id']}, isMonitored: $isMonitored',
-                      );
-
-                      if (index != -1 && index < _isExpanded.length) {
-                        newIsExpanded.add(_isExpanded[index]);
-                        newIsPlus.add(isMonitored);
-                      } else {
-                        newIsExpanded.add(false);
-                        newIsPlus.add(true);
-                      }
-                    }
-
-                    _isExpanded.clear();
-                    _isExpanded.addAll(newIsExpanded);
-                    isPlus.clear();
-                    isPlus.addAll(newIsPlus);
+                  if (filteredPatients.isEmpty) {
+                    return NoPatientWidget();
                   }
-                  // print('Filtered Patients: ${filteredPatients.length}');
-                  // print('Is Expanded List: ${_isExpanded.length}');
-                  // print('Is Expanded List Contents: $_isExpanded');
-                  // print('isPlus: $isPlus');
-                  // print('monitor: $monitoredPatientIDs');
+
+                  // Synchronize _isExpanded with filteredPatients
+                  List isExpanded = List.generate(
+                    filteredPatients.length,
+                    (index) => false,
+                  );
 
                   return HomeExpandableCards(
                     filteredPatients: filteredPatients,
                     context: context,
-                    isExpanded: _isExpanded,
-                    isPlus: isPlus,
+                    isExpanded: isExpanded,
                   );
+                  // return Text('a');
                 },
               ),
             ),

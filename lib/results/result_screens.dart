@@ -1,9 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pulse/models/note.dart';
 import 'package:pulse/utils/note_adder.dart';
 
-void showResultDialog(BuildContext context, int MEWs) {
+void showResultDialog({
+  required BuildContext context,
+  required int MEWs,
+  required String noteID,
+}) {
   List<dynamic> components = getComponent(MEWs);
   String nursing = components[0];
   String emoji = components[1];
@@ -38,7 +43,9 @@ void showResultDialog(BuildContext context, int MEWs) {
                               child: Text(
                                 "finishedCalculating".tr(),
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 22),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22,
+                                ),
                               ),
                             ),
                           ),
@@ -125,14 +132,14 @@ void showResultDialog(BuildContext context, int MEWs) {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return NoteAdder(
-                        onSave: () {},
-                      );
+                      return NoteAdder(noteID: noteID);
                     },
                   );
                 },
-                icon: const Icon(FontAwesomeIcons.solidPenToSquare,
-                    color: Colors.white),
+                icon: const Icon(
+                  FontAwesomeIcons.solidPenToSquare,
+                  color: Colors.white,
+                ),
                 label: Text(
                   'addNote'.tr(),
                   style: const TextStyle(
@@ -143,8 +150,10 @@ void showResultDialog(BuildContext context, int MEWs) {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF565656),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -156,10 +165,7 @@ void showResultDialog(BuildContext context, int MEWs) {
               bottom: 0,
               right: 0,
               child: IgnorePointer(
-                child: Opacity(
-                  opacity: 0.5,
-                  child: Image.asset(emoji),
-                ),
+                child: Opacity(opacity: 0.5, child: Image.asset(emoji)),
               ),
             ),
             Positioned(

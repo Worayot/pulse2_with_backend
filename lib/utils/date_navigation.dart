@@ -3,7 +3,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 class DateNavigation extends StatefulWidget {
-  const DateNavigation({super.key});
+  final Function(DateTime) onDateChanged; // Callback function
+
+  const DateNavigation({super.key, required this.onDateChanged});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -17,12 +19,14 @@ class _DateNavigationState extends State<DateNavigation> {
     setState(() {
       selectedDate = selectedDate.subtract(const Duration(days: 1));
     });
+    widget.onDateChanged(selectedDate); // Notify parent widget with new date
   }
 
   void _increaseDate() {
     setState(() {
       selectedDate = selectedDate.add(const Duration(days: 1));
     });
+    widget.onDateChanged(selectedDate); // Notify parent widget with new date
   }
 
   @override
@@ -53,18 +57,17 @@ class _DateNavigationState extends State<DateNavigation> {
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
-                decoration:
-                    TextDecoration.underline, // Add underline decoration
+                decoration: TextDecoration.underline,
                 decorationColor: Colors.white,
               ),
             ),
           ),
-          // Check if the selected date is today, if true, hide the increase button
           SizedBox(
             width: 15,
             child: Visibility(
-              visible: selectedDate
-                  .isBefore(DateTime.now().subtract(const Duration(days: 1))),
+              visible: selectedDate.isBefore(
+                DateTime.now().subtract(const Duration(days: 1)),
+              ),
               child: InkWell(
                 onTap: _increaseDate,
                 child: const FaIcon(
