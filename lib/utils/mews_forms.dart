@@ -8,8 +8,14 @@ import 'package:pulse/services/mews_services.dart';
 
 class MEWsForms extends StatefulWidget {
   final String patientID;
-  final String mewsID;
-  const MEWsForms({super.key, required this.patientID, required this.mewsID});
+  final String noteID;
+  final VoidCallback onPop;
+  const MEWsForms({
+    super.key,
+    required this.patientID,
+    required this.noteID,
+    required this.onPop,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -680,6 +686,8 @@ class _MEWsFormsState extends State<MEWsForms> {
                             );
 
                             Navigator.pop(context);
+                            widget.onPop();
+
                             showResultDialog(context, MEWs);
                             Parameters parameters = Parameters(
                               patientId: widget.patientID,
@@ -693,7 +701,7 @@ class _MEWsFormsState extends State<MEWsForms> {
                               mews: MEWs.toString(),
                               cvp: cvp,
                             );
-                            MEWsService().addMEWs(widget.mewsID, parameters);
+                            MEWsService().addMEWs(widget.noteID, parameters);
                           },
                           child: Text(
                             'calculate'.tr(),

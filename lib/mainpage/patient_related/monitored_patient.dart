@@ -25,6 +25,16 @@ class _PatientPageState extends State<PatientPage> {
     });
   }
 
+  // void refreshData() {
+  //   setState(() {});
+  // }
+
+  Future<void> refreshData() async {
+    // Perform any asynchronous work here
+    await Future.delayed(Duration(seconds: 1)); // Example of async work
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +92,10 @@ class _PatientPageState extends State<PatientPage> {
                 itemCount: patients.length,
                 itemBuilder: (context, index) {
                   Map<String, dynamic> patientData = patients[index];
-                  return MonitoredPatientCard(patientData: patientData);
+                  return MonitoredPatientCard(
+                    patientData: patientData,
+                    onPop: refreshData,
+                  );
                 },
               );
             }

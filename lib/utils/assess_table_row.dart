@@ -8,12 +8,14 @@ class AssessTableRowWidget extends StatelessWidget {
   final Map<String, dynamic> combinedData;
   final String myUserID;
   final String patientID;
+  final VoidCallback onPop;
   // Constructor with required parameters
   const AssessTableRowWidget({
     super.key,
     required this.combinedData,
     required this.myUserID,
     required this.patientID,
+    required this.onPop,
   });
 
   @override
@@ -69,7 +71,7 @@ class AssessTableRowWidget extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           SizedBox(
-            width: screenWidth * 0.28,
+            width: screenWidth * 0.26,
             height: screenHeight * 0.033,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -89,7 +91,11 @@ class AssessTableRowWidget extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return MEWsForms(patientID: patientID, mewsID: mewsID);
+                    return MEWsForms(
+                      patientID: patientID,
+                      noteID: noteID,
+                      onPop: onPop,
+                    );
                   },
                 );
               },
@@ -106,7 +112,7 @@ class AssessTableRowWidget extends StatelessWidget {
           const SizedBox(width: 8),
           Container(
             // padding: padding,
-            width: screenWidth * 0.18,
+            width: screenWidth * 0.2,
             height: screenHeight * 0.033,
             decoration: BoxDecoration(
               color: Colors.white,
@@ -184,7 +190,7 @@ class AssessTableRowWidget extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return NoteEditor(note: note, noteID: noteID);
+                    return NoteEditor(note: note, noteID: noteID, onPop: onPop);
                   },
                 );
               },

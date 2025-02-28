@@ -7,8 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NoteEditor extends StatefulWidget {
   final String note;
   final String noteID;
+  final VoidCallback onPop;
 
-  const NoteEditor({super.key, required this.note, required this.noteID});
+  const NoteEditor({
+    super.key,
+    required this.note,
+    required this.noteID,
+    required this.onPop,
+  });
 
   @override
   State<NoteEditor> createState() => _NoteEditorState();
@@ -41,6 +47,7 @@ class _NoteEditorState extends State<NoteEditor> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     return Padding(
       padding: EdgeInsets.only(top: size.height / 4, left: 16, right: 16),
       child: Stack(
@@ -91,13 +98,14 @@ class _NoteEditorState extends State<NoteEditor> {
                         child: ElevatedButton(
                           onPressed: () {
                             MEWsService().addNote(
-                              widget.noteID,
-                              Note(
+                              noteID: widget.noteID,
+                              note: Note(
                                 text: _noteController.text,
                                 auditor: myUserID,
                               ),
                             );
                             Navigator.pop(context);
+                            widget.onPop();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xff407BFF),

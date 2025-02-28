@@ -8,10 +8,16 @@ import 'package:pulse/utils/circle_with_num.dart';
 import 'package:pulse/utils/assess_table_row.dart';
 import 'package:pulse/utils/time_manager.dart';
 import 'package:pulse/func/time_formatter.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class MonitoredPatientCard extends StatefulWidget {
   final Map<String, dynamic> patientData;
-  const MonitoredPatientCard({super.key, required this.patientData});
+  final VoidCallback onPop;
+  const MonitoredPatientCard({
+    super.key,
+    required this.patientData,
+    required this.onPop,
+  });
 
   @override
   State<MonitoredPatientCard> createState() => _MonitoredPatientCardState();
@@ -26,33 +32,35 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     String patientID = patientData['patient_id'];
     String myUserID = patientData['user_id'];
     Map<String, dynamic> patientDetails = patientData['patient_details'];
-    String gender = patientDetails['gender'];
-    String bedNumber = patientDetails['bed_number'];
-    String ward = patientDetails['ward'];
-    String age = patientDetails['age'];
-    String hn = patientDetails['hospital_number'];
     String fullname = patientDetails['fullname'];
     List<Map<String, dynamic>> dataRows = patientData['inspection_notes'];
     dataRows.sort((a, b) => a['time'].compareTo(b['time']));
 
     Size size = MediaQuery.of(context).size;
     int dataLength = dataRows.length;
-    // print(myUserID);
+
     List<Map<String, dynamic>> combinedData = [];
 
     if (dataRows.isNotEmpty) {
       for (var map in dataRows) {
         Timestamp timestamp = map['time'];
-        DateTime dateTime = timestamp.toDate();
-        String formattedTime = DateFormat('HH.mm').format(dateTime);
-        String timeDelta = timeDeltaFromNow(dateTime: dateTime);
+        DateTime dateTime = timestamp.toDate().toUtc();
+
+        // Convert DateTime to Asia/Bangkok timezone
+        final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+        var localDateTime = tz.TZDateTime.from(dateTime, bangkokTimezone);
+        localDateTime = localDateTime.subtract(Duration(hours: 7));
+
+        // Format the local DateTime
+        String formattedTime = DateFormat('HH.mm').format(localDateTime);
+        String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
 
         combinedData.add({
           "formatted_time": '$formattedTime${'n'.tr()} ($timeDelta)',
-          "mews": map['mews']['mews'],
+          "mews": map['mews']['mews'] ?? '-',
           "mews_id": map['mews_id'],
           "note_id": map['note_id'],
-          "note": map['text'],
+          "note": map['text'] ?? '',
           "auditor": map['audit_by'],
         });
       }
@@ -61,10 +69,9 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     // Get latest values
     String latestTime =
         combinedData.isNotEmpty ? combinedData.last["formatted_time"] : "-";
+
     String latestMews =
         combinedData.isNotEmpty ? combinedData.last["mews"].toString() : "-";
-
-    // print(combinedData.isNotEmpty ? combinedData[0] : 'None');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -75,9 +82,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
             child: Padding(
               padding: const EdgeInsets.only(top: 10),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(
-                  16,
-                ), // Match the container's radius
+                borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   onTap: () {
                     setState(() {
@@ -100,13 +105,10 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                     child: SingleChildScrollView(
                       physics: const NeverScrollableScrollPhysics(),
                       child: Column(
-                        mainAxisSize:
-                            MainAxisSize.min, // Adjust height dynamically
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(
-                            height: 70,
-                          ), // Static height for header
+                          const SizedBox(height: 70),
                           if (isExpanded) ...[
                             Column(
                               children: List.generate(dataLength, (i) {
@@ -114,6 +116,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                                   combinedData: combinedData[i],
                                   myUserID: myUserID,
                                   patientID: patientID,
+                                  onPop: widget.onPop,
                                 );
                               }),
                             ),
@@ -161,7 +164,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                           children: [
                             Text(
                               fullname,
-
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: size.width * 0.04,
@@ -189,7 +191,14 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                       buildActionButton(
                         FontAwesomeIcons.solidClock,
                         () {
-                          showTimeManager(context, size.width, size.height);
+                          showTimeManager(
+                            context: context,
+                            screenWidth: size.width,
+                            screenHeight: size.height,
+                            auditorID: myUserID,
+                            patientID: patientID,
+                            onPop: widget.onPop,
+                          );
                         },
                         Colors.white,
                         const Color(0xff3362CC),
@@ -207,7 +216,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
             child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-
                 children: [
                   Text('assess'.tr()),
                   isExpanded

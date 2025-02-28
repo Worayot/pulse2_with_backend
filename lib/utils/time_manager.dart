@@ -1,12 +1,24 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:pulse/func/notification_scheduler.dart';
+import 'package:pulse/models/inspection_note.dart';
+import 'package:pulse/services/mews_services.dart';
+import 'package:timezone/data/latest.dart'
+    as tzdata; // Import for initializeTimeZones
+import 'package:timezone/timezone.dart'
+    as tz; // Import for timezone functionality
 
-void showTimeManager(
-  BuildContext context,
-  double screenWidth,
-  double screenHeight,
-) {
+void showTimeManager({
+  required BuildContext context,
+  required double screenWidth,
+  required double screenHeight,
+  required String auditorID,
+  required String patientID,
+  required VoidCallback onPop,
+}) async {
+  // Initialize timezone database
+  await _loadTimezone();
+
   int selectedHour = 0;
   int selectedMinute = 0;
 
@@ -199,29 +211,8 @@ void showTimeManager(
                           ),
                         ),
                         const SizedBox(height: 30),
-                        // ElevatedButton(
-                        //   onPressed: () {
-                        //     print(
-                        //         "Selected Time: $selectedHour:$selectedMinute");
-
-                        //     Navigator.of(context).pop();
-                        //   },
-                        //   style: ElevatedButton.styleFrom(
-                        //       padding: const EdgeInsets.symmetric(
-                        //         vertical: 12,
-                        //         horizontal: 20,
-                        //       ),
-                        //       shape: RoundedRectangleBorder(
-                        //         borderRadius: BorderRadius.circular(15),
-                        //       ),
-                        //       backgroundColor: const Color(0xffC6D8FF)),
-                        //   child: Text("setNotification".tr(),
-                        //       style: const TextStyle(
-                        //           fontWeight: FontWeight.bold,
-                        //           color: Colors.black)),
-                        // ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             print(
                               "Selected Time: $selectedHour:$selectedMinute",
                             );
@@ -234,18 +225,49 @@ void showTimeManager(
                               selectedHour,
                               selectedMinute,
                             );
+
+                            // If the selected time is in the past, schedule for the next day
                             if (notificationTime.isBefore(now)) {
                               notificationTime = notificationTime.add(
                                 Duration(days: 1),
                               );
                             }
 
-                            NotificationScheduler().scheduleNotificationAtTime(
-                              notificationTime,
-                              'Your notification message here', // Replace with your message
+                            print('Scheduled Time: $notificationTime');
+
+                            // Create a new InspectionNote
+                            InspectionNote newInspection = InspectionNote(
+                              patientID: patientID,
+                              auditorID: auditorID,
+                              time: notificationTime,
                             );
 
+                            // Add the inspection to Firestore
+                            try {
+                              await MEWsService().addNewInspection(
+                                inspectionNote: newInspection,
+                              );
+                              print('Inspection added to Firestore');
+                            } catch (e) {
+                              print(
+                                'Failed to add inspection to Firestore: $e',
+                              );
+                            }
+
+                            // Schedule the notification
+                            try {
+                              await NotificationScheduler()
+                                  .scheduleNotificationAtTime(
+                                    notificationTime,
+                                    'Reminder: Your inspection is scheduled at ${DateFormat('HH:mm').format(notificationTime)}',
+                                  );
+                              print('Notification scheduled successfully');
+                            } catch (e) {
+                              print('Failed to schedule notification: $e');
+                            }
+
                             Navigator.of(context).pop();
+                            onPop();
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
@@ -277,4 +299,11 @@ void showTimeManager(
       );
     },
   );
+}
+
+// Function to initialize the timezone database
+Future<void> _loadTimezone() async {
+  tzdata.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Bangkok')); // Set local timezone
+  print("Timezone initialized!");
 }
