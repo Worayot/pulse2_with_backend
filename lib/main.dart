@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:pulse/authentication/login.dart';
 import 'package:pulse/firebase_options.dart';
 import 'package:pulse/func/notification_scheduler.dart';
-
 import 'package:pulse/mainpage/navigation.dart';
 import 'package:pulse/provider/user_data_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -59,7 +58,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await initializeNotifications(); // Initialize notifications
 
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
@@ -95,8 +94,8 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
-      // home: const NavigationPage(),
-      home: const LoginPage(),
+      home: const NavigationPage(),
+      // home: const LoginPage(),
     );
   }
 }

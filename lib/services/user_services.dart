@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:pulse/models/note.dart';
 import 'package:pulse/models/parameters.dart';
 import '../models/user.dart';
-import 'url.dart';
+import 'server_url.dart';
 
 class UserServices {
   //* Tested
@@ -55,7 +55,7 @@ class UserServices {
 
   //* Tested
   Future<bool> addUser(User user) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/add_user');
+    final url = Uri.parse('$baseUrl/authenticate/signup');
 
     try {
       final response = await http.post(
@@ -102,30 +102,27 @@ class UserServices {
   }
 
   //* Tested
-  saveUserData(String userId, User user) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/save_user');
+  saveUserData({required User newUserData, required String uid}) async {
+    final url = Uri.parse('$baseUrl/sett-fetch/save_user/$uid');
 
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-
-        // body: jsonEncode(user.toJson()),
-        body: jsonEncode({
-          'user': user.toJson(),
-          'user_id': userId, // Added userId to request body
-        }),
+        body: jsonEncode(newUserData.toJson()),
       );
 
       if (response.statusCode == 200) {
         print("Successfully edited user's data: ${response.body}");
         return true; // Success
+      } else if (response.statusCode == 404) {
+        print("User not found: ${response.body}");
       } else {
         print("Failed to edit user's data: ${response.body}");
-        return false; // Failure
       }
+      return false; // Failure
     } catch (e) {
-      print("Error getting note: $e");
+      print("Error during request: $e");
       return false;
     }
   }

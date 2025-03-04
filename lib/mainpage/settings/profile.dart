@@ -60,34 +60,62 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
   void _toggleEditMode(String field) {
     UserServices userServices = UserServices();
+
     setState(() {
       if (field == 'name') {
+        // Toggle edit state for name
         _isEditingName = !_isEditingName;
+
         if (!_isEditingName) {
+          // After editing name, save the updated name
           _saveName('name', _nameController.text);
+
+          // Update user data and send the new name to the backend
           userServices.saveUserData(
-            _nurseID,
-            User(
-              fullname: _name,
+            newUserData: User(
+              fullname:
+                  _nameController.text, // Use the value from the controller
               nurseId: _nurseID,
               password: _password,
               role: _role,
             ),
+            uid: _nurseID,
           );
         }
       } else if (field == 'password') {
+        // Toggle edit state for password
         _isEditingPassword = !_isEditingPassword;
-        if (!_isEditingPassword) {
-          _savePassword('password', _passwordController.text);
 
+        if (!_isEditingPassword) {
+          // Perform password validation check (e.g., at least 6 characters)
+          if (_passwordController.text.trim().length < 6) {
+            // Show an error message using Snackbar
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'passwordWarning'.tr(),
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 2),
+              ),
+            );
+            return; // Exit and don't save if validation fails
+          }
+
+          // Save the password value from the controller
+          _savePassword('password', _passwordController.text.trim());
+
+          // Update user data and send the new password to the backend
           userServices.saveUserData(
-            _nurseID,
-            User(
+            newUserData: User(
               fullname: _name,
               nurseId: _nurseID,
-              password: _password,
+              password:
+                  _passwordController.text.trim(), // Use the controller value
               role: _role,
             ),
+            uid: _nurseID,
           );
         }
       }
@@ -263,12 +291,24 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                       0.0,
                                                     ), // Move 8 pixels to the right
                                                     child: IconButton(
-                                                      onPressed:
-                                                          () => _saveName(
-                                                            'name',
-                                                            _nameController
-                                                                .text,
+                                                      onPressed: () {
+                                                        UserServices().saveUserData(
+                                                          newUserData: User(
+                                                            fullname: _name,
+                                                            nurseId: _nurseID,
+                                                            password:
+                                                                _passwordController
+                                                                    .text
+                                                                    .trim(), // Use the controller value
+                                                            role: _role,
                                                           ),
+                                                          uid: _nurseID,
+                                                        );
+                                                        _saveName(
+                                                          'name',
+                                                          _nameController.text,
+                                                        );
+                                                      },
                                                       icon: const Icon(
                                                         FontAwesomeIcons
                                                             .chevronRight,
@@ -349,12 +389,54 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                       0.0,
                                                     ), // Move 8 pixels to the right
                                                     child: IconButton(
-                                                      onPressed:
-                                                          () => _savePassword(
-                                                            'password',
-                                                            _passwordController
-                                                                .text,
+                                                      onPressed: () {
+                                                        if (_passwordController
+                                                                .text
+                                                                .trim()
+                                                                .length <
+                                                            6) {
+                                                          ScaffoldMessenger.of(
+                                                            context,
+                                                          ).showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(
+                                                                'passwordWarning'
+                                                                    .tr(),
+                                                                style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              backgroundColor:
+                                                                  Colors.red,
+                                                              duration:
+                                                                  Duration(
+                                                                    seconds: 2,
+                                                                  ),
+                                                            ),
+                                                          );
+                                                          return;
+                                                        }
+                                                        _savePassword(
+                                                          'password',
+                                                          _passwordController
+                                                              .text,
+                                                        );
+                                                        UserServices().saveUserData(
+                                                          newUserData: User(
+                                                            fullname: _name,
+                                                            nurseId: _nurseID,
+                                                            password:
+                                                                _passwordController
+                                                                    .text
+                                                                    .trim(), // Use the controller value
+                                                            role: _role,
                                                           ),
+                                                          uid: _nurseID,
+                                                        );
+                                                      },
+
                                                       icon: const Icon(
                                                         FontAwesomeIcons
                                                             .chevronRight,

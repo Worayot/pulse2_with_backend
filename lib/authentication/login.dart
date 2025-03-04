@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:pulse/authentication/loading_screen.dart';
-import 'package:pulse/services/url.dart';
+import 'package:pulse/services/server_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -20,8 +20,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _nurseIDController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   int _selectedLanguageIndex = 1;
-  bool _isLoading = false;
-  String _errorMessage = '';
+  bool isLoading = false;
+  String errorMessage = '';
   final _storage = const FlutterSecureStorage();
   final loginUrl = Uri.parse('$baseUrl/authenticate/login');
   final cookieUrl = Uri.parse('$baseUrl/authenticate/create-session-cookie');
@@ -77,8 +77,8 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() {
-      _isLoading = true;
-      _errorMessage = '';
+      isLoading = true;
+      errorMessage = '';
     });
 
     try {
@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (idToken != null) {
           print("Firebase ID Token: $idToken");
-          await Future.delayed(Duration(seconds: 5));
+          await Future.delayed(Duration(seconds: 1));
 
           // Step 2: Send ID Token to FastAPI to create a session
           final sessionResponse = await http.post(
@@ -138,13 +138,22 @@ class _LoginPageState extends State<LoginPage> {
             );
           } else {
             print("Failed to create session: ${sessionResponse.body}");
+            setState(() {
+              isLoading = false;
+            });
           }
         }
       } else {
         print("Login failed: ${response.body}");
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
       print("Error: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -234,10 +243,11 @@ class _LoginPageState extends State<LoginPage> {
                               keyboardType: TextInputType.number,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return "Please enter a Nurse ID"; // Use .tr() if localized
+                                  return "plsEnterNurseID"
+                                      .tr(); // Use .tr() if localized
                                 }
                                 if (!RegExp(r'^\d+$').hasMatch(value)) {
-                                  return "Nurse ID must be a number";
+                                  return "nurseIDMustBeANumber".tr();
                                 }
                                 return null; // No error
                               },
@@ -273,7 +283,7 @@ class _LoginPageState extends State<LoginPage> {
                               obscureText: true,
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return "Please enter your password".tr();
+                                  return "plsEnterPassword".tr();
                                 }
                                 return null;
                               },
@@ -296,13 +306,23 @@ class _LoginPageState extends State<LoginPage> {
                                   elevation: 5,
                                 ),
                                 onPressed: _login,
-                                child: Text(
-                                  "login".tr(),
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                child:
+                                    isLoading
+                                        ? Center(
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  Colors.white,
+                                                ),
+                                          ),
+                                        )
+                                        : Text(
+                                          "login".tr(),
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                               ),
                             ),
                           ],

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-Widget infoTextField(
-    {required String title,
-    required TextEditingController controller,
-    required Color boxColor,
-    required BuildContext context,
-    required bool fillSpace,
-    String? hintText}) {
+Widget infoTextField({
+  required String title,
+  required TextEditingController controller,
+  required Color boxColor,
+  required BuildContext context,
+  required bool fillSpace,
+  String? hintText,
+}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -28,8 +29,12 @@ Widget infoTextField(
           borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
-          padding:
-              const EdgeInsets.only(top: 10, bottom: 0, left: 12, right: 12),
+          padding: const EdgeInsets.only(
+            top: 10,
+            bottom: 0,
+            left: 12,
+            right: 12,
+          ),
           child: TextFormField(
             controller: controller,
             maxLines: 2, // Allows for text wrapping to new lines
@@ -38,10 +43,7 @@ Widget infoTextField(
               border: InputBorder.none,
               isCollapsed: true,
               hintText: hintText,
-              hintStyle: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
+              hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
             ),
           ),
         ),

@@ -35,13 +35,12 @@ class _EditUserFormState extends State<EditUserForm> {
     nurseIDController.text = user.nurseId;
     String role = user.role;
     if (role.isNotEmpty) {
-      if (role == 'user') {
-        selectedRole = 'Nurse';
-      } else {
+      if (role.toLowerCase() == 'admin') {
         selectedRole = 'Admin';
+      } else {
+        selectedRole = 'Nurse';
       }
     }
-    // selectedRole = user.role;
   }
 
   @override
@@ -86,7 +85,10 @@ class _EditUserFormState extends State<EditUserForm> {
         password: widget.user.password,
         role: selectedRole,
       );
-      UserServices().saveUserData(widget.user.nurseId, newUserData);
+      UserServices().saveUserData(
+        newUserData: newUserData,
+        uid: widget.user.nurseId,
+      );
 
       Navigator.pop(context);
     }
@@ -242,6 +244,7 @@ class _EditUserFormState extends State<EditUserForm> {
                         title: "nurseID".tr(),
                         fontSize: tws.getInfoBoxTextSize(),
                         controller: nurseIDController,
+                        blockEditing: true,
                         boxColor: const Color(0xffE0EAFF),
                         minWidth: 140,
                       ),

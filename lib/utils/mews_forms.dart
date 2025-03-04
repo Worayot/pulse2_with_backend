@@ -71,6 +71,7 @@ class _MEWsFormsState extends State<MEWsForms> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

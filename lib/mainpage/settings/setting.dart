@@ -13,6 +13,8 @@ import 'package:pulse/mainpage/settings/profile.dart';
 import 'package:pulse/utils/custom_header.dart';
 import 'dart:io';
 
+import 'package:pulse/utils/warning_dialog.dart';
+
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -29,8 +31,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<List<Map<String, String>>> loadQuotes() async {
     try {
-      final String response =
-          await rootBundle.loadString('assets/quotes/quotes.json');
+      final String response = await rootBundle.loadString(
+        'assets/quotes/quotes.json',
+      );
       final List<dynamic> data = json.decode(response);
 
       // Ensure every dynamic map is safely cast to Map<String, String>
@@ -56,9 +59,10 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Padding(
-          padding: Platform.isAndroid
-              ? EdgeInsets.only(top: size.height * 0.05)
-              : EdgeInsets.only(top: size.height * 0),
+          padding:
+              Platform.isAndroid
+                  ? EdgeInsets.only(top: size.height * 0.05)
+                  : EdgeInsets.only(top: size.height * 0),
           child: const Header(),
         ),
         toolbarHeight: size.height * 0.13,
@@ -75,19 +79,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 _buildSettingsTile(
                   title: 'profileSetting'.tr(),
                   leadingIcon: FontAwesomeIcons.solidAddressBook,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfileSettingsPage()),
-                  ),
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileSettingsPage(),
+                        ),
+                      ),
                 ),
                 _buildSettingsTile(
                   title: 'aboutApp'.tr(),
                   leadingIcon: FontAwesomeIcons.circleInfo,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AboutAppPage()),
-                  ),
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AboutAppPage()),
+                      ),
                 ),
                 _buildSettingsTile(
                   title: 'language'.tr(),
@@ -96,7 +103,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LanguageSelectPage()),
+                        builder: (context) => LanguageSelectPage(),
+                      ),
                     );
                     setState(() {});
                   },
@@ -122,13 +130,14 @@ class _SettingsPageState extends State<SettingsPage> {
                       return Text('Error loading role: ${snapshot.error}');
                     } else if (snapshot.data == "admin") {
                       return _buildSettingsTile(
-                        title: 'admin'.tr(),
+                        title: 'adminFeature'.tr(),
                         leadingIcon: FontAwesomeIcons.userTie,
                         onTap: () async {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const AdminPage()),
+                              builder: (context) => const AdminPage(),
+                            ),
                           );
                         },
                       );
@@ -141,13 +150,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   leadingIcon: FontAwesomeIcons.rightFromBracket,
                   color: const Color(0xffFF0000),
                   onTap: () async {
-                    await Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage()),
-                      (Route<dynamic> route) =>
-                          false, // Removes all previous screens
-                    );
+                    bool shouldProceed = await showWarningDialog(context);
+                    if (shouldProceed) {
+                      await Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                        (Route<dynamic> route) =>
+                            false, // Removes all previous screens
+                      );
+                    } else {
+                      return;
+                    }
                   },
                 ),
 
@@ -183,31 +198,37 @@ class _SettingsPageState extends State<SettingsPage> {
                             children: [
                               SizedBox(
                                 width: size.width / 2.2,
-                                child: Text.rich(TextSpan(children: [
+                                child: Text.rich(
                                   TextSpan(
-                                      text: '"',
-                                      style: TextStyle(
-                                        fontSize: size.width / 25,
-                                        fontWeight: FontWeight.bold,
-                                        height: size.height * 0.002,
-                                      )),
-                                  TextSpan(
-                                    text: selectedQuote['quote']![0],
-                                    style: TextStyle(
-                                      fontSize: size.width / 15,
-                                      fontWeight: FontWeight.bold,
-                                      height: size.height * 0.002,
-                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: '"',
+                                        style: TextStyle(
+                                          fontSize: size.width / 25,
+                                          fontWeight: FontWeight.bold,
+                                          height: size.height * 0.002,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: selectedQuote['quote']![0],
+                                        style: TextStyle(
+                                          fontSize: size.width / 15,
+                                          fontWeight: FontWeight.bold,
+                                          height: size.height * 0.002,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            '${selectedQuote['quote']!.substring(1)}"',
+                                        style: TextStyle(
+                                          fontSize: size.width / 25,
+                                          fontWeight: FontWeight.bold,
+                                          height: size.height * 0.002,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  TextSpan(
-                                      text:
-                                          '${selectedQuote['quote']!.substring(1)}"',
-                                      style: TextStyle(
-                                        fontSize: size.width / 25,
-                                        fontWeight: FontWeight.bold,
-                                        height: size.height * 0.002,
-                                      ))
-                                ])),
+                                ),
                               ),
                               SizedBox(height: size.height * 0.01),
                               SizedBox(
@@ -241,7 +262,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 fit: BoxFit.contain,
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -254,23 +275,13 @@ class _SettingsPageState extends State<SettingsPage> {
     Color? color,
   }) {
     return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(color: color ?? Colors.black),
-      ),
-      leading: FaIcon(
-        leadingIcon,
-        color: color ?? const Color(0xff3362CC),
-      ),
+      title: Text(title, style: TextStyle(color: color ?? Colors.black)),
+      leading: FaIcon(leadingIcon, color: color ?? const Color(0xff3362CC)),
       trailing: FaIcon(
         FontAwesomeIcons.arrowRight,
         color: color ?? Colors.black,
       ),
       onTap: onTap,
     );
-  }
-
-  void _logout() {
-    print('Logout tapped');
   }
 }

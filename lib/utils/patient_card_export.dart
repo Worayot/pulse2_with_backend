@@ -106,7 +106,9 @@ class PatientCardExport extends StatelessWidget {
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
+                                overflow: TextOverflow.clip,
                               ),
+                              maxLines: 1,
                             ),
                           ],
                         ),

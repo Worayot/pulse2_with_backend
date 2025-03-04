@@ -281,6 +281,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                                     // print(
                                     //   "✅ User confirmed: Deleting patient...",
                                     // );
+                                    Navigator.pop(context);
                                     await removePatientID(widget.patientId);
                                     PatientService patientService =
                                         PatientService();
@@ -288,9 +289,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                                       widget.patientId,
                                     );
                                     // await deleteUser();
-                                    Navigator.pop(
-                                      context,
-                                    ); // Only pop if it makes sense in this context
+                                    // Only pop if it makes sense in this context
                                   } else {
                                     // print("❌ User canceled deletion.");
                                   }
@@ -309,18 +308,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                             return Container(); // If not admin, don't show this tile
                           },
                         ),
-                        // TextButton(
-                        //   onPressed: () {},
-                        //   child: Text(
-                        //     'deletePatient'.tr(),
-                        //     style: const TextStyle(
-                        //         fontWeight: FontWeight.bold,
-                        //         color: Colors.red, // Red text color
-                        //         decoration: TextDecoration.underline,
-                        //         decorationColor: Colors.red // Underline
-                        //         ),
-                        //   ),
-                        // ),
+
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(

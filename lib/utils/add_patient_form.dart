@@ -5,7 +5,6 @@ import 'package:pulse/services/patient_services.dart';
 import 'package:pulse/universal_setting/sizes.dart';
 import 'package:pulse/utils/gender_dropdown.dart';
 import 'package:pulse/utils/info_text_field.dart';
-
 import '../models/patient.dart';
 
 class AddPatientForm extends StatefulWidget {
@@ -27,7 +26,18 @@ class _AddPatientFormState extends State<AddPatientForm> {
   final PatientService _patientService = PatientService();
   final _formKey = GlobalKey<FormState>();
 
+  bool _isSubmitting = false; // Flag to prevent multiple submissions
+
   Future<void> _submitForm() async {
+    if (_isSubmitting) {
+      // If already submitting, do nothing
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true; // Set submitting flag to true
+    });
+
     if (_formKey.currentState!.validate()) {
       String fullname = '${nameController.text} ${surnameController.text}';
       Patient patient = Patient(
@@ -40,15 +50,19 @@ class _AddPatientFormState extends State<AddPatientForm> {
       );
 
       bool success = await _patientService.addPatient(patient);
-      if (success) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text("Patient added successfully!")),
-        // );
-        Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Failed to add patient.")));
+
+      if (mounted) {
+        if (success) {
+          Navigator.pop(context); // Pop the form if successful
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to add patient.")),
+          );
+        }
+        setState(() {
+          _isSubmitting =
+              false; // Set submitting flag back to false after process is complete
+        });
       }
     }
   }
@@ -98,7 +112,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       );
       return;
     } else {
-      _submitForm();
+      _submitForm(); // Proceed with submission if no empty fields
     }
   }
 
@@ -247,21 +261,27 @@ class _AddPatientFormState extends State<AddPatientForm> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: ElevatedButton.icon(
-                          onPressed: submitData,
-                          label: Text(
-                            'save'.tr(),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                          onPressed:
+                              _isSubmitting
+                                  ? null
+                                  : submitData, // Disable if submitting
+                          label:
+                              _isSubmitting
+                                  ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ) // Show progress indicator
+                                  : Text(
+                                    'save'.tr(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xff407BFF),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                12,
-                              ), // Set border radius
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                           ),

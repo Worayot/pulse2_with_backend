@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pulse/services/patient_services.dart';
 import 'package:pulse/universal_setting/sizes.dart';
 import 'package:pulse/mainpage/patient_related/no_patient_screen.dart';
-import 'package:pulse/utils/monitored_patient_card.dart';
+import 'package:pulse/utils/patient_card_monitored.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientPage extends StatefulWidget {

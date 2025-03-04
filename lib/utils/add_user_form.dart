@@ -19,6 +19,7 @@ class _AddUserFormState extends State<AddUserForm> {
   final TextEditingController nurseIDController = TextEditingController();
 
   String selectedRole = '';
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -29,6 +30,16 @@ class _AddUserFormState extends State<AddUserForm> {
   }
 
   void submitData() {
+    if (_isSubmitting) {
+      // If already submitting, do nothing
+      return;
+    }
+
+    // Set _isSubmitting to true to prevent double submission
+    setState(() {
+      _isSubmitting = true;
+    });
+
     String name = nameController.text.trim();
     String surname = surnameController.text.trim();
     String nurseID = nurseIDController.text.trim();
@@ -54,17 +65,36 @@ class _AddUserFormState extends State<AddUserForm> {
           );
         },
       );
+
+      // Set _isSubmitting back to false to enable further submissions
+      setState(() {
+        _isSubmitting = false;
+      });
       return;
     } else {
+      // Only pop once if the form submission is successful
+      if (mounted) {
+        Navigator.pop(context); // Pop the current form
+      }
+
+      String password = nurseID.padLeft(6, '0');
+
+      // Uncomment the following line when you want to add user data
       UserServices().addUser(
         User(
           fullname: '$name $surname',
           nurseId: nurseID,
-          password: nurseID,
+          password: password,
           role: selectedRole,
         ),
       );
-      Navigator.pop(context);
+
+      // Set _isSubmitting back to false after submission completes
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
     }
   }
 
@@ -187,7 +217,7 @@ class _AddUserFormState extends State<AddUserForm> {
                           ),
                           items: [
                             DropdownMenuItem(
-                              value: "Nurse",
+                              value: "nurse",
                               child: Text(
                                 "nurse".tr(),
                                 style: TextStyle(
@@ -197,7 +227,7 @@ class _AddUserFormState extends State<AddUserForm> {
                               ),
                             ),
                             DropdownMenuItem(
-                              value: "Admin",
+                              value: "admin",
                               child: Text(
                                 "admin".tr(),
                                 style: TextStyle(

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:pulse/models/patient_user_link.dart';
-import 'url.dart';
+import 'server_url.dart';
 import '../models/patient.dart';
 
 class FirebasePatientService {

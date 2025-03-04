@@ -112,6 +112,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
         String patientID = patient['patient_id'];
         String time = patient['inspectionTime'];
 
+        String nextTimeText =
+            time == '-'
+                ? "${"latestInspection".tr()} -"
+                : "${"latestInspection".tr()} $time${"n".tr()}";
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 16.0, left: 8, right: 8),
           child: Stack(
@@ -234,7 +239,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                         ),
                                       ),
                                       Text(
-                                        "${"latestInspection".tr()} $time${"n".tr()}",
+                                        nextTimeText,
                                         style: const TextStyle(fontSize: 11),
                                       ),
                                       const SizedBox(height: 2),
