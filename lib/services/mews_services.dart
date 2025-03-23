@@ -83,31 +83,29 @@ class MEWsService {
   }
 
   //* Tested
-  addNewInspection({required InspectionNote inspectionNote}) async {
+  Future<String> addNewInspection({
+    required InspectionNote inspectionNote,
+  }) async {
     final url = Uri.parse('$baseUrl/noti-fetch/set_inspection_time/');
 
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          ...inspectionNote.toJson(), // Assuming Note has a `toJson()` method
-        }),
+        body: jsonEncode({...inspectionNote.toJson()}),
       );
 
-      print(inspectionNote.toString());
-      print(inspectionNote.toJson());
-
       if (response.statusCode == 200) {
-        print("Successfully adding new inspection time: ${response.body}");
-        return true; // Success
+        // print("Successfully adding new inspection time: ${response.body}");
+        return response.body; // Success
       } else {
-        print("Failed to new inspection time: ${response.body}");
-        return false; // Failure
+        // print("Failed to new inspection time: ${response.body}");
+        return "Failed to new inspection time: ${response.body}";
+        // return false; // Failure
       }
     } catch (e) {
-      print("Error adding new inspection time: $e");
-      return false;
+      // print("Error adding new inspection time: $e");
+      return '$e';
     }
   }
 }

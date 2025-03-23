@@ -6,6 +6,8 @@ import 'package:pulse/func/get_color.dart';
 import 'package:pulse/utils/action_button.dart';
 import 'package:pulse/utils/circle_with_num.dart';
 import 'package:pulse/utils/assess_table_row.dart';
+import 'package:pulse/utils/mews_forms.dart';
+import 'package:pulse/utils/mews_forms_instant.dart';
 import 'package:pulse/utils/time_manager.dart';
 import 'package:pulse/func/time_formatter.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -188,6 +190,24 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                           ],
                         ),
                       ),
+                      buildActionButton(
+                        FontAwesomeIcons.magnifyingGlassPlus,
+                        () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return InstantMEWsForm(
+                                patientID: patientID,
+                                auditorID: myUserID,
+                                onPop: widget.onPop,
+                              );
+                            },
+                          );
+                        },
+                        Colors.white,
+                        const Color(0xff3362CC),
+                      ),
+                      SizedBox(width: size.width * 0.017),
                       buildActionButton(
                         FontAwesomeIcons.solidClock,
                         () {
