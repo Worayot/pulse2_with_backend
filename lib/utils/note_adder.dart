@@ -6,8 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class NoteAdder extends StatefulWidget {
   final String noteID;
+  final VoidCallback onPop;
 
-  const NoteAdder({super.key, required this.noteID});
+  const NoteAdder({super.key, required this.noteID, required this.onPop});
 
   @override
   _NoteAdderState createState() => _NoteAdderState();
@@ -100,6 +101,7 @@ class _NoteAdderState extends State<NoteAdder> {
                             Navigator.pop(
                               context,
                             ); // Close the screen after saving
+                            widget.onPop();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(

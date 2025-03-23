@@ -6,7 +6,6 @@ import 'package:pulse/func/get_color.dart';
 import 'package:pulse/utils/action_button.dart';
 import 'package:pulse/utils/circle_with_num.dart';
 import 'package:pulse/utils/assess_table_row.dart';
-import 'package:pulse/utils/mews_forms.dart';
 import 'package:pulse/utils/mews_forms_instant.dart';
 import 'package:pulse/utils/time_manager.dart';
 import 'package:pulse/func/time_formatter.dart';
@@ -45,6 +44,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
     if (dataRows.isNotEmpty) {
       for (var map in dataRows) {
+        // print(map);
         Timestamp timestamp = map['time'];
         DateTime dateTime = timestamp.toDate().toUtc();
 
@@ -60,6 +60,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
         combinedData.add({
           "formatted_time": '$formattedTime${'n'.tr()} ($timeDelta)',
           "mews": map['mews']['mews'] ?? '-',
+          "is_assessed": map['mews']['is_assessed'],
           "mews_id": map['mews_id'],
           "note_id": map['note_id'],
           "note": map['text'] ?? '',
@@ -74,6 +75,8 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
     String latestMews =
         combinedData.isNotEmpty ? combinedData.last["mews"].toString() : "-";
+
+    // print(combinedData);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),

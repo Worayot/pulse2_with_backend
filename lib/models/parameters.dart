@@ -9,6 +9,7 @@ class Parameters {
   final String bloodPressure;
   final String mews;
   final String cvp;
+  final bool isAssessed;
 
   Parameters({
     required this.patientId,
@@ -21,6 +22,7 @@ class Parameters {
     required this.bloodPressure,
     required this.mews,
     required this.cvp,
+    required this.isAssessed,
   });
 
   factory Parameters.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class Parameters {
       bloodPressure: json['blood_pressure'],
       mews: json['mews'],
       cvp: json['cvp'],
+      isAssessed: json['is_assessed'],
     );
   }
 
@@ -50,6 +53,7 @@ class Parameters {
       'blood_pressure': bloodPressure,
       'mews': mews,
       'cvp': cvp,
+      'is_assessed': isAssessed,
     };
   }
 }

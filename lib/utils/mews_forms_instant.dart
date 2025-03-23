@@ -742,11 +742,13 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                               bloodPressure: '$sBp/$dBp',
                               mews: MEWs.toString(),
                               cvp: cvp,
+                              isAssessed: true,
                             );
                             showResultDialog(
                               context: context,
                               MEWs: MEWs,
                               noteID: inspectionNotesID,
+                              onPop: widget.onPop,
                             );
                             MEWsService().addMEWs(
                               inspectionNotesID,

@@ -9,7 +9,7 @@ class AssessTableRowWidget extends StatelessWidget {
   final String myUserID;
   final String patientID;
   final VoidCallback onPop;
-  // Constructor with required parameters
+
   const AssessTableRowWidget({
     super.key,
     required this.combinedData,
@@ -24,13 +24,16 @@ class AssessTableRowWidget extends StatelessWidget {
     // final String time = combinedData['formatted_time'];
     final dynamic MEWs = combinedData['mews'];
     // final String auditorID = combinedData['auditor'];
-    final String mewsID = combinedData['mews_id'];
+    final bool isAssessed = combinedData['is_assessed'];
+    // final String mewsID = combinedData['mews_id'];
     final String noteID = combinedData['note_id'];
     final String note = combinedData['note'];
     // final String auditorID = combinedData['auditor'];
     final Size size = MediaQuery.of(context).size;
     final double screenWidth = size.width;
     final double screenHeight = size.height;
+
+    final bool isButtonEnabled = !isAssessed;
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, right: 10, top: 8),
       child: Row(
@@ -75,11 +78,20 @@ class AssessTableRowWidget extends StatelessWidget {
             height: screenHeight * 0.033,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                foregroundColor: const Color(0xff3362CC), // Text color
-                backgroundColor: const Color(0xffE0EAFF), // Background color
+                foregroundColor:
+                    isButtonEnabled
+                        ? const Color(0xff3362CC)
+                        : Colors.black.withOpacity(0.5), // Text color
+                backgroundColor:
+                    isButtonEnabled
+                        ? const Color(0xffE0EAFF)
+                        : Color(0xffF4F4F4), // Background color
                 shadowColor: Colors.transparent, // Removes shadow
-                side: const BorderSide(
-                  color: Color(0xff3362CC), // Border color
+                side: BorderSide(
+                  color:
+                      isButtonEnabled
+                          ? Color(0xff3362CC)
+                          : Colors.black.withOpacity(0.5), // Border color
                   width: 1, // Border width
                 ),
                 shape: RoundedRectangleBorder(
@@ -87,20 +99,23 @@ class AssessTableRowWidget extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
               ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return MEWsForms(
-                      patientID: patientID,
-                      noteID: noteID,
-                      onPop: onPop,
-                    );
-                  },
-                );
-              },
+              onPressed:
+                  isButtonEnabled
+                      ? () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return MEWsForms(
+                              patientID: patientID,
+                              noteID: noteID,
+                              onPop: onPop,
+                            );
+                          },
+                        );
+                      }
+                      : () {},
               child: Text(
-                "assessScore".tr(),
+                isButtonEnabled ? "assessScore".tr() : "assessed".tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: screenWidth * 0.035,
@@ -177,7 +192,7 @@ class AssessTableRowWidget extends StatelessWidget {
                 foregroundColor: const Color(0xff3362CC), // Text color
                 backgroundColor: const Color(0xffE0EAFF), // Background color
                 shadowColor: Colors.transparent, // Removes shadow
-                side: const BorderSide(
+                side: BorderSide(
                   color: Color(0xff3362CC), // Border color
                   width: 1, // Border width
                 ),

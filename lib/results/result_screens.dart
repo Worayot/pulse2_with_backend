@@ -8,6 +8,7 @@ void showResultDialog({
   required BuildContext context,
   required int MEWs,
   required String noteID,
+  required VoidCallback onPop,
 }) {
   List<dynamic> components = getComponent(MEWs);
   String nursing = components[0];
@@ -132,7 +133,7 @@ void showResultDialog({
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return NoteAdder(noteID: noteID);
+                      return NoteAdder(noteID: noteID, onPop: onPop);
                     },
                   );
                 },
