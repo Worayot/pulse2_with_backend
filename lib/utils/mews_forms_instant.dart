@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pulse/func/calculateMEWs.dart';
 import 'package:pulse/func/notification_scheduler.dart';
@@ -181,7 +182,14 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: temperatureController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d*$'),
+                        ), // Allows only numbers and one decimal point
+                      ],
                       decoration: InputDecoration(
                         hintText: '-',
                         suffix: const Text(
