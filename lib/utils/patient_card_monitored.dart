@@ -221,6 +221,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                             auditorID: myUserID,
                             patientID: patientID,
                             onPop: widget.onPop,
+                            patientName: fullname,
                           );
                         },
                         Colors.white,

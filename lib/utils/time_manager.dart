@@ -13,6 +13,8 @@ import 'package:timezone/data/latest.dart'
     as tzdata; // Import for initializeTimeZones
 import 'package:timezone/timezone.dart'
     as tz; // Import for timezone functionality
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 void showTimeManager({
   required BuildContext context,
@@ -21,6 +23,7 @@ void showTimeManager({
   required String auditorID,
   required String patientID,
   required VoidCallback onPop,
+  required String patientName,
 }) {
   // Initialize timezone database first
   _loadTimezone().then((_) {
@@ -257,46 +260,79 @@ void showTimeManager({
                                 );
                                 print('Inspection added to Firestore');
 
-                                final alarmSettings = AlarmSettings(
-                                  id: 42,
+                                var alarmSettings = AlarmSettings(
+                                  id:
+                                      Uuid()
+                                          .v4()
+                                          .hashCode, // Use unique hash-based ID
                                   dateTime: notificationTime,
                                   assetAudioPath: "assets/audio/alarm.mp3",
-                                  loopAudio: true,
+                                  loopAudio: false,
                                   vibrate: true,
-                                  warningNotificationOnKill: Platform.isIOS,
+                                  // warningNotificationOnKill: Platform.isIOS,
+                                  warningNotificationOnKill: true,
                                   androidFullScreenIntent: true,
                                   volumeSettings: VolumeSettings.fixed(
                                     volume: 0.8,
-                                    //  : Duration(seconds: 5),
                                     volumeEnforced: true,
                                   ),
-                                  notificationSettings:
-                                      const NotificationSettings(
-                                        title: 'TUH MEWs',
-                                        body:
-                                            'Reminder to assess this patient.',
-                                        stopButton: 'Stop the alarm',
-                                        icon: 'notification_icon',
-                                      ),
+                                  notificationSettings: NotificationSettings(
+                                    title: 'TUH MEWs',
+                                    body:
+                                        '${'remindAssess'.tr()} "$patientName".',
+                                    stopButton: 'stop'.tr(),
+                                    icon: 'notification_icon',
+                                  ),
                                 );
 
                                 await Alarm.set(alarmSettings: alarmSettings);
+
+                                // Set alarm 5 minutes before the initial alarm
+                                if (notificationTime.difference(now).inMinutes >
+                                    5) {
+                                  print(
+                                    "Adding notification before 5 minutes of the set time.",
+                                  );
+                                  alarmSettings = AlarmSettings(
+                                    id:
+                                        Uuid()
+                                            .v4()
+                                            .hashCode, // Use unique hash-based ID
+
+                                    dateTime: notificationTime.subtract(
+                                      Duration(
+                                        minutes: 5,
+                                      ), // 5 minutes before the set time
+                                    ),
+                                    assetAudioPath: "assets/audio/alarm.mp3",
+                                    loopAudio: false,
+                                    vibrate: true,
+                                    // warningNotificationOnKill: Platform.isIOS,
+                                    warningNotificationOnKill: true,
+                                    androidFullScreenIntent: true,
+                                    volumeSettings: VolumeSettings.fixed(
+                                      volume: 0.8,
+                                      volumeEnforced: true,
+                                    ),
+                                    notificationSettings: NotificationSettings(
+                                      title: 'TUH MEWs',
+                                      body:
+                                          '${'remindAssess'.tr()} "$patientName".',
+                                      stopButton: 'stop'.tr(),
+                                      icon: 'notification_icon',
+                                    ),
+                                  );
+                                  await Alarm.set(alarmSettings: alarmSettings);
+
+                                  print(
+                                    'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',
+                                  );
+                                }
                               } catch (e) {
                                 print(
                                   'Failed to add inspection to Firestore: $e',
                                 );
                               }
-
-                              // try {
-                              //   await NotificationScheduler()
-                              //       .scheduleNotificationAtTime(
-                              //         notificationTime,
-                              //         'Reminder: Your inspection is scheduled at ${DateFormat('HH:mm').format(notificationTime)}',
-                              //       );
-                              //   print('Notification scheduled successfully');
-                              // } catch (e) {
-                              //   print('Failed to schedule notification: $e');
-                              // }
 
                               if (!context.mounted) {
                                 return; // Check before popping
@@ -343,3 +379,37 @@ Future<void> _loadTimezone() async {
   tz.setLocalLocation(tz.getLocation('Asia/Bangkok')); // Set local timezone
   print("Timezone initialized!");
 }
+
+// Save active alarm ID to SharedPreferences
+Future<void> saveAlarmId(int alarmId) async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
+  alarmIds.add(alarmId.toString());
+  await prefs.setStringList('activeAlarms', alarmIds);
+}
+
+// Stop an alarm manually
+Future<void> stopAlarm(int alarmId) async {
+  await Alarm.stop(alarmId);
+  print('Alarm $alarmId stopped');
+
+  // Remove the ID from SharedPreferences
+  final prefs = await SharedPreferences.getInstance();
+  List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
+  alarmIds.remove(alarmId.toString());
+  await prefs.setStringList('activeAlarms', alarmIds);
+}
+
+// Stop all active alarms
+// Future<void> stopAllAlarms() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
+
+//   for (String id in alarmIds) {
+//     await Alarm.stop(int.parse(id));
+//     print('Alarm $id stopped');
+//   }
+
+//   // Clear stored alarms
+//   await prefs.remove('activeAlarms');
+// }
