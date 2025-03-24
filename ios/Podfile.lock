@@ -1145,6 +1145,8 @@ PODS:
     - abseil/meta/type_traits
     - abseil/xcprivacy
   - abseil/xcprivacy (1.20240116.2)
+  - alarm (0.0.1):
+    - Flutter
   - BoringSSL-GRPC (0.0.36):
     - BoringSSL-GRPC/Implementation (= 0.0.36)
     - BoringSSL-GRPC/Interface (= 0.0.36)
@@ -1245,6 +1247,8 @@ PODS:
     - nanopb (~> 3.30910.0)
   - FirebaseSharedSwift (11.8.0)
   - Flutter (1.0.0)
+  - flutter_fgbg (0.0.1):
+    - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
   - flutter_secure_storage (6.0.0):
@@ -1391,12 +1395,14 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - alarm (from `.symlinks/plugins/alarm/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_database (from `.symlinks/plugins/firebase_database/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
+  - flutter_fgbg (from `.symlinks/plugins/flutter_fgbg/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
@@ -1434,6 +1440,8 @@ SPEC REPOS:
     - RecaptchaInterop
 
 EXTERNAL SOURCES:
+  alarm:
+    :path: ".symlinks/plugins/alarm/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   firebase_auth:
@@ -1446,6 +1454,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
+  flutter_fgbg:
+    :path: ".symlinks/plugins/flutter_fgbg/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_secure_storage:
@@ -1465,6 +1475,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
+  alarm: 6c1f6a9688f94cd6bf8f104c67cc26e78c9d8d13
   BoringSSL-GRPC: ca6a8e5d04812fce8ffd6437810c2d46f925eaeb
   cloud_firestore: 63a98b4e73424e1b66ebb6f289eb1a73514cbc49
   Firebase: d80354ed7f6df5f9aca55e9eb47cc4b634735eaf
@@ -1485,6 +1496,7 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 487b634ccdf6f7b7ff180fdcb2a9935490f764e8
   FirebaseSharedSwift: 672954eac7b141d6954fab9a32d45d6b1d922df8
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_fgbg: 31c0d1140a131daea2d342121808f6aa0dcd879d
   flutter_local_notifications: df98d66e515e1ca797af436137b4459b160ad8c9
   flutter_secure_storage: d33dac7ae2ea08509be337e775f6b59f1ff45f12
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7

@@ -36,6 +36,7 @@ dependencies:
   timezone: ^0.10.0
   firebase_messaging: ^15.2.4
   url_launcher: ^6.3.1
+  alarm: ^5.0.3
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +55,7 @@ flutter:
     - assets/images/flags/
     - assets/images/emojis/
     - assets/quotes/quotes.json 
+    - assets/audio/alarm.mp3
   fonts:
     - family: SpaceGrotesk
       fonts:

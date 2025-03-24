@@ -1,3 +1,9 @@
+import 'dart:io';
+
+import 'package:alarm/alarm.dart';
+import 'package:alarm/model/alarm_settings.dart';
+import 'package:alarm/model/notification_settings.dart';
+import 'package:alarm/model/volume_settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:pulse/func/notification_scheduler.dart';
@@ -250,22 +256,47 @@ void showTimeManager({
                                   inspectionNote: newInspection,
                                 );
                                 print('Inspection added to Firestore');
+
+                                final alarmSettings = AlarmSettings(
+                                  id: 42,
+                                  dateTime: notificationTime,
+                                  assetAudioPath: "assets/audio/alarm.mp3",
+                                  loopAudio: true,
+                                  vibrate: true,
+                                  warningNotificationOnKill: Platform.isIOS,
+                                  androidFullScreenIntent: true,
+                                  volumeSettings: VolumeSettings.fixed(
+                                    volume: 0.8,
+                                    //  : Duration(seconds: 5),
+                                    volumeEnforced: true,
+                                  ),
+                                  notificationSettings:
+                                      const NotificationSettings(
+                                        title: 'TUH MEWs',
+                                        body:
+                                            'Reminder to assess this patient.',
+                                        stopButton: 'Stop the alarm',
+                                        icon: 'notification_icon',
+                                      ),
+                                );
+
+                                await Alarm.set(alarmSettings: alarmSettings);
                               } catch (e) {
                                 print(
                                   'Failed to add inspection to Firestore: $e',
                                 );
                               }
 
-                              try {
-                                await NotificationScheduler()
-                                    .scheduleNotificationAtTime(
-                                      notificationTime,
-                                      'Reminder: Your inspection is scheduled at ${DateFormat('HH:mm').format(notificationTime)}',
-                                    );
-                                print('Notification scheduled successfully');
-                              } catch (e) {
-                                print('Failed to schedule notification: $e');
-                              }
+                              // try {
+                              //   await NotificationScheduler()
+                              //       .scheduleNotificationAtTime(
+                              //         notificationTime,
+                              //         'Reminder: Your inspection is scheduled at ${DateFormat('HH:mm').format(notificationTime)}',
+                              //       );
+                              //   print('Notification scheduled successfully');
+                              // } catch (e) {
+                              //   print('Failed to schedule notification: $e');
+                              // }
 
                               if (!context.mounted) {
                                 return; // Check before popping

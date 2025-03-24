@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -12,51 +13,52 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//     FlutterLocalNotificationsPlugin();
 
-Future<void> initializeNotifications() async {
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings(
-        '@mipmap/ic_launcher',
-      ); // Replace with your launcher icon
+// Future<void> initializeNotifications() async {
+//   const AndroidInitializationSettings initializationSettingsAndroid =
+//       AndroidInitializationSettings(
+//         '@mipmap/ic_launcher',
+//       ); // Replace with your launcher icon
 
-  const DarwinInitializationSettings initializationSettingsIOS =
-      DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true,
-      );
+//   const DarwinInitializationSettings initializationSettingsIOS =
+//       DarwinInitializationSettings(
+//         requestAlertPermission: true,
+//         requestBadgePermission: true,
+//         requestSoundPermission: true,
+//       );
 
-  const InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-    iOS: initializationSettingsIOS,
-  );
+//   const InitializationSettings initializationSettings = InitializationSettings(
+//     android: initializationSettingsAndroid,
+//     iOS: initializationSettingsIOS,
+//   );
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+//   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'Notification', // Replace with your channel ID
-    "Pulse's alert", // Replace with your channel name
-    importance: Importance.high,
-  );
+//   const AndroidNotificationChannel channel = AndroidNotificationChannel(
+//     'Notification', // Replace with your channel ID
+//     "Pulse's alert", // Replace with your channel name
+//     importance: Importance.high,
+//   );
 
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin
-      >()
-      ?.createNotificationChannel(channel);
-}
+//   await flutterLocalNotificationsPlugin
+//       .resolvePlatformSpecificImplementation<
+//         AndroidFlutterLocalNotificationsPlugin
+//       >()
+//       ?.createNotificationChannel(channel);
+// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Alarm.init();
   tzdata.initializeTimeZones(); // Initialize timezone data
   tz.setLocalLocation(tz.getLocation(tz.local.name)); // Set local timezone
-  NotificationScheduler notificationScheduler = NotificationScheduler();
-  await notificationScheduler.initialize();
+  // NotificationScheduler notificationScheduler = NotificationScheduler();
+  // await notificationScheduler.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await EasyLocalization.ensureInitialized();
-  await initializeNotifications(); // Initialize notifications
+  // await initializeNotifications(); // Initialize notifications
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -82,7 +84,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pulse',
+      title: 'TUH MEWs',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
