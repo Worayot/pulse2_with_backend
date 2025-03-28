@@ -4,14 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/func/pref/pref.dart';
-import 'package:pulse/mainpage/patient_related/patient_ind_data.dart';
-import 'package:pulse/models/patient_user_link.dart';
-import 'package:pulse/services/patient_services.dart';
-import 'package:pulse/utils/action_button.dart';
-import 'package:pulse/utils/edit_patient_form.dart';
-import 'package:pulse/utils/patient_details.dart';
-import 'package:pulse/utils/toggle_icon_button.dart';
+import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/mainpage/patient_related/patient_ind_data.dart';
+import 'package:tuh_mews/models/patient_user_link.dart';
+import 'package:tuh_mews/services/patient_services.dart';
+import 'package:tuh_mews/utils/action_button.dart';
+import 'package:tuh_mews/utils/edit_patient_form.dart';
+import 'package:tuh_mews/utils/patient_details.dart';
+import 'package:tuh_mews/utils/toggle_icon_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeExpandableCards extends StatefulWidget {

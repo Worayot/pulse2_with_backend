@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:pulse/models/note.dart';
-import 'package:pulse/models/parameters.dart';
+import 'package:tuh_mews/models/note.dart';
+import 'package:tuh_mews/models/parameters.dart';
 import '../models/user.dart';
 import 'server_url.dart';
 

@@ -3,10 +3,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/universal_setting/sizes.dart';
-import 'package:pulse/utils/symbols_dialog/home_symbols.dart';
-import 'package:pulse/utils/symbols_dialog/info_dialog.dart';
-import 'package:pulse/mainpage/patient_related/patient_in_system.dart';
+import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/symbols_dialog/home_symbols.dart';
+import 'package:tuh_mews/utils/symbols_dialog/info_dialog.dart';
+import 'package:tuh_mews/mainpage/patient_related/patient_in_system.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});

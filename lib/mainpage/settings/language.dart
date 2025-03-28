@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/utils/custom_header.dart';
+import 'package:tuh_mews/utils/custom_header.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageSelectPage extends StatefulWidget {
@@ -117,15 +117,18 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                             Stack(
                               children: [
                                 ElevatedButton(
-                                  onPressed: () => _onLanguageSelected(
-                                      const Locale(
-                                          'th', 'TH')), // Change to Thai
+                                  onPressed:
+                                      () => _onLanguageSelected(
+                                        const Locale('th', 'TH'),
+                                      ), // Change to Thai
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 14), // Adjust height
+                                      vertical: 14,
+                                    ), // Adjust height
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
-                                          15), // Radius 15
+                                        15,
+                                      ), // Radius 15
                                     ),
                                     backgroundColor:
                                         _selectedLocale?.languageCode == 'th'
@@ -133,50 +136,60 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                                             : Colors.grey[300],
                                   ),
                                   child: Align(
-                                    alignment: Alignment
-                                        .centerLeft, // Align text to the left
+                                    alignment:
+                                        Alignment
+                                            .centerLeft, // Align text to the left
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 8.0), // Add padding
+                                        left: 8.0,
+                                      ), // Add padding
                                       child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 12.0),
+                                        padding: const EdgeInsets.only(
+                                          left: 12.0,
+                                        ),
                                         child: Text(
                                           'ไทย',
                                           style: TextStyle(
-                                              fontSize: 16,
-                                              color: _selectedLocale
-                                                          ?.languageCode ==
-                                                      'th'
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                              fontWeight: FontWeight.bold),
+                                            fontSize: 16,
+                                            color:
+                                                _selectedLocale?.languageCode ==
+                                                        'th'
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                                 Positioned(
-                                    right: 1,
-                                    bottom: 0,
-                                    child: IgnorePointer(
-                                        child: Image.asset(
-                                            "assets/images/flags/thai_flag.png"))),
+                                  right: 1,
+                                  bottom: 0,
+                                  child: IgnorePointer(
+                                    child: Image.asset(
+                                      "assets/images/flags/thai_flag.png",
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Stack(
                               children: [
                                 ElevatedButton(
-                                  onPressed: () => _onLanguageSelected(
-                                      const Locale(
-                                          'en', 'US')), // Change to English
+                                  onPressed:
+                                      () => _onLanguageSelected(
+                                        const Locale('en', 'US'),
+                                      ), // Change to English
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 14), // Adjust height
+                                      vertical: 14,
+                                    ), // Adjust height
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
-                                          15), // Radius 15
+                                        15,
+                                      ), // Radius 15
                                     ),
                                     backgroundColor:
                                         _selectedLocale?.languageCode == 'en'
@@ -184,35 +197,42 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                                             : Colors.grey[300],
                                   ),
                                   child: Align(
-                                    alignment: Alignment
-                                        .centerLeft, // Align text to the left
+                                    alignment:
+                                        Alignment
+                                            .centerLeft, // Align text to the left
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 8.0), // Add padding
+                                        left: 8.0,
+                                      ), // Add padding
                                       child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 12.0),
+                                        padding: const EdgeInsets.only(
+                                          left: 12.0,
+                                        ),
                                         child: Text(
                                           'English',
                                           style: TextStyle(
-                                              fontSize: 16,
-                                              color: _selectedLocale
-                                                          ?.languageCode ==
-                                                      'en'
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                              fontWeight: FontWeight.bold),
+                                            fontSize: 16,
+                                            color:
+                                                _selectedLocale?.languageCode ==
+                                                        'en'
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                                 Positioned(
-                                    right: 1,
-                                    bottom: 0,
-                                    child: IgnorePointer(
-                                        child: Image.asset(
-                                            "assets/images/flags/eng_flag.png")))
+                                  right: 1,
+                                  bottom: 0,
+                                  child: IgnorePointer(
+                                    child: Image.asset(
+                                      "assets/images/flags/eng_flag.png",
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -221,14 +241,16 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                     ],
                   ),
                   Positioned(
-                      right: -5,
-                      bottom: 0,
-                      child: IgnorePointer(
-                          child: Image.asset(
+                    right: -5,
+                    bottom: 0,
+                    child: IgnorePointer(
+                      child: Image.asset(
                         "assets/images/med_care.png",
                         height: size.width * 0.75,
                         width: size.width * 0.75,
-                      )))
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

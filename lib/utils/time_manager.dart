@@ -6,9 +6,9 @@ import 'package:alarm/model/notification_settings.dart';
 import 'package:alarm/model/volume_settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:pulse/func/notification_scheduler.dart';
-import 'package:pulse/models/inspection_note.dart';
-import 'package:pulse/services/mews_services.dart';
+import 'package:tuh_mews/func/notification_scheduler.dart';
+import 'package:tuh_mews/models/inspection_note.dart';
+import 'package:tuh_mews/services/mews_services.dart';
 import 'package:timezone/data/latest.dart'
     as tzdata; // Import for initializeTimeZones
 import 'package:timezone/timezone.dart'

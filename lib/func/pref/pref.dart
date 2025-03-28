@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pulse/provider/user_data_provider.dart';
+import 'package:tuh_mews/provider/user_data_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Function to save a boolean preference

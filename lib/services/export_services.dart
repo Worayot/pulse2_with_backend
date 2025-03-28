@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:convert';
-import 'package:pulse/services/server_url.dart';
+import 'package:tuh_mews/services/server_url.dart';
 import 'package:uuid/uuid.dart';
 
 class ExportServices {

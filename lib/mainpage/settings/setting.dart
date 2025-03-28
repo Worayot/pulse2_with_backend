@@ -4,16 +4,16 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/authentication/login.dart';
-import 'package:pulse/func/pref/pref.dart';
-import 'package:pulse/mainpage/settings/aboutapp.dart';
-import 'package:pulse/mainpage/settings/admin.dart';
-import 'package:pulse/mainpage/settings/language.dart';
-import 'package:pulse/mainpage/settings/profile.dart';
-import 'package:pulse/utils/custom_header.dart';
+import 'package:tuh_mews/authentication/login.dart';
+import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/mainpage/settings/aboutapp.dart';
+import 'package:tuh_mews/mainpage/settings/admin.dart';
+import 'package:tuh_mews/mainpage/settings/language.dart';
+import 'package:tuh_mews/mainpage/settings/profile.dart';
+import 'package:tuh_mews/utils/custom_header.dart';
 import 'dart:io';
 
-import 'package:pulse/utils/warning_dialog.dart';
+import 'package:tuh_mews/utils/warning_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   @override

@@ -2,10 +2,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/services/patient_services.dart';
-import 'package:pulse/universal_setting/sizes.dart';
-import 'package:pulse/mainpage/patient_related/no_patient_screen.dart';
-import 'package:pulse/utils/patient_card_monitored.dart';
+import 'package:tuh_mews/services/patient_services.dart';
+import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
+import 'package:tuh_mews/utils/patient_card_monitored.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientPage extends StatefulWidget {

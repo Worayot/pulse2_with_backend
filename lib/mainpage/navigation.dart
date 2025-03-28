@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/func/pref/pref.dart';
-import 'package:pulse/mainpage/patient_related/patient_in_system_initilizer.dart';
-import 'package:pulse/mainpage/patient_related/export.dart';
-import 'package:pulse/mainpage/patient_related/monitored_patient.dart';
-// import 'package:pulse/mainpage/patient_data/monitored_patient_original.dart';
-import 'package:pulse/mainpage/settings/setting.dart';
-import 'package:pulse/utils/navbar.dart';
+import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/mainpage/patient_related/patient_in_system_initilizer.dart';
+import 'package:tuh_mews/mainpage/patient_related/export.dart';
+import 'package:tuh_mews/mainpage/patient_related/monitored_patient.dart';
+// import 'package:tuh_mews/mainpage/patient_data/monitored_patient_original.dart';
+import 'package:tuh_mews/mainpage/settings/setting.dart';
+import 'package:tuh_mews/utils/navbar.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});

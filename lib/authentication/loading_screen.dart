@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pulse/authentication/login.dart';
-import 'package:pulse/func/pref/pref.dart';
-import 'package:pulse/mainpage/navigation.dart';
-import 'package:pulse/services/user_services.dart';
-import 'package:pulse/utils/loading_bar.dart';
+import 'package:tuh_mews/authentication/login.dart';
+import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/mainpage/navigation.dart';
+import 'package:tuh_mews/services/user_services.dart';
+import 'package:tuh_mews/utils/loading_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:pulse/func/notification_scheduler.dart';
+import 'package:tuh_mews/func/notification_scheduler.dart';
 
 class LoadingScreen extends StatefulWidget {
   final String userId;

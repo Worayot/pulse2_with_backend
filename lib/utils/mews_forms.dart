@@ -2,10 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/func/calculateMEWs.dart';
-import 'package:pulse/models/parameters.dart';
-import 'package:pulse/results/result_screens.dart';
-import 'package:pulse/services/mews_services.dart';
+import 'package:tuh_mews/func/calculateMEWs.dart';
+import 'package:tuh_mews/models/parameters.dart';
+import 'package:tuh_mews/results/result_screens.dart';
+import 'package:tuh_mews/services/mews_services.dart';
 
 class MEWsForms extends StatefulWidget {
   final String patientID;

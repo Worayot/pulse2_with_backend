@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pulse/universal_setting/sizes.dart';
+import 'package:tuh_mews/universal_setting/sizes.dart';
 
 Widget infoTextField({
   required String title,

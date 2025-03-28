@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/models/user.dart';
-import 'package:pulse/services/user_services.dart';
-import 'package:pulse/universal_setting/sizes.dart';
-import 'package:pulse/utils/add_user_form.dart';
-import 'package:pulse/utils/custom_header.dart';
-// import 'package:pulse/utils/edit_user_form.dart';
-import 'package:pulse/utils/user_card.dart';
+import 'package:tuh_mews/models/user.dart';
+import 'package:tuh_mews/services/user_services.dart';
+import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/add_user_form.dart';
+import 'package:tuh_mews/utils/custom_header.dart';
+// import 'package:tuh_mews/utils/edit_user_form.dart';
+import 'package:tuh_mews/utils/user_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

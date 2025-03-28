@@ -28,5 +28,7 @@
 	<string>1:122811449387:ios:646d37edb837772dc96a6e</string>
 	<key>DATABASE_URL</key>
 	<string>https://mews-project-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+	<key>CFBundleDisplayName</key>
+	<string>TUH MEWS</string>
 </dict>
 </plist>

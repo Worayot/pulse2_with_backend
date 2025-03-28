@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:pulse/provider/user_data_provider.dart';
+import 'package:tuh_mews/provider/user_data_provider.dart';
 
 class Header extends StatelessWidget {
   const Header({super.key});
@@ -31,8 +31,10 @@ class Header extends StatelessWidget {
             children: [
               Text(
                 userDataProvider.name,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 '${"nurseID".tr()} : ${userDataProvider.nurseID}',

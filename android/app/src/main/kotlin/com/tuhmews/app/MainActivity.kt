@@ -1,4 +1,4 @@
-package com.example.test_fastapi
+package com.tuhmews.app
 
 import io.flutter.embedding.android.FlutterActivity
 

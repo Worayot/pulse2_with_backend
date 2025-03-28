@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/models/user.dart';
-import 'package:pulse/services/user_services.dart';
-import 'package:pulse/universal_setting/sizes.dart';
-import 'package:pulse/utils/info_text_field.dart';
+import 'package:tuh_mews/models/user.dart';
+import 'package:tuh_mews/services/user_services.dart';
+import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/info_text_field.dart';
 
 class AddUserForm extends StatefulWidget {
   const AddUserForm({super.key});

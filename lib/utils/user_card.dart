@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/utils/action_button.dart';
-import 'package:pulse/utils/delete_user_dialog.dart';
-import 'package:pulse/utils/edit_user_form.dart';
+import 'package:tuh_mews/utils/action_button.dart';
+import 'package:tuh_mews/utils/delete_user_dialog.dart';
+import 'package:tuh_mews/utils/edit_user_form.dart';
 import '../models/user.dart';
 
 class UserCard extends StatelessWidget {

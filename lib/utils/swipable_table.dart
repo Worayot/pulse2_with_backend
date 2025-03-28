@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/services/patient_services.dart';
-import 'package:pulse/utils/note_viewer.dart';
+import 'package:tuh_mews/services/patient_services.dart';
+import 'package:tuh_mews/utils/note_viewer.dart';
 import 'package:intl/intl.dart';
 
 class SwipableTable extends StatefulWidget {

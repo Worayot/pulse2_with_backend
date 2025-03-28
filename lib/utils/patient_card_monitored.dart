@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/func/get_color.dart';
-import 'package:pulse/utils/action_button.dart';
-import 'package:pulse/utils/circle_with_num.dart';
-import 'package:pulse/utils/assess_table_row.dart';
-import 'package:pulse/utils/mews_forms_instant.dart';
-import 'package:pulse/utils/time_manager.dart';
-import 'package:pulse/func/time_formatter.dart';
+import 'package:tuh_mews/func/get_color.dart';
+import 'package:tuh_mews/utils/action_button.dart';
+import 'package:tuh_mews/utils/circle_with_num.dart';
+import 'package:tuh_mews/utils/assess_table_row.dart';
+import 'package:tuh_mews/utils/mews_forms_instant.dart';
+import 'package:tuh_mews/utils/time_manager.dart';
+import 'package:tuh_mews/func/time_formatter.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class MonitoredPatientCard extends StatefulWidget {

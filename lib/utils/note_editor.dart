@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:pulse/models/note.dart';
-import 'package:pulse/services/mews_services.dart';
+import 'package:tuh_mews/models/note.dart';
+import 'package:tuh_mews/services/mews_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NoteEditor extends StatefulWidget {

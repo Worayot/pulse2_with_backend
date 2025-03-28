@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pulse/utils/date_navigation.dart';
-import 'package:pulse/utils/swipable_table.dart';
+import 'package:tuh_mews/utils/date_navigation.dart';
+import 'package:tuh_mews/utils/swipable_table.dart';
 
 class ReportWidget extends StatefulWidget {
   final double tableHeight;

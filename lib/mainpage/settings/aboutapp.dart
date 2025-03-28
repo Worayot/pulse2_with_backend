@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/utils/custom_header.dart';
+import 'package:tuh_mews/utils/custom_header.dart';
 
 class AboutAppPage extends StatelessWidget {
   @override
@@ -91,7 +91,9 @@ class AboutAppPage extends StatelessWidget {
                                       spreadRadius: 2,
                                       blurRadius: 5,
                                       offset: const Offset(
-                                          0, 3), // Position of the shadow
+                                        0,
+                                        3,
+                                      ), // Position of the shadow
                                     ),
                                   ],
                                 ),
@@ -101,8 +103,9 @@ class AboutAppPage extends StatelessWidget {
                                     Text(
                                       "application".tr(),
                                       style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
@@ -113,14 +116,15 @@ class AboutAppPage extends StatelessWidget {
                                     Text(
                                       'contactDev'.tr(),
                                       style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
                                       "contactDevContent".tr(),
                                       style: const TextStyle(fontSize: 14),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),

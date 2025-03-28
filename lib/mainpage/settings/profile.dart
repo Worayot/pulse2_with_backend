@@ -2,10 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/models/user.dart';
-import 'package:pulse/services/user_services.dart';
-import 'package:pulse/utils/custom_header.dart';
-import 'package:pulse/func/pref/pref.dart';
+import 'package:tuh_mews/models/user.dart';
+import 'package:tuh_mews/services/user_services.dart';
+import 'package:tuh_mews/utils/custom_header.dart';
+import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileSettingsPage extends StatefulWidget {

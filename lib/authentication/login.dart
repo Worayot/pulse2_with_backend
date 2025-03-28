@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:pulse/authentication/loading_screen.dart';
-import 'package:pulse/services/server_url.dart';
+import 'package:tuh_mews/authentication/loading_screen.dart';
+import 'package:tuh_mews/services/server_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:pulse/models/patient.dart';
-import 'package:pulse/services/export_services.dart';
-import 'package:pulse/utils/action_button.dart';
+import 'package:tuh_mews/models/patient.dart';
+import 'package:tuh_mews/services/export_services.dart';
+import 'package:tuh_mews/utils/action_button.dart';
 
 class PatientCardExport extends StatelessWidget {
   final Patient patient;
