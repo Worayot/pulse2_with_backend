@@ -51,11 +51,12 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
         // Convert DateTime to Asia/Bangkok timezone
         final bangkokTimezone = tz.getLocation('Asia/Bangkok');
         var localDateTime = tz.TZDateTime.from(dateTime, bangkokTimezone);
-        localDateTime = localDateTime.subtract(Duration(hours: 7));
+        // localDateTime = localDateTime.subtract(Duration(hours: 7));
 
         // Format the local DateTime
         String formattedTime = DateFormat('HH.mm').format(localDateTime);
         String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
+        String time = DateFormat('yyyy-MM-dd HH.mm').format(localDateTime);
 
         combinedData.add({
           "formatted_time": '$formattedTime${'n'.tr()} ($timeDelta)',
@@ -65,16 +66,69 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
           "note_id": map['note_id'],
           "note": map['text'] ?? '',
           "auditor": map['audit_by'],
+          "time": time,
         });
       }
     }
 
+    List<String> scores =
+        combinedData.map((item) => item["mews"].toString()).toList();
+
+    int latestIndex = -1;
+
+    for (int i = scores.length - 1; i >= 0; i--) {
+      if (int.tryParse(scores[i]) != null) {
+        // Check if it can be converted to a number
+        latestIndex = i;
+        break;
+      }
+    }
+
+    List<String> times =
+        combinedData.map((item) => item["time"].toString()).toList();
+    // print(times);
+
+    DateTime now = DateTime.now();
+    DateFormat format = DateFormat("yyyy-MM-dd HH.mm");
+
+    List<DateTime> dateTimeList = times.map((t) => format.parse(t)).toList();
+
+    // Filter future times
+    List<DateTime> futureTimes =
+        dateTimeList.where((t) => t.isAfter(now)).toList();
+
+    String latestTime;
+
+    // Get the nearest future time
+    if (futureTimes.isNotEmpty) {
+      futureTimes.sort((a, b) => a.compareTo(b));
+      DateTime nearestFutureTime = futureTimes.first;
+      print("Nearest future time: ${format.format(nearestFutureTime)}");
+
+      // Find index in dateTimeList
+      int index = dateTimeList.indexOf(nearestFutureTime);
+      latestTime =
+          (index != -1 && combinedData.isNotEmpty)
+              ? combinedData[index]["formatted_time"]
+              : "-";
+    } else {
+      print("No future times available.");
+      latestTime = "-";
+    }
+
+    print("Latest time: $latestTime");
+
     // Get latest values
-    String latestTime =
-        combinedData.isNotEmpty ? combinedData.last["formatted_time"] : "-";
+    // String latestTime =
+    //     combinedData.isNotEmpty ? combinedData.last["formatted_time"] : "-";
 
     String latestMews =
-        combinedData.isNotEmpty ? combinedData.last["mews"].toString() : "-";
+        combinedData.isNotEmpty
+            ? (latestIndex == -1 ? '-' : scores[latestIndex])
+            : "-";
+
+    print(latestMews);
+    print(latestIndex);
 
     // print(combinedData);
 

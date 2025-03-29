@@ -61,18 +61,23 @@ class _MEWsFormsState extends State<MEWsForms> {
 
   Widget _showMEWsForms(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Stack(
-      children: [
-        Card(
-          margin: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20), // Adjust radius here
-          ),
-          color: const Color(0xFFD7E0F5),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: Stack(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // Adjust radius here
+            ),
+            color: const Color(0xFFD7E0F5),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -734,22 +739,22 @@ class _MEWsFormsState extends State<MEWsForms> {
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 15,
-          right: 15,
-          child: IconButton(
-            icon: const Icon(
-              Icons.close, // Close icon
-              color: Colors.black,
-              size: 30,
+          Positioned(
+            top: 15,
+            right: 15,
+            child: IconButton(
+              icon: const Icon(
+                Icons.close, // Close icon
+                color: Colors.black,
+                size: 30,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

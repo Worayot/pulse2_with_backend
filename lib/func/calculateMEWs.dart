@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 int calculateMEWs({
   required String consciousness,
   int? heartRate,
@@ -16,10 +18,11 @@ int calculateMEWs({
     "Alert": 2,
     "Conscious": 0,
     "-": 0,
-    " ": 0
+    " ": 0,
   };
 
-  score += consciousnessScoreMap[consciousness] ??
+  score +=
+      consciousnessScoreMap[consciousness] ??
       0; // Default to 0 if consciousness is unknown
 
   // Heart Rate scoring
@@ -58,6 +61,8 @@ int calculateMEWs({
 
   // Temperature scoring
   if (temperature != null) {
+    temperature = double.parse(NumberFormat("#.#").format(temperature));
+
     if (temperature < 34 || temperature > 40) {
       score += 3;
     } else if ((temperature >= 34 && temperature <= 35) ||

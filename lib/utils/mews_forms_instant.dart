@@ -1,11 +1,8 @@
 import 'dart:convert';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/calculateMEWs.dart';
-import 'package:tuh_mews/func/notification_scheduler.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';
@@ -68,18 +65,23 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
 
   Widget _showMEWsForms(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Stack(
-      children: [
-        Card(
-          margin: const EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20), // Adjust radius here
-          ),
-          color: const Color(0xFFD7E0F5),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: Stack(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20), // Adjust radius here
+            ),
+            color: const Color(0xFFD7E0F5),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -772,22 +774,22 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 15,
-          right: 15,
-          child: IconButton(
-            icon: const Icon(
-              Icons.close, // Close icon
-              color: Colors.black,
-              size: 30,
+          Positioned(
+            top: 15,
+            right: 15,
+            child: IconButton(
+              icon: const Icon(
+                Icons.close, // Close icon
+                color: Colors.black,
+                size: 30,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -42,19 +42,21 @@ class _NoteViewerState extends State<NoteViewer> {
         // Extract fields from the note document
         var noteData = noteDoc.data()!;
 
+        print("reportID: ${widget.reportID}");
+        print(noteData);
+
         // Handling the 'time' field if it's a Timestamp
         Timestamp timestamp = noteData['time'];
         DateTime noteDate = timestamp.toDate();
-        noteDate = noteDate.subtract(Duration(days: 1, hours: 7));
+        // noteDate = noteDate.subtract(Duration(days: 1, hours: 7));
 
         setState(() {
           date = DateFormat('d/M/yyyy').format(noteDate); // Format date
-
           time = DateFormat('HH:mm').format(noteDate); // Format time
           authorID = noteData['audit_by'];
           mewsID = noteData['mews_id'] ?? '';
           patientID = noteData['patient_id'] ?? '';
-          noteText = noteData['text'] ?? '';
+          noteText = noteData['text'] ?? '-';
 
           // Set noteText to the TextField
           _noteController.text = noteText;

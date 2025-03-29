@@ -22,7 +22,7 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen> {
   final storage = FlutterSecureStorage();
-  String name = 'N/A';
+  String name = '';
 
   Map<String, dynamic>? accountData = {};
 

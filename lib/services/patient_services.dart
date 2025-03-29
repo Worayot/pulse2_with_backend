@@ -307,7 +307,7 @@ class PatientService {
     }
   }
 
-  //! Not tested
+  //* Tested
   Future<Map<String, dynamic>?> getPatientReport(String patientId) async {
     final url = Uri.parse('$baseUrl/home-fetch/report/$patientId');
 

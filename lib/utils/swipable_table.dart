@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/utils/note_viewer.dart';
 import 'package:intl/intl.dart';
+import 'package:tuh_mews/utils/report_widget.dart';
 
 class SwipableTable extends StatefulWidget {
   final DateTime date;
@@ -44,17 +45,27 @@ class _SwipableTableState extends State<SwipableTable> {
     if (patientData.isNotEmpty) {
       final fullReports = patientData['full_reports'] ?? [];
 
+      // print(fullReports);
+
       setState(() {
         tableData =
             List.generate(fullReports.length, (index) {
                   final report = fullReports[index];
 
                   // Ensure the report date matches the selected date
-                  DateTime reportDate = DateTime.parse(
-                    report['time'] ?? '1970-01-01T00:00:00Z',
-                  ); // Use 'time' field for the report date
+                  // DateTime reportDate = DateTime.parse(
+                  //   report['time'] ?? '',
+                  // ); // Use 'time' field for the report date
 
-                  reportDate = reportDate.subtract(Duration(days: 1));
+                  DateTime reportDate = DateTime.parse(
+                    report['time'] ?? '',
+                  ).toUtc().add(Duration(hours: 7));
+
+                  // print(report['time']);
+
+                  // print(reportDate);
+
+                  // reportDate = reportDate.subtract(Duration(days: 1));
 
                   // print(reportDate.day);
                   // print(selectedDate.day);
@@ -65,8 +76,7 @@ class _SwipableTableState extends State<SwipableTable> {
                       reportDate.day == selectedDate.day) {
                     List<String> timeParts = reportDate.toString().split(' ');
                     return [
-                      ('${timeParts[0]} ${timeParts[1].split('.')[0]}' ??
-                              '08:00')
+                      ('${timeParts[0]} ${timeParts[1].split('.')[0]}' ?? 'N?A')
                           .toString(),
                       (report['consciousness'] ?? 'Conscious')
                           .toString(), // Use 'consciousness' for 'C'
