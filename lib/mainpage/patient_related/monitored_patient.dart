@@ -25,10 +25,6 @@ class _PatientPageState extends State<PatientPage> {
     });
   }
 
-  // void refreshData() {
-  //   setState(() {});
-  // }
-
   Future<void> refreshData() async {
     // Perform any asynchronous work here
     await Future.delayed(Duration(seconds: 1)); // Example of async work

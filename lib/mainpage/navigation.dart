@@ -46,8 +46,13 @@ class _NavigationPageState extends State<NavigationPage> {
 
     // Adjusting sizes based on screen width (responsive design)
     double iconSize =
-        screenWidth * 0.06; // Relative icon size based on screen width
-    double bottomBarHeight = screenHeight * 0.1; // Responsive bottom bar height
+        screenWidth * 0.045; // Relative icon size based on screen width
+    double fontSize = screenWidth * 0.03;
+    double bottomBarHeight =
+        screenHeight * 0.95; // Responsive bottom bar height
+
+    // double iconSize = 18;
+    // double fontSize = 18;
 
     return Scaffold(
       body: _pages[_selectedIndex],
@@ -59,49 +64,41 @@ class _NavigationPageState extends State<NavigationPage> {
             icon: Icon(FontAwesomeIcons.house, size: iconSize),
             title: Text(
               "\t${'patientsInSystem'.tr()}",
-              style: TextStyle(
-                fontSize: screenWidth * 0.035,
-              ), // Relative text size
+              style: TextStyle(fontSize: fontSize), // Relative text size
             ),
             activeColor: const Color(0xffFEFEFE),
             inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: 190,
+            boxWidth: screenWidth * 0.4,
           ),
           BottomNavyBarItem(
             icon: Icon(FontAwesomeIcons.users, size: iconSize),
             title: Text(
               "\t${'patientInMonitoring'.tr()}",
-              style: TextStyle(
-                fontSize: screenWidth * 0.035,
-              ), // Relative text size
+              style: TextStyle(fontSize: fontSize), // Relative text size
             ),
             activeColor: const Color(0xffFEFEFE),
             inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: 190,
+            boxWidth: screenWidth * 0.4,
           ),
           BottomNavyBarItem(
             icon: Icon(FontAwesomeIcons.fileArrowDown, size: iconSize),
             title: Text(
               'data'.tr(),
-              style: TextStyle(
-                fontSize: screenWidth * 0.035,
-              ), // Relative text size
+              style: TextStyle(fontSize: fontSize), // Relative text size
             ),
             activeColor: const Color(0xffFEFEFE),
             inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: 120,
+            boxWidth: screenWidth * 0.3,
           ),
           BottomNavyBarItem(
             icon: Icon(FontAwesomeIcons.gear, size: iconSize),
             title: Text(
               'settings'.tr(),
-              style: TextStyle(
-                fontSize: screenWidth * 0.035,
-              ), // Relative text size
+              style: TextStyle(fontSize: fontSize), // Relative text size
             ),
             activeColor: const Color(0xffFEFEFE),
             inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: 120,
+            boxWidth: screenWidth * 0.33,
           ),
         ],
         height: bottomBarHeight, // Adjusting bottom bar height responsively

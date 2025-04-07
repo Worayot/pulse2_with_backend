@@ -16,7 +16,7 @@ void showPatientDetails(BuildContext context, var patient) {
     context: context,
     builder: (BuildContext context) {
       return Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -28,19 +28,21 @@ void showPatientDetails(BuildContext context, var patient) {
                   child: Text(
                     'report'.tr(),
                     style: TextStyle(
-                      fontSize: screenWidth * 0.05,
+                      // fontSize: screenWidth * 0.05,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 Positioned(
-                  top: -15,
-                  right: -15,
+                  top: -10,
+                  right: -10,
                   child: IconButton(
                     icon: Icon(
                       Icons.close,
                       color: Colors.black,
-                      size: screenWidth * 0.06,
+                      // size: screenWidth * 0.06,
+                      size: 25,
                     ),
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -51,14 +53,17 @@ void showPatientDetails(BuildContext context, var patient) {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: Opacity(
-                    opacity: 0.8,
-                    child: Image.asset(
-                      "assets/images/therapy.png",
-                      fit: BoxFit.contain,
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: 0.8,
+                      child: Image.asset(
+                        "assets/images/therapy.png",
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),
+
                 Column(
                   children: [
                     const SizedBox(height: 40),

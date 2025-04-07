@@ -29,8 +29,7 @@ class _NotificationPageState extends State<NotificationPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     // Adjusting text size based on screen width
-    double iconSize =
-        screenWidth * 0.08; // Scaling icon size based on screen width
+    double iconSize = 28; // Scaling icon size based on screen width
     double paddingSize =
         screenWidth * 0.04; // Scaling padding based on screen width
 
@@ -44,7 +43,7 @@ class _NotificationPageState extends State<NotificationPage> {
               "patientsInSystem".tr(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: getPageTitleSize(context), // Responsive text size
+                fontSize: getPageTitleSize(context),
               ),
             ),
           ),

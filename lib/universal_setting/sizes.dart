@@ -5,7 +5,8 @@ Size getScreenSize(BuildContext context) {
 }
 
 double getPageTitleSize(BuildContext context) {
-  return MediaQuery.of(context).size.width / 18.5;
+  // return MediaQuery.of(context).size.width / 18.5;
+  return 22;
 }
 
 class SearchBarSetting {

@@ -39,17 +39,16 @@ class CustomAnimatedBottomBar extends StatelessWidget {
     final bool isAndroid = Platform.isAndroid;
 
     return Container(
-      height: isAndroid ? size.height * 0.09 : size.height * 0.12,
+      height: isAndroid ? size.height * 0.09 : size.height * 0.11,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
         color: bgColor,
         boxShadow: [
           if (showElevation)
-            const BoxShadow(
-              color: Colors.black12,
-              blurRadius: 2,
-            ),
+            const BoxShadow(color: Colors.black12, blurRadius: 2),
         ],
       ),
       child: SafeArea(
@@ -59,22 +58,23 @@ class CustomAnimatedBottomBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Row(
             mainAxisAlignment: mainAxisAlignment,
-            children: items.map((item) {
-              var index = items.indexOf(item);
-              return GestureDetector(
-                onTap: () => onItemSelected(index),
-                child: _ItemWidget(
-                  item: item,
-                  iconSize: iconSize,
-                  isSelected: index == selectedIndex,
-                  backgroundColor: bgColor,
-                  itemCornerRadius: itemCornerRadius,
-                  animationDuration: animationDuration,
-                  curve: curve,
-                  boxWidth: item.boxWidth,
-                ),
-              );
-            }).toList(),
+            children:
+                items.map((item) {
+                  var index = items.indexOf(item);
+                  return GestureDetector(
+                    onTap: () => onItemSelected(index),
+                    child: _ItemWidget(
+                      item: item,
+                      iconSize: iconSize,
+                      isSelected: index == selectedIndex,
+                      backgroundColor: bgColor,
+                      itemCornerRadius: itemCornerRadius,
+                      animationDuration: animationDuration,
+                      curve: curve,
+                      boxWidth: item.boxWidth,
+                    ),
+                  );
+                }).toList(),
           ),
         ),
       ),
@@ -93,7 +93,6 @@ class _ItemWidget extends StatelessWidget {
   final double boxWidth;
 
   const _ItemWidget({
-    super.key,
     required this.item,
     required this.isSelected,
     required this.backgroundColor,
@@ -128,14 +127,17 @@ class _ItemWidget extends StatelessWidget {
               IconTheme(
                 data: IconThemeData(
                   size: iconSize,
-                  color: isSelected
-                      ? item.activeColor.withOpacity(1)
-                      : item.inactiveColor ?? item.activeColor,
+                  color:
+                      isSelected
+                          ? item.activeColor.withOpacity(1)
+                          : item.inactiveColor ?? item.activeColor,
                 ),
                 child: item.icon,
               ),
               if (isSelected)
-                const SizedBox(width: 8), // Space between icon and text
+                SizedBox(
+                  width: size.width * 0.025,
+                ), // Space between icon and text
               if (isSelected)
                 Flexible(
                   child: DefaultTextStyle.merge(
@@ -159,13 +161,14 @@ class _ItemWidget extends StatelessWidget {
 }
 
 class BottomNavyBarItem {
-  BottomNavyBarItem(
-      {required this.icon,
-      required this.title,
-      this.activeColor = const Color(0xff407BFF),
-      this.textAlign,
-      this.inactiveColor,
-      required this.boxWidth});
+  BottomNavyBarItem({
+    required this.icon,
+    required this.title,
+    this.activeColor = const Color(0xff407BFF),
+    this.textAlign,
+    this.inactiveColor,
+    required this.boxWidth,
+  });
 
   final Widget icon;
   final Widget title;

@@ -103,7 +103,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     if (futureTimes.isNotEmpty) {
       futureTimes.sort((a, b) => a.compareTo(b));
       DateTime nearestFutureTime = futureTimes.first;
-      print("Nearest future time: ${format.format(nearestFutureTime)}");
+      // print("Nearest future time: ${format.format(nearestFutureTime)}");
 
       // Find index in dateTimeList
       int index = dateTimeList.indexOf(nearestFutureTime);
@@ -112,11 +112,11 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
               ? combinedData[index]["formatted_time"]
               : "-";
     } else {
-      print("No future times available.");
+      // print("No future times available.");
       latestTime = "-";
     }
 
-    print("Latest time: $latestTime");
+    // print("Latest time: $latestTime");
 
     // Get latest values
     // String latestTime =
@@ -126,9 +126,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
         combinedData.isNotEmpty
             ? (latestIndex == -1 ? '-' : scores[latestIndex])
             : "-";
-
-    print(latestMews);
-    print(latestIndex);
 
     // print(combinedData);
 
@@ -154,8 +151,8 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                     padding: const EdgeInsets.only(top: 16),
                     height:
                         isExpanded
-                            ? (size.height * 0.033 + 8) * dataLength + 96
-                            : 90,
+                            ? (size.height * 0.033 + 8) * dataLength + 101
+                            : 101,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: const Color(0xff98B1E8),
@@ -167,7 +164,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 70),
+                          const SizedBox(height: 75),
                           if (isExpanded) ...[
                             Column(
                               children: List.generate(dataLength, (i) {
@@ -225,7 +222,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                               fullname,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: size.width * 0.04,
+                                fontSize: 16,
                                 shadows: [
                                   Shadow(
                                     color: Colors.black.withOpacity(0.25),
@@ -237,13 +234,10 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                             ),
                             Text(
                               "nextInspectionTime".tr(),
-                              style: TextStyle(fontSize: size.width * 0.03),
+                              style: TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 2),
-                            Text(
-                              latestTime,
-                              style: TextStyle(fontSize: size.width * 0.03),
-                            ),
+                            Text(latestTime, style: TextStyle(fontSize: 16)),
                           ],
                         ),
                       ),
@@ -290,7 +284,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
           Positioned(
             left: 0,
             right: 0,
-            top: 75,
+            top: 85,
             child: IgnorePointer(
               child: Center(
                 child: Row(

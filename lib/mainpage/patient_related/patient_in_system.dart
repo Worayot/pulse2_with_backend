@@ -19,7 +19,6 @@ class PatientInSystem extends StatefulWidget {
 
 class _PatientInSystemState extends State<PatientInSystem> {
   bool isLoading = true;
-  final List<bool> _isExpanded = [];
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -112,7 +111,6 @@ class _PatientInSystemState extends State<PatientInSystem> {
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height: sbs.getHeight(),
                       child: TextField(
                         controller: _searchController,
                         decoration: InputDecoration(
@@ -156,7 +154,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
                     icon: Icon(
                       FontAwesomeIcons.userPlus,
                       color: Colors.white,
-                      size: screenWidth * 0.07,
+                      size: 26,
                     ),
                     label: Padding(
                       padding: const EdgeInsets.only(left: 4.0),
@@ -173,13 +171,13 @@ class _PatientInSystemState extends State<PatientInSystem> {
                       backgroundColor: const Color(0xff407BFF),
                       padding: EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: btnsb.verticalPadding(),
+                        vertical: 16,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
-                      fixedSize: Size.fromHeight(sbs.getHeight()),
+                      // fixedSize: Size.fromHeight(60),
                     ),
                   ),
                 ],

@@ -230,7 +230,7 @@ class _ExportPageState extends State<ExportPage> {
                                 child: Text(
                                   'filterPatients'.tr(),
                                   style: TextStyle(
-                                    fontSize: tws.getDialogTitleSize(),
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -503,7 +503,7 @@ class _ExportPageState extends State<ExportPage> {
               children: [
                 Expanded(
                   child: SizedBox(
-                    height: sbs.getHeight(),
+                    // height: sbs.getHeight(),
                     child: TextField(
                       onChanged: (value) {
                         setState(() {
@@ -552,7 +552,7 @@ class _ExportPageState extends State<ExportPage> {
                 ),
                 const SizedBox(width: 10),
                 SizedBox(
-                  height: sbs.getHeight(),
+                  // height: sbs.getHeight(),
                   child: ElevatedButton(
                     onPressed: () {
                       showFilterDialog(context);
@@ -563,11 +563,11 @@ class _ExportPageState extends State<ExportPage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       padding: EdgeInsets.symmetric(
-                        vertical: btnsb.verticalPadding(),
+                        vertical: 17,
                         horizontal: 10,
                       ),
                       backgroundColor: const Color(0xff407BFF),
-                      fixedSize: Size.fromHeight(sbs.getHeight()),
+                      // fixedSize: Size.fromHeight(sbs.getHeight()),
                     ),
                     child: Row(
                       children: [
@@ -581,7 +581,7 @@ class _ExportPageState extends State<ExportPage> {
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                           ),
                         ),
                       ],
@@ -606,7 +606,8 @@ class _ExportPageState extends State<ExportPage> {
                       decoration: TextDecoration.underline, // Add underline
                       decorationColor: Colors.red, // Set underline color to red
                       fontWeight: FontWeight.bold,
-                      fontSize: size.width * 0.035,
+                      // fontSize: size.width * 0.035,
+                      fontSize: 14,
                     ),
                   ),
                 ),
@@ -627,7 +628,8 @@ class _ExportPageState extends State<ExportPage> {
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: size.width * 0.035,
+                      // fontSize: size.width * 0.035,
+                      fontSize: 14,
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,

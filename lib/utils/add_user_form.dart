@@ -148,7 +148,7 @@ class _AddUserFormState extends State<AddUserForm> {
                         Expanded(
                           child: SizedBox(
                             child: infoTextField(
-                              fontSize: tws.getInfoBoxTextSize(),
+                              fontSize: 14,
                               title: "name".tr(),
                               controller: nameController,
                               boxColor: const Color(0xffE0EAFF),
@@ -161,7 +161,7 @@ class _AddUserFormState extends State<AddUserForm> {
                           child: SizedBox(
                             child: infoTextField(
                               title: "surname".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
+                              fontSize: 14,
                               controller: surnameController,
                               boxColor: const Color(0xffE0EAFF),
                               minWidth: 140,
@@ -211,9 +211,7 @@ class _AddUserFormState extends State<AddUserForm> {
                             ),
                             labelText:
                                 selectedRole.isEmpty ? 'selectRole'.tr() : "",
-                            labelStyle: TextStyle(
-                              fontSize: tws.getInfoBoxTextSize(),
-                            ),
+                            labelStyle: TextStyle(fontSize: 14),
                           ),
                           items: [
                             DropdownMenuItem(
@@ -222,7 +220,7 @@ class _AddUserFormState extends State<AddUserForm> {
                                 "nurse".tr(),
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: tws.getInfoBoxTextSize(),
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
@@ -232,7 +230,7 @@ class _AddUserFormState extends State<AddUserForm> {
                                 "admin".tr(),
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: tws.getInfoBoxTextSize(),
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
@@ -250,7 +248,7 @@ class _AddUserFormState extends State<AddUserForm> {
                       width: double.infinity,
                       child: infoTextField(
                         title: "nurseID".tr(),
-                        fontSize: tws.getInfoBoxTextSize(),
+                        fontSize: 14,
                         controller: nurseIDController,
                         boxColor: const Color(0xffE0EAFF),
                         minWidth: 140,

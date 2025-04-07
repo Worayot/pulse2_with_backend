@@ -13,42 +13,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
-// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-//     FlutterLocalNotificationsPlugin();
-
-// Future<void> initializeNotifications() async {
-//   const AndroidInitializationSettings initializationSettingsAndroid =
-//       AndroidInitializationSettings(
-//         '@mipmap/ic_launcher',
-//       ); // Replace with your launcher icon
-
-//   const DarwinInitializationSettings initializationSettingsIOS =
-//       DarwinInitializationSettings(
-//         requestAlertPermission: true,
-//         requestBadgePermission: true,
-//         requestSoundPermission: true,
-//       );
-
-//   const InitializationSettings initializationSettings = InitializationSettings(
-//     android: initializationSettingsAndroid,
-//     iOS: initializationSettingsIOS,
-//   );
-
-//   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-//   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-//     'Notification', // Replace with your channel ID
-//     "Pulse's alert", // Replace with your channel name
-//     importance: Importance.high,
-//   );
-
-//   await flutterLocalNotificationsPlugin
-//       .resolvePlatformSpecificImplementation<
-//         AndroidFlutterLocalNotificationsPlugin
-//       >()
-//       ?.createNotificationChannel(channel);
-// }
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Alarm.init();

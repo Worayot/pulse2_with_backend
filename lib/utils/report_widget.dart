@@ -34,7 +34,6 @@ class _ReportWidgetState extends State<ReportWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print(selectedDate);
     return Card(
       margin: const EdgeInsets.all(0),
       child: Column(

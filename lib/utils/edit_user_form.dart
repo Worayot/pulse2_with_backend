@@ -141,24 +141,26 @@ class _EditUserFormState extends State<EditUserForm> {
                   children: [
                     Row(
                       children: [
-                        SizedBox(
-                          width: size.width / 2 - size.width / 8 - 6,
-                          child: infoTextField(
-                            title: "name".tr(),
-                            fontSize: tws.getInfoBoxTextSize(),
-                            controller: nameController,
-                            boxColor: const Color(0xffE0EAFF),
-                            minWidth: 140,
+                        Expanded(
+                          child: SizedBox(
+                            child: infoTextField(
+                              title: "name".tr(),
+                              fontSize: 14,
+                              controller: nameController,
+                              boxColor: const Color(0xffE0EAFF),
+                              minWidth: 140,
+                            ),
                           ),
                         ),
-                        SizedBox(
-                          width: size.width / 2 - size.width / 8 - 6,
-                          child: infoTextField(
-                            title: "surname".tr(),
-                            fontSize: tws.getInfoBoxTextSize(),
-                            controller: surnameController,
-                            boxColor: const Color(0xffE0EAFF),
-                            minWidth: 140,
+                        Expanded(
+                          child: SizedBox(
+                            child: infoTextField(
+                              title: "surname".tr(),
+                              fontSize: 14,
+                              controller: surnameController,
+                              boxColor: const Color(0xffE0EAFF),
+                              minWidth: 140,
+                            ),
                           ),
                         ),
                       ],
@@ -203,9 +205,7 @@ class _EditUserFormState extends State<EditUserForm> {
                             ),
                             labelText:
                                 selectedRole.isEmpty ? 'selectRole'.tr() : "",
-                            labelStyle: TextStyle(
-                              fontSize: tws.getInfoBoxTextSize(),
-                            ),
+                            labelStyle: TextStyle(fontSize: 14),
                           ),
                           items: [
                             DropdownMenuItem(
@@ -214,7 +214,7 @@ class _EditUserFormState extends State<EditUserForm> {
                                 "nurse".tr(),
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: tws.getInfoBoxTextSize(),
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
@@ -224,7 +224,7 @@ class _EditUserFormState extends State<EditUserForm> {
                                 "admin".tr(),
                                 style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: tws.getInfoBoxTextSize(),
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
@@ -242,7 +242,7 @@ class _EditUserFormState extends State<EditUserForm> {
                       width: double.infinity,
                       child: infoTextField(
                         title: "nurseID".tr(),
-                        fontSize: tws.getInfoBoxTextSize(),
+                        fontSize: 14,
                         controller: nurseIDController,
                         blockEditing: true,
                         boxColor: const Color(0xffE0EAFF),

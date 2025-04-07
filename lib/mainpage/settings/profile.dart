@@ -528,8 +528,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                     child: IgnorePointer(
                       child: Image.asset(
                         "assets/images/ambulance.png",
-                        width: size.width * 0.62, // Set width
-                        height: size.width * 0.62, // Set height
+                        // width: size.width * 0.62, // Set width
+                        // height: size.width * 0.62, // Set height
                       ),
                     ),
                   ),

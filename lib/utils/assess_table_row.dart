@@ -54,7 +54,8 @@ class AssessTableRowWidget extends StatelessWidget {
                 '$time${"n".tr()}',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: screenWidth * 0.035,
+                  // fontSize: screenWidth * 0.035,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                   shadows: [
                     Shadow(
@@ -118,7 +119,8 @@ class AssessTableRowWidget extends StatelessWidget {
                 isButtonEnabled ? "assessScore".tr() : "assessed".tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: screenWidth * 0.035,
+                  // fontSize: screenWidth * 0.035,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
               ),

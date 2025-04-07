@@ -204,7 +204,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       TextSpan(
                                         text: '"',
                                         style: TextStyle(
-                                          fontSize: size.width / 25,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                           height: size.height * 0.002,
                                         ),
@@ -212,7 +212,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       TextSpan(
                                         text: selectedQuote['quote']![0],
                                         style: TextStyle(
-                                          fontSize: size.width / 15,
+                                          fontSize: 26,
                                           fontWeight: FontWeight.bold,
                                           height: size.height * 0.002,
                                         ),
@@ -221,7 +221,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         text:
                                             '${selectedQuote['quote']!.substring(1)}"',
                                         style: TextStyle(
-                                          fontSize: size.width / 25,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                           height: size.height * 0.002,
                                         ),

@@ -246,8 +246,8 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                     child: IgnorePointer(
                       child: Image.asset(
                         "assets/images/med_care.png",
-                        height: size.width * 0.75,
-                        width: size.width * 0.75,
+                        // height: size.width * 0.75,
+                        // width: size.width * 0.75,
                       ),
                     ),
                   ),

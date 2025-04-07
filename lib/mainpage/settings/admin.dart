@@ -146,7 +146,7 @@ class _AdminPageState extends State<AdminPage> {
                 ),
                 const SizedBox(width: 10),
                 SizedBox(
-                  height: sbs.getHeight(),
+                  // height: sbs.getHeight(),
                   child: ElevatedButton.icon(
                     onPressed: () {
                       showDialog(
@@ -158,11 +158,15 @@ class _AdminPageState extends State<AdminPage> {
                     },
                     icon: Icon(
                       FontAwesomeIcons.personCirclePlus,
-                      size: size.height * 0.04,
+                      size: 40,
                       color: Colors.white,
                     ),
                     label: Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
+                      padding: const EdgeInsets.only(
+                        left: 4.0,
+                        top: 20,
+                        bottom: 20,
+                      ),
                       child: Align(
                         alignment: Alignment.center,
                         child: Text(
@@ -183,7 +187,7 @@ class _AdminPageState extends State<AdminPage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      fixedSize: Size.fromHeight(sbs.getHeight()),
+                      // fixedSize: Size.fromHeight(sbs.getHeight()),
                     ),
                   ),
                 ),
