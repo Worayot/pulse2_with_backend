@@ -42,9 +42,6 @@ class _NoteViewerState extends State<NoteViewer> {
         // Extract fields from the note document
         var noteData = noteDoc.data()!;
 
-        print("reportID: ${widget.reportID}");
-        print(noteData);
-
         // Handling the 'time' field if it's a Timestamp
         Timestamp timestamp = noteData['time'];
         DateTime noteDate = timestamp.toDate();

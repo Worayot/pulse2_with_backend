@@ -318,12 +318,14 @@ class PatientService {
       );
 
       if (response.statusCode == 200) {
-        // Parse the response body if it's JSON
-        Map<String, dynamic> responseData = jsonDecode(response.body);
-        return responseData; // Return parsed response
+        // 👇 Decode response body as UTF-8 explicitly
+        final decodedBody = utf8.decode(response.bodyBytes);
+        Map<String, dynamic> responseData = jsonDecode(decodedBody);
+
+        return responseData;
       } else {
         print("Failed to get patient report: ${response.body}");
-        return null; // Failure, no data to return
+        return null;
       }
     } catch (e) {
       print("Error getting patient report: $e");

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -18,6 +21,7 @@ class SwipableTable extends StatefulWidget {
 
 class _SwipableTableState extends State<SwipableTable> {
   var patientData = {};
+  List<Map<String, dynamic>> _fullReports = [];
   List<List<String>> tableData = [];
 
   @override
@@ -32,87 +36,133 @@ class _SwipableTableState extends State<SwipableTable> {
     if (reportData != null) {
       setState(() {
         patientData = reportData;
+        _fullReports =
+            (patientData['full_reports'] ?? [])
+                .cast<Map<String, dynamic>>(); // Ensure it's a list of maps
+        _sortFullReportsByTime();
+        filterDataByDate(widget.date);
       });
-
-      // Filter the data based on the selected date
-      filterDataByDate(widget.date);
     } else {
       print('Failed to fetch patient report');
     }
   }
 
+  void _sortFullReportsByTime() {
+    _fullReports.sort((a, b) {
+      DateTime timeA = DateTime.parse(
+        a['time'] ?? '',
+      ).toUtc().add(const Duration(hours: 7));
+      DateTime timeB = DateTime.parse(
+        b['time'] ?? '',
+      ).toUtc().add(const Duration(hours: 7));
+      return timeA.compareTo(timeB);
+    });
+  }
+
   void filterDataByDate(DateTime selectedDate) {
-    if (patientData.isNotEmpty) {
-      final fullReports = patientData['full_reports'] ?? [];
+    setState(() {
+      tableData =
+          _fullReports
+              .where((report) {
+                DateTime reportDate = DateTime.parse(
+                  report['time'] ?? '',
+                ).toUtc().add(const Duration(hours: 7));
+                return reportDate.year == selectedDate.year &&
+                    reportDate.month == selectedDate.month &&
+                    reportDate.day == selectedDate.day;
+              })
+              .map((report) {
+                DateTime reportDate = DateTime.parse(
+                  report['time'] ?? '',
+                ).toUtc().add(const Duration(hours: 7));
+                List<String> timeParts = reportDate.toString().split(' ');
 
-      // print(fullReports);
+                return [
+                  ('${timeParts[0]} ${timeParts[1].split('.')[0]}').toString(),
+                  (report['consciousness'] ?? '').toString(),
+                  (report['temperature'] ?? '').toString(),
+                  (report['heart_rate'] ?? '').toString(),
+                  (report['respiratory_rate'] ?? '').toString(),
+                  (report['blood_pressure'] ?? '').toString(),
+                  (report['spo2'] ?? '').toString(),
+                  (report['urine'] ?? '').toString(),
+                  (report['mews'] ?? '').toString(),
+                  (report['cvp'] ?? '').toString(),
+                ];
+              })
+              .toList();
+    });
+  }
 
-      setState(() {
-        tableData =
-            List.generate(fullReports.length, (index) {
-                  final report = fullReports[index];
+  Future<String> fetchNoteData(String reportID) async {
+    try {
+      var noteDoc =
+          await FirebaseFirestore.instance
+              .collection('inspection_notes')
+              .doc(reportID)
+              .get();
 
-                  // Ensure the report date matches the selected date
-                  // DateTime reportDate = DateTime.parse(
-                  //   report['time'] ?? '',
-                  // ); // Use 'time' field for the report date
-
-                  DateTime reportDate = DateTime.parse(
-                    report['time'] ?? '',
-                  ).toUtc().add(Duration(hours: 7));
-
-                  // print(report['time']);
-
-                  // print(reportDate);
-
-                  // reportDate = reportDate.subtract(Duration(days: 1));
-
-                  // print(reportDate.day);
-                  // print(selectedDate.day);
-
-                  // Only include rows where the date matches the selected date
-                  if (reportDate.year == selectedDate.year &&
-                      reportDate.month == selectedDate.month &&
-                      reportDate.day == selectedDate.day) {
-                    List<String> timeParts = reportDate.toString().split(' ');
-                    return [
-                      ('${timeParts[0]} ${timeParts[1].split('.')[0]}' ?? 'N?A')
-                          .toString(),
-                      (report['consciousness'] ?? 'Conscious')
-                          .toString(), // Use 'consciousness' for 'C'
-                      (report['temperature'] ?? '37.5')
-                          .toString(), // Use 'temperature' for 'T'
-                      (report['heart_rate'] ?? '120')
-                          .toString(), // Use 'heart_rate' for 'P'
-                      (report['respiratory_rate'] ?? '18')
-                          .toString(), // Use 'respiratory_rate' for 'R'
-                      (report['blood_pressure'] ?? '120/80')
-                          .toString(), // Use 'blood_pressure' for 'BP'
-                      (report['spo2'] ?? '98%, 95')
-                          .toString(), // Use 'spo2' for 'O2, Sat'
-                      (report['urine'] ?? '0.5L')
-                          .toString(), // Use 'urine' for 'Urine'
-                      (report['mews'] ?? '3')
-                          .toString(), // Use 'mews' for 'MEWs Score'
-                      (report['cvp'] ?? '14').toString(), // Use 'cvp' for 'CVP'
-                    ]; // Explicit cast to List<String>
-                  } else {
-                    return []; // Skip this entry if the date doesn't match
-                  }
-                })
-                .where((row) => row.isNotEmpty)
-                .toList()
-                .cast<List<String>>(); // Cast to List<List<String>>
-      });
+      if (noteDoc.exists) {
+        var noteData = noteDoc.data()!;
+        String noteText = noteData['text'] ?? '';
+        return noteText;
+      }
+      return "";
+    } catch (e) {
+      print("Error fetching note data: $e");
+      return "";
     }
+  }
+
+  Widget _buildButtonCell({
+    required int index,
+    required BuildContext context,
+    required String reportID,
+  }) {
+    return FutureBuilder<String>(
+      future: fetchNoteData(reportID),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox.shrink(); // Or a small loading indicator
+        } else if (snapshot.hasError) {
+          return const SizedBox.shrink(); // Or an error indicator
+        } else {
+          final noteText = snapshot.data;
+          if (noteText != null &&
+              noteText.trim().isNotEmpty &&
+              noteText.trim() != '-') {
+            return Container(
+              height: 35,
+              alignment: Alignment.center,
+              child: IconButton(
+                icon: const Icon(
+                  FontAwesomeIcons.solidBookmark,
+                  color: Color(0xffFCAD00),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return NoteViewer(reportID: reportID);
+                    },
+                  );
+                },
+              ),
+            );
+          } else {
+            return const SizedBox.shrink(); // Don't render the button
+          }
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal, // Horizontal scrolling
+      scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(
-        scrollDirection: Axis.vertical, // Vertical scrolling
+        scrollDirection: Axis.vertical,
         child: Table(
           border: const TableBorder(
             horizontalInside: BorderSide.none,
@@ -123,7 +173,7 @@ class _SwipableTableState extends State<SwipableTable> {
             right: BorderSide.none,
           ),
           columnWidths: const {
-            0: FixedColumnWidth(180), // Time column width
+            0: FixedColumnWidth(180),
             1: FixedColumnWidth(120),
             2: FixedColumnWidth(60),
             3: FixedColumnWidth(60),
@@ -136,7 +186,6 @@ class _SwipableTableState extends State<SwipableTable> {
             10: FixedColumnWidth(120),
           },
           children: [
-            // Header Row
             TableRow(
               decoration: const BoxDecoration(color: Color(0xFFC6D8FF)),
               children: [
@@ -153,10 +202,8 @@ class _SwipableTableState extends State<SwipableTable> {
                 _buildHeaderCell('Management'),
               ],
             ),
-            // Data Rows
             ...List.generate(tableData.length, (index) {
-              final reportID =
-                  patientData['full_reports'][index]['report_id'] ?? '';
+              final reportID = _fullReports[index]['report_id'] ?? '';
               return TableRow(
                 decoration: BoxDecoration(
                   color: index.isOdd ? const Color(0xffF5F5F5) : Colors.white,
@@ -186,53 +233,24 @@ class _SwipableTableState extends State<SwipableTable> {
     );
   }
 
-  // Builds the header cell with fixed height
   Widget _buildHeaderCell(String text) {
     return Container(
-      height: 35, // Reduced height for header cells to lower the row space
+      height: 35,
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 4), // Reduced padding
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
     );
   }
 
-  // Builds the content cell with fixed height, shadow, and reduced padding
   Widget _buildContainerCell(String text, int index) {
     return Container(
-      height: 35, // Reduced height for content cells
+      height: 35,
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 4), // Reduced padding
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: index.isOdd ? const Color(0xffF5F5F5) : Colors.white,
       ),
       child: Text(text),
-    );
-  }
-
-  // Builds the button cell with fixed height and reduced padding
-  Widget _buildButtonCell({
-    required int index,
-    required BuildContext context,
-
-    required String reportID,
-  }) {
-    return Container(
-      height: 35, // Reduced height for button cell
-      alignment: Alignment.center,
-      child: IconButton(
-        icon: const Icon(
-          FontAwesomeIcons.solidBookmark,
-          color: Color(0xffFCAD00),
-        ),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return NoteViewer(reportID: reportID);
-            },
-          );
-        },
-      ),
     );
   }
 }

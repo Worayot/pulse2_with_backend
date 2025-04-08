@@ -71,6 +71,7 @@ class _ExportPageState extends State<ExportPage> {
           setState(() {
             _patients = patients;
             _filterPatients();
+            _resetFilters();
           });
         });
   }

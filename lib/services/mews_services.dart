@@ -32,8 +32,8 @@ class MEWsService {
   }
 
   //* Tested
-  addMEWs(String mewsID, Parameters parameters) async {
-    final url = Uri.parse('$baseUrl/noti-fetch/add_mews/$mewsID');
+  addMEWs(String noteID, Parameters parameters) async {
+    final url = Uri.parse('$baseUrl/noti-fetch/add_mews/$noteID');
 
     try {
       final response = await http.post(
@@ -43,14 +43,14 @@ class MEWsService {
       );
 
       if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
+        print("Successfully added MEWS: ${response.body}");
         return true; // Success
       } else {
-        print("Failed to receive note: ${response.body}");
+        print("Failed to add MEWS: ${response.body}");
         return false; // Failure
       }
     } catch (e) {
-      print("Error getting note: $e");
+      print("Error adding MEWS: $e");
       return false;
     }
   }

@@ -243,12 +243,14 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     child: TextField(
                       controller: heartRateController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: "-",
                         suffix: const Text(
                           "bpm",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
+
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
@@ -293,6 +295,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     child: TextField(
                       controller: respiratoryRateController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         suffix: const Text(
                           "bpm",
@@ -365,6 +368,9 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                 },
                                 controller: sysBloodPressureController,
                                 keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
                                 decoration: InputDecoration(
                                   hintText: '-',
                                   suffix: const Text(
@@ -415,6 +421,9 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                 focusNode: diasBpFocusNode,
                                 controller: diaBloodPressureController,
                                 keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
                                 decoration: InputDecoration(
                                   hintText: '-',
                                   suffix: const Text(
@@ -470,6 +479,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     child: TextField(
                       controller: spo2Controller,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
                         suffix: const Text(
@@ -521,6 +531,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     child: TextField(
                       controller: urineController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
                         suffix: const Text(
@@ -745,6 +756,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                               mews: MEWs.toString(),
                               cvp: cvp,
                               isAssessed: true,
+                              assessTime: DateTime.now(),
                             );
                             showResultDialog(
                               context: context,
