@@ -1,20 +1,38 @@
 import 'dart:convert';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/note.dart';
 import 'package:tuh_mews/models/parameters.dart';
+import 'package:tuh_mews/services/url.dart';
 import 'server_url.dart';
 
 class MEWsService {
   //! Not used
   Future<bool> getNoteByMEWsId(String mewsId) async {
-    final url = Uri.parse('$baseUrl/home-fetch/delete-patient/$mewsId');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/home-fetch/delete-patient/$mewsId',
+    );
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         // body: jsonEncode(patientId),
       );
 
@@ -33,12 +51,28 @@ class MEWsService {
 
   //* Tested
   addMEWs(String noteID, Parameters parameters) async {
-    final url = Uri.parse('$baseUrl/noti-fetch/add_mews/$noteID');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/noti-fetch/add_mews/$noteID',
+    );
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         body: jsonEncode(parameters),
       );
 
@@ -57,12 +91,28 @@ class MEWsService {
 
   //* Tested
   addNote({required String noteID, required Note note}) async {
-    final url = Uri.parse('$baseUrl/noti-fetch/add_notes/$noteID');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/noti-fetch/add_notes/$noteID',
+    );
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         body: jsonEncode({
           // "note_id": noteId,
           ...note.toJson(), // Assuming Note has a `toJson()` method
@@ -86,12 +136,28 @@ class MEWsService {
   Future<String> addNewInspection({
     required InspectionNote inspectionNote,
   }) async {
-    final url = Uri.parse('$baseUrl/noti-fetch/set_inspection_time/');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return "";
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/noti-fetch/set_inspection_time/',
+    );
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         body: jsonEncode({...inspectionNote.toJson()}),
       );
 

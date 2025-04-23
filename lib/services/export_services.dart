@@ -1,22 +1,38 @@
 import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:convert';
 import 'package:tuh_mews/services/server_url.dart';
+import 'package:tuh_mews/services/url.dart';
 import 'package:uuid/uuid.dart';
 
 class ExportServices {
   Future<bool> export(List<String> patientIds) async {
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
     final url = Uri.parse(
-      '$baseUrl/expt-fetch/get_report_excel',
+      '${URL().getServerURL()}/expt-fetch/get_report_excel',
     ); // Corrected URL
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         body: jsonEncode({"patient_ids": patientIds}), // Corrected body
       );
 

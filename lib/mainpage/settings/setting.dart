@@ -8,6 +8,7 @@ import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/settings/aboutapp.dart';
 import 'package:tuh_mews/mainpage/settings/admin.dart';
+import 'package:tuh_mews/mainpage/settings/bug_report.dart';
 import 'package:tuh_mews/mainpage/settings/language.dart';
 import 'package:tuh_mews/mainpage/settings/profile.dart';
 import 'package:tuh_mews/utils/custom_header.dart';
@@ -109,18 +110,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   },
                 ),
-                // if (_role == "admin")
-                //   _buildSettingsTile(
-                //     title: 'admin'.tr(),
-                //     leadingIcon: FontAwesomeIcons.userTie,
-                //     onTap: () async {
-                //       await Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //             builder: (context) => const AdminPage()),
-                //       );
-                //     },
-                //   ),
+                _buildSettingsTile(
+                  title: 'bugReport'.tr(),
+                  leadingIcon: FontAwesomeIcons.solidPaperPlane,
+                  onTap:
+                      () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BugReportPage(),
+                        ),
+                      ),
+                ),
+
                 FutureBuilder<String?>(
                   future: loadStringPreference('role'),
                   builder: (context, snapshot) {

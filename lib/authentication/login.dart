@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tuh_mews/services/url.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -23,8 +24,10 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   String errorMessage = '';
   final _storage = const FlutterSecureStorage();
-  final loginUrl = Uri.parse('$baseUrl/authenticate/login');
-  final cookieUrl = Uri.parse('$baseUrl/authenticate/create-session-cookie');
+  // String u =
+  //     "https://6ef7-2403-6200-8830-14ac-c01e-7e2c-2eaa-835e.ngrok-free.app";
+  // Uri loginUrl = Uri.parse('$u/authenticate/login');
+  // final cookieUrl = Uri.parse('$u/authenticate/create-session-cookie');
 
   @override
   void initState() {
@@ -82,6 +85,9 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
+      String url = URL().getServerURL();
+      Uri loginUrl = Uri.parse('$url/authenticate/login');
+      final cookieUrl = Uri.parse('$url/authenticate/create-session-cookie');
       final response = await http.post(
         loginUrl,
         headers: {'Content-Type': 'application/json'},
@@ -102,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
             await userCredential.user?.getIdToken(); // Get Firebase ID Token
 
         if (idToken != null) {
-          print("Firebase ID Token: $idToken");
+          // print("Firebase ID Token: $idToken");
           await Future.delayed(Duration(seconds: 1));
 
           // Step 2: Send ID Token to FastAPI to create a session
@@ -119,8 +125,10 @@ class _LoginPageState extends State<LoginPage> {
                 key: 'session_cookie',
                 value: sessionData['session_cookie'],
               );
-
               print("Session cookie stored successfully");
+
+              await _storage.write(key: 'id_token', value: idToken);
+              print("Id token stored successfully");
             } catch (e) {
               print("Error storing session cookie: $e");
             }

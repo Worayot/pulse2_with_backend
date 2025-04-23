@@ -7,6 +7,7 @@ import 'package:alarm/model/volume_settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:tuh_mews/func/notification_scheduler.dart';
+import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/services/mews_services.dart';
 import 'package:timezone/data/latest.dart'
@@ -286,6 +287,7 @@ void showTimeManager({
                                 );
 
                                 await Alarm.set(alarmSettings: alarmSettings);
+                                saveAlarmToPrefs(alarmSettings);
 
                                 // Set alarm 5 minutes before the initial alarm
                                 if (notificationTime.difference(now).inMinutes >
@@ -323,6 +325,7 @@ void showTimeManager({
                                     ),
                                   );
                                   await Alarm.set(alarmSettings: alarmSettings);
+                                  saveAlarmToPrefs(alarmSettings);
 
                                   print(
                                     'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',

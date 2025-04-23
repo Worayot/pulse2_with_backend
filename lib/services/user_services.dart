@@ -1,19 +1,37 @@
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/note.dart';
 import 'package:tuh_mews/models/parameters.dart';
+import 'package:tuh_mews/services/url.dart';
 import '../models/user.dart';
 import 'server_url.dart';
 
 class UserServices {
   //* Tested
   Future<Map<String, dynamic>?> loadAccount(String userId) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/account_load/$userId');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      // return false;
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/sett-fetch/account_load/$userId',
+    );
 
     try {
       final response = await http.get(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
       );
 
       if (response.statusCode == 200) {
@@ -31,12 +49,28 @@ class UserServices {
 
   //! Not tested, Won't be used
   Future<bool> getUsersList(String userId) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/users_load/$userId');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/sett-fetch/users_load/$userId',
+    );
 
     try {
       final response = await http.get(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         // body: jsonEncode(parameters),
       );
 
@@ -55,12 +89,26 @@ class UserServices {
 
   //* Tested
   Future<bool> addUser(User user) async {
-    final url = Uri.parse('$baseUrl/authenticate/signup');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse('${URL().getServerURL()}/authenticate/signup');
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         body: jsonEncode(user),
       );
 
@@ -79,12 +127,28 @@ class UserServices {
 
   //? May not be used.
   Future<bool> getUserData(String userId) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/get_user_data/$userId');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/sett-fetch/get_user_data/$userId',
+    );
 
     try {
       final response = await http.get(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         // body: jsonEncode(user),
       );
 
@@ -103,12 +167,26 @@ class UserServices {
 
   //* Tested
   saveUserData({required User newUserData, required String uid}) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/save_user/$uid');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse('${URL().getServerURL()}/sett-fetch/save_user/$uid');
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         body: jsonEncode(newUserData.toJson()),
       );
 
@@ -129,12 +207,28 @@ class UserServices {
 
   //* Tested
   Future<bool> deleteUser(String userId) async {
-    final url = Uri.parse('$baseUrl/sett-fetch/del_user/$userId');
+    final _storage = FlutterSecureStorage();
+
+    // Later in your code...
+    String? idToken = await _storage.read(key: 'id_token');
+
+    if (idToken != null) {
+      print('ID Token: $idToken');
+    } else {
+      print('No token found');
+      return false;
+    }
+    final url = Uri.parse(
+      '${URL().getServerURL()}/sett-fetch/del_user/$userId',
+    );
 
     try {
       final response = await http.delete(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
         // body: jsonEncode(user),
       );
 

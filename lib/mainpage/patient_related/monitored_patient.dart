@@ -5,6 +5,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
+import 'package:tuh_mews/utils/action_button.dart';
+import 'package:tuh_mews/utils/mews_forms_general.dart';
+import 'package:tuh_mews/utils/notification_list_page.dart';
 import 'package:tuh_mews/utils/patient_card_monitored.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,12 +51,70 @@ class _PatientPageState extends State<PatientPage> {
           padding: EdgeInsets.only(left: paddingSize),
           child: Align(
             alignment: Alignment.topLeft,
-            child: Text(
-              "patientInMonitoring".tr(),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: getPageTitleSize(context),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "patientInMonitoring".tr(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: getPageTitleSize(context),
+                  ),
+                ),
+                Row(
+                  children: [
+                    buildActionButton(
+                      FontAwesomeIcons.solidBell,
+                      () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              backgroundColor: Color(0xffE0EAFF),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: NotificationsDialogContent(),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      const Color(0xff3362CC),
+                      Colors.white,
+                    ),
+                    SizedBox(width: 8),
+                    buildActionButton(
+                      FontAwesomeIcons.calculator,
+                      () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return MEWsFormsGeneral();
+                          },
+                        );
+                      },
+                      const Color(0xff3362CC),
+                      Colors.white,
+                    ),
+                  ],
+                ),
+                // buildActionButton(
+                //   FontAwesomeIcons.calculator,
+                //   () {
+                //     showDialog(
+                //       context: context,
+                //       builder: (BuildContext context) {
+                //         return MEWsFormsGeneral();
+                //       },
+                //     );
+                //   },
+                //   const Color(0xff3362CC),
+                //   Colors.white,
+                // ),
+              ],
             ),
           ),
         ),
