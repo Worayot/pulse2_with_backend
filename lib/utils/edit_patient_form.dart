@@ -201,6 +201,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                               controller: ageController,
                               boxColor: const Color(0xffE0EAFF),
                               minWidth: 140,
+                              numberOnly: true,
                             ),
                           ),
                         ),

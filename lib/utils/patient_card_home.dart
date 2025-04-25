@@ -341,8 +341,12 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                         });
                       },
                     ),
-                    Icon(
-                      isExpanded[index] ? Icons.expand_less : Icons.expand_more,
+                    IgnorePointer(
+                      child: Icon(
+                        isExpanded[index]
+                            ? Icons.expand_less
+                            : Icons.expand_more,
+                      ),
                     ),
                   ],
                 ),

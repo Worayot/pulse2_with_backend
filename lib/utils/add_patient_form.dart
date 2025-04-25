@@ -199,6 +199,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                               controller: ageController,
                               boxColor: const Color(0xffE0EAFF),
                               minWidth: 140,
+                              numberOnly: true,
                             ),
                           ),
                           const SizedBox(width: 8),

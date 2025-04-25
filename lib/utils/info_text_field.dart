@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 
 Widget infoTextField({
@@ -7,6 +8,7 @@ Widget infoTextField({
   required Color boxColor,
   required double minWidth,
   required double fontSize,
+  bool? numberOnly,
   bool? blockEditing,
   String? hintText,
 }) {
@@ -45,6 +47,14 @@ Widget infoTextField({
             ),
             child: TextFormField(
               controller: controller,
+              keyboardType:
+                  numberOnly == true
+                      ? TextInputType.number
+                      : TextInputType.text,
+              inputFormatters:
+                  numberOnly == true
+                      ? [FilteringTextInputFormatter.digitsOnly]
+                      : [],
               maxLines: 2, // Allows for text wrapping to new lines
               style: const TextStyle(color: Colors.black, fontSize: 14),
               decoration: InputDecoration(
