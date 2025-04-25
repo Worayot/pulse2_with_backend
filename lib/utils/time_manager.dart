@@ -9,6 +9,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:tuh_mews/func/notification_scheduler.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/mews_services.dart';
@@ -245,8 +246,8 @@ void showTimeManager({
                                 );
                               }
 
-                              print('Scheduled Time: $notificationTime');
-
+                              // print('stringToHash');
+                              // print(stringToHash);
                               InspectionNote newInspection = InspectionNote(
                                 patientID: patientID,
                                 auditorID: auditorID,
@@ -254,13 +255,24 @@ void showTimeManager({
                               );
 
                               try {
+                                //! This does not verify that MEWsService() has successfully added new inspection note
                                 await MEWsService().addNewInspection(
                                   inspectionNote: newInspection,
                                 );
                                 print('Inspection added to Firestore');
 
+                                String stringToHash =
+                                    patientID + notificationTime.toString();
+
+                                int alarmId = StringTransformer().generateID(
+                                  stringToHash,
+                                );
+
+                                print(stringToHash);
+
                                 var alarmSettings = AlarmSettings(
-                                  id: Uuid().v4().hashCode,
+                                  id: alarmId,
+                                  // id: Uuid().v4().hashCode,
                                   dateTime: notificationTime,
                                   assetAudioPath: "assets/audio/alarm.mp3",
                                   loopAudio: false,
@@ -293,9 +305,22 @@ void showTimeManager({
                                           .difference(DateTime.now())
                                           .inMinutes >
                                       5) {
+                                    String secondStringToHash =
+                                        patientID +
+                                        notificationTime
+                                            .subtract(
+                                              const Duration(minutes: 5),
+                                            )
+                                            .toString();
+
+                                    int secondAlarmId = StringTransformer()
+                                        .generateID(secondStringToHash);
+                                    // print('secondStringToHash');
+                                    // print(secondStringToHash);
                                     final alarmSettingsBefore = alarmSettings
                                         .copyWith(
-                                          id: Uuid().v4().hashCode,
+                                          // id: Uuid().v4().hashCode,
+                                          id: secondAlarmId,
                                           dateTime: notificationTime.subtract(
                                             const Duration(minutes: 5),
                                           ),
@@ -310,9 +335,9 @@ void showTimeManager({
                                   // );
                                 }
                               } catch (e) {
-                                // print(
-                                //   'Failed to add inspection to Firestore: $e',
-                                // );
+                                print(
+                                  'Failed to add inspection to Firestore: $e',
+                                );
                               }
 
                               if (!context.mounted) {

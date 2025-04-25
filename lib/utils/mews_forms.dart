@@ -3,19 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/calculateMEWs.dart';
+import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';
+import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/mews_services.dart';
 
 class MEWsForms extends StatefulWidget {
   final String patientID;
   final String noteID;
   final VoidCallback onPop;
+  final String alarmStringID;
   const MEWsForms({
     super.key,
     required this.patientID,
     required this.noteID,
     required this.onPop,
+    required this.alarmStringID,
   });
 
   @override
@@ -734,6 +738,10 @@ class _MEWsFormsState extends State<MEWsForms> {
                               onPop: widget.onPop,
                             );
                             MEWsService().addMEWs(widget.noteID, parameters);
+                            int alarmID = StringTransformer().generateID(
+                              widget.alarmStringID,
+                            );
+                            AlarmService().stopAlarm(alarmID);
                           },
                           child: Text(
                             'calculate'.tr(),

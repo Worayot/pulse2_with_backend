@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:tuh_mews/func/get_color.dart';
+import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/utils/mews_forms.dart';
 import 'package:tuh_mews/utils/note_editor.dart';
 
@@ -22,6 +23,7 @@ class AssessTableRowWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // print(combinedData['formatted_time']);
     final String time = combinedData['formatted_time'].split(' ')[0];
+    final fullTime = combinedData['time'];
     // final String time = combinedData['formatted_time'];
     final dynamic MEWs = combinedData['mews'];
     // final String auditorID = combinedData['auditor'];
@@ -35,6 +37,7 @@ class AssessTableRowWidget extends StatelessWidget {
     final double screenHeight = size.height;
 
     final bool isButtonEnabled = !isAssessed;
+
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, right: 10, top: 8),
       child: Row(
@@ -104,6 +107,8 @@ class AssessTableRowWidget extends StatelessWidget {
               onPressed:
                   isButtonEnabled
                       ? () {
+                        String stringToHash = patientID + fullTime + ':00.000';
+
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -111,6 +116,7 @@ class AssessTableRowWidget extends StatelessWidget {
                               patientID: patientID,
                               noteID: noteID,
                               onPop: onPop,
+                              alarmStringID: stringToHash,
                             );
                           },
                         );
