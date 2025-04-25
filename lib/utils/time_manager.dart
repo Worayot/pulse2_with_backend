@@ -232,6 +232,15 @@ void showTimeManager({
                           ElevatedButton(
                             onPressed: () async {
                               DateTime now = DateTime.now();
+                              DateTime recordTime = DateTime(
+                                now.year,
+                                now.month,
+                                now.day,
+                                selectedHour,
+                                selectedMinute,
+                                now.second,
+                              );
+
                               DateTime notificationTime = DateTime(
                                 now.year,
                                 now.month,
@@ -246,12 +255,16 @@ void showTimeManager({
                                 );
                               }
 
+                              if (recordTime.isBefore(now)) {
+                                recordTime = recordTime.add(Duration(days: 1));
+                              }
+
                               // print('stringToHash');
                               // print(stringToHash);
                               InspectionNote newInspection = InspectionNote(
                                 patientID: patientID,
                                 auditorID: auditorID,
-                                time: notificationTime,
+                                time: recordTime,
                               );
 
                               try {
@@ -262,13 +275,13 @@ void showTimeManager({
                                 print('Inspection added to Firestore');
 
                                 String stringToHash =
-                                    patientID + notificationTime.toString();
+                                    patientID + recordTime.toString();
 
                                 int alarmId = StringTransformer().generateID(
                                   stringToHash,
                                 );
 
-                                print(stringToHash);
+                                // print(stringToHash);
 
                                 var alarmSettings = AlarmSettings(
                                   id: alarmId,
@@ -292,48 +305,52 @@ void showTimeManager({
                                   ),
                                 );
 
+                                print("Record Time: $recordTime");
+                                print("First Alarm Time: $notificationTime");
+                                print("First string: $stringToHash");
+                                print("First alarm id: $alarmId");
+
                                 await AlarmService().setAlarm(alarmSettings);
 
                                 // Set alarm 5 minutes before the initial alarm
                                 if (notificationTime.difference(now).inMinutes >
                                     5) {
                                   print(
-                                    "Scheduled Time before 5 minutes of the set time.",
+                                    "Scheduling Time before 5 minutes of the set time.",
                                   );
 
-                                  if (notificationTime
-                                          .difference(DateTime.now())
-                                          .inMinutes >
-                                      5) {
-                                    String secondStringToHash =
-                                        patientID +
-                                        notificationTime
-                                            .subtract(
-                                              const Duration(minutes: 5),
-                                            )
-                                            .toString();
+                                  DateTime secondNotificationTime = recordTime
+                                      .subtract(const Duration(minutes: 5));
+                                  String secondStringToHash =
+                                      patientID +
+                                      secondNotificationTime.toString();
 
-                                    int secondAlarmId = StringTransformer()
-                                        .generateID(secondStringToHash);
-                                    print('secondStringToHash');
-                                    print(secondStringToHash);
-                                    final alarmSettingsBefore = alarmSettings
-                                        .copyWith(
-                                          // id: Uuid().v4().hashCode,
-                                          id: secondAlarmId,
-                                          dateTime: notificationTime.subtract(
-                                            const Duration(minutes: 5),
-                                          ),
-                                        );
-                                    await AlarmService().setAlarm(
-                                      alarmSettingsBefore,
-                                    ); // Use the service
-                                  }
+                                  int secondAlarmId = StringTransformer()
+                                      .generateID(secondStringToHash);
 
-                                  // print(
-                                  //   'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',
-                                  // );
+                                  // print('secondStringToHash');
+                                  // print(secondStringToHash);
+                                  final alarmSettingsBefore = alarmSettings
+                                      .copyWith(
+                                        // id: Uuid().v4().hashCode,
+                                        id: secondAlarmId,
+                                        dateTime: notificationTime.subtract(
+                                          const Duration(minutes: 5),
+                                        ),
+                                      );
+                                  await AlarmService().setAlarm(
+                                    alarmSettingsBefore,
+                                  ); // Use the service
+                                  print(
+                                    "Second alarm Time: $secondNotificationTime",
+                                  );
+                                  print("Second string $secondStringToHash");
+                                  print("Second alarm id: $secondAlarmId");
                                 }
+
+                                // print(
+                                //   'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',
+                                // );
                               } catch (e) {
                                 print(
                                   'Failed to add inspection to Firestore: $e',

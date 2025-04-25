@@ -36,7 +36,10 @@ class AssessTableRowWidget extends StatelessWidget {
     final double screenWidth = size.width;
     final double screenHeight = size.height;
 
-    DateFormat formatter = DateFormat('yyyy-MM-dd HH.mm');
+    DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+    // DateFormat formatter = DateFormat('yyyy-MM-dd HH.mm');
+
+    // print("assTableRow $fullTime");
 
     // Step 1: Parse string to DateTime
     DateTime parsedTime = formatter.parse(fullTime);
@@ -120,8 +123,13 @@ class AssessTableRowWidget extends StatelessWidget {
               onPressed:
                   isButtonEnabled
                       ? () {
-                        String stringToHash = '$patientID$fullTime:00.000';
-                        String secondStringToHash = '$patientID$newTime:00.000';
+                        String stringToHash = '$patientID$fullTime.000';
+                        String secondStringToHash = '$patientID$newTime.000';
+
+                        print("$stringToHash stringToHash assTableRow");
+                        print(
+                          "$secondStringToHash secondStringToHash secondStringToHash",
+                        );
 
                         showDialog(
                           context: context,

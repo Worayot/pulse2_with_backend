@@ -10,7 +10,6 @@ import 'package:tuh_mews/utils/circle_with_num.dart';
 import 'package:tuh_mews/utils/assess_table_row.dart';
 import 'package:tuh_mews/utils/mews_forms_instant.dart';
 import 'package:tuh_mews/utils/time_manager.dart';
-import 'package:tuh_mews/func/time_formatter.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class MonitoredPatientCard extends StatefulWidget {
@@ -30,6 +29,8 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
   String _latestTimeText = "";
   String _countdownText = "";
   Timer? _timer;
+  List<Map<String, dynamic>> _processedData = [];
+  DateTime? _nearestFutureTime;
 
   @override
   void dispose() {
@@ -40,69 +41,78 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
   @override
   void initState() {
     super.initState();
+    _processInspectionData();
     _startNearestTimeCountdown();
   }
 
-  void _startNearestTimeCountdown() {
-    _timer?.cancel(); // Cancel any existing timer
-
+  void _processInspectionData() {
     var patientData = widget.patientData;
     List<Map<String, dynamic>> dataRows = patientData['inspection_notes'];
-    dataRows.sort((a, b) => a['time'].compareTo(b['time']));
+    dataRows.sort(
+      (a, b) => (a['time'] as Timestamp).compareTo(b['time'] as Timestamp),
+    );
 
-    List<Map<String, dynamic>> combinedData = [];
-    List<DateTime> dateTimeList = [];
+    _processedData =
+        dataRows.map((map) {
+          Timestamp timestamp = map['time'];
+          DateTime dateTimeUtc = timestamp.toDate().toUtc();
+          final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+          var localDateTime = tz.TZDateTime.from(dateTimeUtc, bangkokTimezone);
+          // String formattedTimeShort = DateFormat('HH.mm').format(localDateTime);
+          String formattedTime = DateFormat('HH.mm').format(localDateTime);
+          // String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
+          String timeFull = DateFormat(
+            'yyyy-MM-dd HH:mm:ss',
+          ).format(localDateTime);
 
-    if (dataRows.isNotEmpty) {
-      for (var map in dataRows) {
-        Timestamp timestamp = map['time'];
-        DateTime dateTime = timestamp.toDate().toUtc();
-        final bangkokTimezone = tz.getLocation('Asia/Bangkok');
-        var localDateTime = tz.TZDateTime.from(dateTime, bangkokTimezone);
-        String formattedTime = DateFormat('HH.mm').format(localDateTime);
-        // String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
-        String time = DateFormat('yyyy-MM-dd HH.mm').format(localDateTime);
+          return {
+            // "formatted_time_short":
+            //     '$formattedTimeShort${'n'.tr()} ($timeDelta)',
+            "formatted_time": '$formattedTime${'n'.tr()}',
+            "mews": map['mews']['mews'] ?? '-',
+            "is_assessed": map['mews']['is_assessed'],
+            "mews_id": map['mews_id'],
+            "note_id": map['note_id'],
+            "note": map['text'] ?? '',
+            "auditor": map['audit_by'],
+            "time": timeFull,
+            "local_date_time": localDateTime,
+          };
+        }).toList();
 
-        combinedData.add({
-          // "formatted_time": '$formattedTime${'n'.tr()} ($timeDelta)',
-          "formatted_time": '$formattedTime${'n'.tr()}',
-          "mews": map['mews']['mews'] ?? '-',
-          "is_assessed": map['mews']['is_assessed'],
-          "mews_id": map['mews_id'],
-          "note_id": map['note_id'],
-          "note": map['text'] ?? '',
-          "auditor": map['audit_by'],
-          "time": time,
-        });
-        dateTimeList.add(localDateTime);
-      }
-    }
+    DateTime nowUtc = DateTime.now().toUtc();
+    final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+    final nowLocal = tz.TZDateTime.from(nowUtc, bangkokTimezone);
 
-    DateTime now = DateTime.now();
     List<DateTime> futureTimes =
-        dateTimeList.where((t) => t.isAfter(now)).toList();
+        _processedData
+            .map((item) => item['local_date_time'] as DateTime)
+            .where((t) => t.isAfter(nowLocal))
+            .toList();
     futureTimes.sort((a, b) => a.compareTo(b));
 
-    DateTime? nearestFutureTime;
-    int nearestIndex = -1;
+    _nearestFutureTime = futureTimes.isNotEmpty ? futureTimes.first : null;
+    _latestTimeText =
+        _nearestFutureTime != null
+            ? DateFormat('HH.mm.ss').format(_nearestFutureTime!) + 'n'.tr()
+            : "-";
+  }
 
-    if (futureTimes.isNotEmpty) {
-      nearestFutureTime = futureTimes.first;
-      nearestIndex = dateTimeList.indexOf(nearestFutureTime);
-      _latestTimeText =
-          (nearestIndex != -1 && combinedData.isNotEmpty)
-              ? combinedData[nearestIndex]["formatted_time"]
-              : "-";
-    } else {
-      _latestTimeText = "-";
-    }
+  void _startNearestTimeCountdown() {
+    _timer?.cancel();
 
-    // Start the countdown timer
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (nearestFutureTime != null) {
-        final now = DateTime.now();
-        if (nearestFutureTime.isAfter(now)) {
-          final difference = nearestFutureTime.difference(now);
+      if (_nearestFutureTime != null) {
+        final nowUtc = DateTime.now().toUtc();
+        final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+        final nowLocal = tz.TZDateTime.from(nowUtc, bangkokTimezone);
+        final nearestFutureTimeLocal = tz.TZDateTime.from(
+          _nearestFutureTime!,
+          bangkokTimezone,
+        );
+
+        if (nearestFutureTimeLocal.isAfter(nowLocal)) {
+          final difference = nearestFutureTimeLocal.difference(nowLocal);
           final days = difference.inDays;
           final hours = difference.inHours % 24;
           final minutes = difference.inMinutes % 60;
@@ -113,10 +123,10 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
           });
         } else {
           setState(() {
-            // _countdownText = "Time Arrived";
             _countdownText = " ";
           });
-          _startNearestTimeCountdown(); // Re-calculate for the next nearest time
+          _processInspectionData();
+          _startNearestTimeCountdown();
         }
       } else {
         setState(() {
@@ -124,9 +134,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
         });
       }
     });
-
-    // Set the initial latest time
-    setState(() {});
   }
 
   bool isExpanded = false;
@@ -138,52 +145,18 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     String myUserID = patientData['user_id'];
     Map<String, dynamic> patientDetails = patientData['patient_details'];
     String fullname = patientDetails['fullname'];
-    List<Map<String, dynamic>> dataRows = patientData['inspection_notes'];
-    dataRows.sort((a, b) => a['time'].compareTo(b['time']));
 
     Size size = MediaQuery.of(context).size;
-    int dataLength = dataRows.length;
-
-    List<Map<String, dynamic>> combinedData = [];
-
-    if (dataRows.isNotEmpty) {
-      for (var map in dataRows) {
-        Timestamp timestamp = map['time'];
-        DateTime dateTime = timestamp.toDate().toUtc();
-        final bangkokTimezone = tz.getLocation('Asia/Bangkok');
-        var localDateTime = tz.TZDateTime.from(dateTime, bangkokTimezone);
-        String formattedTime = DateFormat('HH.mm').format(localDateTime);
-        String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
-        String time = DateFormat('yyyy-MM-dd HH.mm').format(localDateTime);
-
-        combinedData.add({
-          "formatted_time": '$formattedTime${'n'.tr()} ($timeDelta)',
-          "mews": map['mews']['mews'] ?? '-',
-          "is_assessed": map['mews']['is_assessed'],
-          "mews_id": map['mews_id'],
-          "note_id": map['note_id'],
-          "note": map['text'] ?? '',
-          "auditor": map['audit_by'],
-          "time": time,
-        });
-      }
-    }
+    int dataLength = _processedData.length;
 
     List<String> scores =
-        combinedData.map((item) => item["mews"].toString()).toList();
+        _processedData.map((item) => item["mews"].toString()).toList();
 
-    int latestIndex = -1;
-    for (int i = scores.length - 1; i >= 0; i--) {
-      if (int.tryParse(scores[i]) != null) {
-        latestIndex = i;
-        break;
-      }
-    }
+    int latestIndex = scores.lastIndexWhere(
+      (score) => int.tryParse(score) != null,
+    );
 
-    String latestMews =
-        combinedData.isNotEmpty
-            ? (latestIndex == -1 ? '-' : scores[latestIndex])
-            : "-";
+    String latestMews = latestIndex != -1 ? scores[latestIndex] : "-";
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -198,7 +171,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                 child: InkWell(
                   onTap: () {
                     setState(() {
-                      isExpanded = !isExpanded; // Toggle state
+                      isExpanded = !isExpanded;
                     });
                   },
                   child: AnimatedContainer(
@@ -225,7 +198,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                             Column(
                               children: List.generate(dataLength, (i) {
                                 return AssessTableRowWidget(
-                                  combinedData: combinedData[i],
+                                  combinedData: _processedData[i],
                                   myUserID: myUserID,
                                   patientID: patientID,
                                   onPop: widget.onPop,
@@ -257,7 +230,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                 InkWell(
                   onTap: () {
                     setState(() {
-                      isExpanded = !isExpanded; // Toggle state
+                      isExpanded = !isExpanded;
                     });
                   },
                   child: Row(
@@ -295,16 +268,11 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                             const SizedBox(height: 2),
                             Text.rich(
                               TextSpan(
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                ), // Default style for the entire Text.rich
+                                style: const TextStyle(fontSize: 16),
                                 children: [
+                                  TextSpan(text: _latestTimeText),
                                   TextSpan(
-                                    text: _latestTimeText,
-                                  ), // First part: _latestTimeText
-                                  TextSpan(
-                                    text:
-                                        _countdownText, // Second part: Countdown with parentheses
+                                    text: _countdownText,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[600],
