@@ -47,6 +47,30 @@ class AlarmService {
     print('Alarm $alarmId stopped and has been removed from preference');
   }
 
+  Future<void> stopAllAlarms() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? savedAlarms = prefs.getStringList('scheduled_alarms');
+
+    if (savedAlarms != null) {
+      for (final alarmJson in savedAlarms) {
+        try {
+          final alarmMap = jsonDecode(alarmJson);
+          final int? alarmId = alarmMap['id'];
+          if (alarmId != null) {
+            await Alarm.stop(alarmId);
+            print('Stopped alarm with ID: $alarmId');
+          }
+        } catch (e) {
+          print('Error decoding alarm JSON: $e');
+        }
+      }
+      await prefs.remove('scheduled_alarms');
+      print('All alarms stopped and removed from preferences.');
+    } else {
+      print('No alarms found in preferences to stop.');
+    }
+  }
+
   // Your preference functions (move these here)
   Future<void> saveAlarmToPrefs(AlarmSettings alarmSettings) async {
     final prefs = await SharedPreferences.getInstance();
