@@ -107,3 +107,17 @@ Future<void> saveAlarmToPrefs(AlarmSettings alarmSettings) async {
 
   await prefs.setStringList('scheduled_alarms', savedAlarms);
 }
+
+Future<void> deleteAlarmFromPrefs(int alarmId) async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
+
+  // Find the alarm with the given ID and remove it from the list
+  savedAlarms.removeWhere((alarmJson) {
+    final alarmMap = jsonDecode(alarmJson);
+    return alarmMap['id'] == alarmId;
+  });
+
+  // Save the updated list back to SharedPreferences
+  await prefs.setStringList('scheduled_alarms', savedAlarms);
+}

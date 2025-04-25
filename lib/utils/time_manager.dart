@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:alarm/alarm.dart';
@@ -327,14 +328,21 @@ void showTimeManager({
                                   await Alarm.set(alarmSettings: alarmSettings);
                                   saveAlarmToPrefs(alarmSettings);
 
-                                  print(
-                                    'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',
-                                  );
+                                  // Add the callback that will be called when the alarm is triggered
+                                  Alarm.ringStream.stream.listen((alarm) {
+                                    deleteAlarmFromPrefs(
+                                      alarm.id,
+                                    ); // Your custom method
+                                  });
+
+                                  // print(
+                                  //   'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',
+                                  // );
                                 }
                               } catch (e) {
-                                print(
-                                  'Failed to add inspection to Firestore: $e',
-                                );
+                                // print(
+                                //   'Failed to add inspection to Firestore: $e',
+                                // );
                               }
 
                               if (!context.mounted) {
@@ -415,4 +423,38 @@ Future<void> stopAlarm(int alarmId) async {
 
 //   // Clear stored alarms
 //   await prefs.remove('activeAlarms');
+// }
+
+//* Function that will be triggered when the alarm goes off
+// void onAlarmTriggered(int alarmId) async {
+//   // Delete the alarm from preferences when triggered
+//   await deleteAlarmFromPrefs(alarmId);
+
+//   // You can also perform other actions here, such as showing a dialog or notifying the user
+//   print(
+//     "Alarm with ID $alarmId has been triggered and deleted from preferences.",
+//   );
+// }
+
+// Future<void> _deleteAlarm(int id) async {
+//   await Alarm.stop(id);
+//   final prefs = await SharedPreferences.getInstance();
+//   List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
+
+//   savedAlarms.removeWhere((item) {
+//     final data = jsonDecode(item);
+//     return data['id'] == id;
+//   });
+
+//   await prefs.setStringList('scheduled_alarms', savedAlarms);
+//   // _loadAlarms();
+// }
+
+// Future<void> _loadAlarms() async {
+//   final prefs = await SharedPreferences.getInstance();
+//   List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
+//   setState(() {
+//     _alarms =
+//         savedAlarms.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
+//   });
 // }

@@ -16,6 +16,7 @@ import 'package:timezone/timezone.dart' as tz;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Alarm.init();
+
   tzdata.initializeTimeZones(); // Initialize timezone data
   tz.setLocalLocation(tz.getLocation(tz.local.name)); // Set local timezone
   // NotificationScheduler notificationScheduler = NotificationScheduler();
