@@ -178,7 +178,8 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d*\.?\d*$'),
+                          // RegExp(r'^\d*\.?\d*$'), //! Many decimal place
+                          RegExp(r'^\d{0,3}(\.\d{0,1})?$'), //* 1 decimal place
                         ), // Allows only numbers and one decimal point
                       ],
                       decoration: InputDecoration(
