@@ -11,6 +11,7 @@ Widget infoTextField({
   bool? numberOnly,
   bool? blockEditing,
   String? hintText,
+  String? Function(String?)? validator,
 }) {
   bool block = blockEditing ?? false ? false : true;
   return Padding(
@@ -28,7 +29,6 @@ Widget infoTextField({
         ),
         const SizedBox(height: 5),
         Container(
-          // Remove fixed width and let it take available space
           constraints: BoxConstraints(
             maxWidth: double.infinity,
             minWidth: minWidth,
@@ -55,14 +55,16 @@ Widget infoTextField({
                   numberOnly == true
                       ? [FilteringTextInputFormatter.digitsOnly]
                       : [],
-              maxLines: 2, // Allows for text wrapping to new lines
+              maxLines: 1,
               style: const TextStyle(color: Colors.black, fontSize: 14),
               decoration: InputDecoration(
                 border: InputBorder.none,
-                isCollapsed: true, // Reduce padding inside the text field
+                isCollapsed: true,
                 hintText: hintText,
               ),
               enabled: block,
+              validator: validator,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
             ),
           ),
         ),

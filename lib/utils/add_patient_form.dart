@@ -25,7 +25,6 @@ class _AddPatientFormState extends State<AddPatientForm> {
   String? _selectedGender;
   final PatientService _patientService = PatientService();
   final _formKey = GlobalKey<FormState>();
-
   bool _isSubmitting = false; // Flag to prevent multiple submissions
 
   Future<void> _submitForm() async {
@@ -200,8 +199,23 @@ class _AddPatientFormState extends State<AddPatientForm> {
                               boxColor: const Color(0xffE0EAFF),
                               minWidth: 140,
                               numberOnly: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  _isSubmitting = false;
+                                  return null;
+                                }
+                                final number = int.tryParse(value);
+                                if (number == null ||
+                                    number < 1 ||
+                                    number > 120) {
+                                  _isSubmitting = false;
+                                  return '1-120';
+                                }
+                                return null;
+                              },
                             ),
                           ),
+
                           const SizedBox(width: 8),
                           Expanded(
                             child: Padding(
@@ -270,7 +284,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                               _isSubmitting
                                   ? CircularProgressIndicator(
                                     color: Colors.white,
-                                  ) // Show progress indicator
+                                  )
                                   : Text(
                                     'save'.tr(),
                                     style: const TextStyle(
@@ -280,7 +294,10 @@ class _AddPatientFormState extends State<AddPatientForm> {
                                     ),
                                   ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff407BFF),
+                            backgroundColor:
+                                _isSubmitting
+                                    ? const Color(0xffE0EAFF)
+                                    : const Color(0xff407BFF),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),

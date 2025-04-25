@@ -241,7 +241,7 @@ class _EditUserFormState extends State<EditUserForm> {
                     SizedBox(
                       width: double.infinity,
                       child: infoTextField(
-                        title: "nurseID".tr(),
+                        title: "${"nurseID".tr()} (${"uneditable".tr()})",
                         fontSize: 14,
                         controller: nurseIDController,
                         blockEditing: true,

@@ -71,12 +71,17 @@ class _EditPatientFormState extends State<EditPatientForm> {
   }
 
   Future<void> submitData() async {
+    String age = ageController.text.trim();
+
     String name = nameController.text.trim();
     String surname = surnameController.text.trim();
-    String age = ageController.text.trim();
     String ward = wardController.text.trim();
     String hn = hnController.text.trim();
     String bedNum = bedNumController.text.trim();
+
+    if (age.isNotEmpty && (int.parse(age) > 120 || int.parse(age) < 1)) {
+      return;
+    }
 
     if (name.isEmpty ||
         surname.isEmpty ||
@@ -194,15 +199,25 @@ class _EditPatientFormState extends State<EditPatientForm> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: SizedBox(
-                            child: infoTextField(
-                              title: "age".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: ageController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                              numberOnly: true,
-                            ),
+                          child: infoTextField(
+                            title: "age".tr(),
+                            fontSize: tws.getInfoBoxTextSize(),
+                            controller: ageController,
+                            boxColor: const Color(0xffE0EAFF),
+                            minWidth: 140,
+                            numberOnly: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return null;
+                              }
+                              final number = int.tryParse(value);
+                              if (number == null ||
+                                  number < 1 ||
+                                  number > 120) {
+                                return '1-120';
+                              }
+                              return null;
+                            },
                           ),
                         ),
                         const SizedBox(width: 8),
