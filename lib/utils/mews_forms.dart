@@ -13,13 +13,13 @@ class MEWsForms extends StatefulWidget {
   final String patientID;
   final String noteID;
   final VoidCallback onPop;
-  final String alarmStringID;
+  final List<String> alarmStringIDs;
   const MEWsForms({
     super.key,
     required this.patientID,
     required this.noteID,
     required this.onPop,
-    required this.alarmStringID,
+    required this.alarmStringIDs,
   });
 
   @override
@@ -738,10 +738,14 @@ class _MEWsFormsState extends State<MEWsForms> {
                               onPop: widget.onPop,
                             );
                             MEWsService().addMEWs(widget.noteID, parameters);
-                            int alarmID = StringTransformer().generateID(
-                              widget.alarmStringID,
-                            );
-                            AlarmService().stopAlarm(alarmID);
+
+                            for (String alarmStringID
+                                in widget.alarmStringIDs) {
+                              int alarmID = StringTransformer().generateID(
+                                alarmStringID,
+                              );
+                              AlarmService().stopAlarm(alarmID);
+                            }
                           },
                           child: Text(
                             'calculate'.tr(),

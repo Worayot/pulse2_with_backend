@@ -6,22 +6,19 @@ class StringTransformer {
   String generateFrom(String input) {
     var bytes = utf8.encode(input);
     var digest = sha256.convert(bytes);
-    return digest.toString(); // SHA256 hex string (64 chars)
+    return digest.toString();
   }
 
-  /// Returns a deterministic integer ID from the input string
+  /// Returns a smaller deterministic integer ID (32-bit) from the input string
   int generateID(String input) {
     var bytes = utf8.encode(input);
     var digest = sha256.convert(bytes);
 
-    // Convert first 8 bytes of the digest to a 64-bit integer
+    // Use first 4 bytes of the digest to form a 32-bit int
     int id = digest.bytes
-        .sublist(0, 8)
+        .sublist(0, 4)
         .fold<int>(0, (prev, elem) => (prev << 8) | elem);
 
-    // print("input: $input");
-    // print("Generated ID: $id");
-
-    return id;
+    return id % 1000000;
   }
 }

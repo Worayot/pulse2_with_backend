@@ -36,6 +36,19 @@ class AssessTableRowWidget extends StatelessWidget {
     final double screenWidth = size.width;
     final double screenHeight = size.height;
 
+    DateFormat formatter = DateFormat('yyyy-MM-dd HH.mm');
+
+    // Step 1: Parse string to DateTime
+    DateTime parsedTime = formatter.parse(fullTime);
+
+    // Step 2: Subtract 5 minutes
+    DateTime fiveMinutesBefore = parsedTime.subtract(
+      const Duration(minutes: 5),
+    );
+
+    // Step 3: Format back to string
+    String newTime = formatter.format(fiveMinutesBefore);
+
     final bool isButtonEnabled = !isAssessed;
 
     return Padding(
@@ -107,7 +120,8 @@ class AssessTableRowWidget extends StatelessWidget {
               onPressed:
                   isButtonEnabled
                       ? () {
-                        String stringToHash = patientID + fullTime + ':00.000';
+                        String stringToHash = '$patientID$fullTime:00.000';
+                        String secondStringToHash = '$patientID$newTime:00.000';
 
                         showDialog(
                           context: context,
@@ -116,7 +130,10 @@ class AssessTableRowWidget extends StatelessWidget {
                               patientID: patientID,
                               noteID: noteID,
                               onPop: onPop,
-                              alarmStringID: stringToHash,
+                              alarmStringIDs: [
+                                stringToHash,
+                                secondStringToHash,
+                              ],
                             );
                           },
                         );

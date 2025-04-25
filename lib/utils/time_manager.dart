@@ -315,8 +315,8 @@ void showTimeManager({
 
                                     int secondAlarmId = StringTransformer()
                                         .generateID(secondStringToHash);
-                                    // print('secondStringToHash');
-                                    // print(secondStringToHash);
+                                    print('secondStringToHash');
+                                    print(secondStringToHash);
                                     final alarmSettingsBefore = alarmSettings
                                         .copyWith(
                                           // id: Uuid().v4().hashCode,
