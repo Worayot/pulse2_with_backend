@@ -41,7 +41,7 @@ class MEWsService {
         return true; // Success
       } else {
         print("Failed to receive note: ${response.body}");
-        return false; // Failure
+        return false;
       }
     } catch (e) {
       print("Error getting note: $e");
@@ -56,9 +56,14 @@ class MEWsService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    // if (idToken != null) {
+    //   print('ID Token');
+    // } else {
+    //   print('No token found');
+    //   return false;
+    // }
+
+    if (idToken == null) {
       print('No token found');
       return false;
     }
@@ -141,9 +146,13 @@ class MEWsService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    // if (idToken != null) {
+    //   print('ID Token: $idToken');
+    // } else {
+    //   print('No token found');
+    //   return "";
+    // }
+    if (idToken == null) {
       print('No token found');
       return "";
     }
@@ -162,7 +171,7 @@ class MEWsService {
       );
 
       if (response.statusCode == 200) {
-        // print("Successfully adding new inspection time: ${response.body}");
+        print("Successfully adding new inspection time: ${response.body}");
         return response.body; // Success
       } else {
         // print("Failed to new inspection time: ${response.body}");

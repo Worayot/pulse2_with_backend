@@ -12,10 +12,12 @@ import 'package:tuh_mews/provider/user_data_provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:tuh_mews/services/alarm_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Alarm.init();
+  await AlarmService().initialize();
 
   tzdata.initializeTimeZones(); // Initialize timezone data
   tz.setLocalLocation(tz.getLocation(tz.local.name)); // Set local timezone

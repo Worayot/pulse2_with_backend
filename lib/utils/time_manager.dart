@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:tuh_mews/func/notification_scheduler.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
+import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/mews_services.dart';
 import 'package:timezone/data/latest.dart'
     as tzdata; // Import for initializeTimeZones
@@ -229,10 +230,6 @@ void showTimeManager({
                           const SizedBox(height: 30),
                           ElevatedButton(
                             onPressed: () async {
-                              print(
-                                "Selected Time: $selectedHour:$selectedMinute",
-                              );
-
                               DateTime now = DateTime.now();
                               DateTime notificationTime = DateTime(
                                 now.year,
@@ -263,15 +260,11 @@ void showTimeManager({
                                 print('Inspection added to Firestore');
 
                                 var alarmSettings = AlarmSettings(
-                                  id:
-                                      Uuid()
-                                          .v4()
-                                          .hashCode, // Use unique hash-based ID
+                                  id: Uuid().v4().hashCode,
                                   dateTime: notificationTime,
                                   assetAudioPath: "assets/audio/alarm.mp3",
                                   loopAudio: false,
                                   vibrate: true,
-                                  // warningNotificationOnKill: Platform.isIOS,
                                   warningNotificationOnKill: true,
                                   androidFullScreenIntent: true,
                                   volumeSettings: VolumeSettings.fixed(
@@ -281,59 +274,36 @@ void showTimeManager({
                                   notificationSettings: NotificationSettings(
                                     title: 'TUH MEWs',
                                     body:
-                                        '${'remindAssess'.tr()} "$patientName".',
+                                        '${'remindAssess'.tr()} "$patientName"',
                                     stopButton: 'stop'.tr(),
                                     icon: 'notification_icon',
                                   ),
                                 );
 
-                                await Alarm.set(alarmSettings: alarmSettings);
-                                saveAlarmToPrefs(alarmSettings);
+                                await AlarmService().setAlarm(alarmSettings);
 
                                 // Set alarm 5 minutes before the initial alarm
                                 if (notificationTime.difference(now).inMinutes >
                                     5) {
                                   print(
-                                    "Adding notification before 5 minutes of the set time.",
+                                    "Scheduled Time before 5 minutes of the set time.",
                                   );
-                                  alarmSettings = AlarmSettings(
-                                    id:
-                                        Uuid()
-                                            .v4()
-                                            .hashCode, // Use unique hash-based ID
 
-                                    dateTime: notificationTime.subtract(
-                                      Duration(
-                                        minutes: 5,
-                                      ), // 5 minutes before the set time
-                                    ),
-                                    assetAudioPath: "assets/audio/alarm.mp3",
-                                    loopAudio: false,
-                                    vibrate: true,
-                                    // warningNotificationOnKill: Platform.isIOS,
-                                    warningNotificationOnKill: true,
-                                    androidFullScreenIntent: true,
-                                    volumeSettings: VolumeSettings.fixed(
-                                      volume: 0.8,
-                                      volumeEnforced: true,
-                                    ),
-                                    notificationSettings: NotificationSettings(
-                                      title: 'TUH MEWs',
-                                      body:
-                                          '${'remindAssess'.tr()} "$patientName".',
-                                      stopButton: 'stop'.tr(),
-                                      icon: 'notification_icon',
-                                    ),
-                                  );
-                                  await Alarm.set(alarmSettings: alarmSettings);
-                                  saveAlarmToPrefs(alarmSettings);
-
-                                  // Add the callback that will be called when the alarm is triggered
-                                  Alarm.ringStream.stream.listen((alarm) {
-                                    deleteAlarmFromPrefs(
-                                      alarm.id,
-                                    ); // Your custom method
-                                  });
+                                  if (notificationTime
+                                          .difference(DateTime.now())
+                                          .inMinutes >
+                                      5) {
+                                    final alarmSettingsBefore = alarmSettings
+                                        .copyWith(
+                                          id: Uuid().v4().hashCode,
+                                          dateTime: notificationTime.subtract(
+                                            const Duration(minutes: 5),
+                                          ),
+                                        );
+                                    await AlarmService().setAlarm(
+                                      alarmSettingsBefore,
+                                    ); // Use the service
+                                  }
 
                                   // print(
                                   //   'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',

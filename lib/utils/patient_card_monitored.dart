@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,108 @@ class MonitoredPatientCard extends StatefulWidget {
 }
 
 class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
+  String _latestTimeText = "";
+  String _countdownText = "";
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _startNearestTimeCountdown();
+  }
+
+  void _startNearestTimeCountdown() {
+    _timer?.cancel(); // Cancel any existing timer
+
+    var patientData = widget.patientData;
+    List<Map<String, dynamic>> dataRows = patientData['inspection_notes'];
+    dataRows.sort((a, b) => a['time'].compareTo(b['time']));
+
+    List<Map<String, dynamic>> combinedData = [];
+    List<DateTime> dateTimeList = [];
+
+    if (dataRows.isNotEmpty) {
+      for (var map in dataRows) {
+        Timestamp timestamp = map['time'];
+        DateTime dateTime = timestamp.toDate().toUtc();
+        final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+        var localDateTime = tz.TZDateTime.from(dateTime, bangkokTimezone);
+        String formattedTime = DateFormat('HH.mm').format(localDateTime);
+        // String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
+        String time = DateFormat('yyyy-MM-dd HH.mm').format(localDateTime);
+
+        combinedData.add({
+          // "formatted_time": '$formattedTime${'n'.tr()} ($timeDelta)',
+          "formatted_time": '$formattedTime${'n'.tr()}',
+          "mews": map['mews']['mews'] ?? '-',
+          "is_assessed": map['mews']['is_assessed'],
+          "mews_id": map['mews_id'],
+          "note_id": map['note_id'],
+          "note": map['text'] ?? '',
+          "auditor": map['audit_by'],
+          "time": time,
+        });
+        dateTimeList.add(localDateTime);
+      }
+    }
+
+    DateTime now = DateTime.now();
+    List<DateTime> futureTimes =
+        dateTimeList.where((t) => t.isAfter(now)).toList();
+    futureTimes.sort((a, b) => a.compareTo(b));
+
+    DateTime? nearestFutureTime;
+    int nearestIndex = -1;
+
+    if (futureTimes.isNotEmpty) {
+      nearestFutureTime = futureTimes.first;
+      nearestIndex = dateTimeList.indexOf(nearestFutureTime);
+      _latestTimeText =
+          (nearestIndex != -1 && combinedData.isNotEmpty)
+              ? combinedData[nearestIndex]["formatted_time"]
+              : "-";
+    } else {
+      _latestTimeText = "-";
+    }
+
+    // Start the countdown timer
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (nearestFutureTime != null) {
+        final now = DateTime.now();
+        if (nearestFutureTime.isAfter(now)) {
+          final difference = nearestFutureTime.difference(now);
+          final days = difference.inDays;
+          final hours = difference.inHours % 24;
+          final minutes = difference.inMinutes % 60;
+          final seconds = difference.inSeconds % 60;
+          setState(() {
+            _countdownText =
+                " (${days > 0 ? '$days days ' : ''}${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')})";
+          });
+        } else {
+          setState(() {
+            // _countdownText = "Time Arrived";
+            _countdownText = " ";
+          });
+          _startNearestTimeCountdown(); // Re-calculate for the next nearest time
+        }
+      } else {
+        setState(() {
+          _countdownText = " ";
+        });
+      }
+    });
+
+    // Set the initial latest time
+    setState(() {});
+  }
+
   bool isExpanded = false;
 
   @override
@@ -44,16 +148,10 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
     if (dataRows.isNotEmpty) {
       for (var map in dataRows) {
-        // print(map);
         Timestamp timestamp = map['time'];
         DateTime dateTime = timestamp.toDate().toUtc();
-
-        // Convert DateTime to Asia/Bangkok timezone
         final bangkokTimezone = tz.getLocation('Asia/Bangkok');
         var localDateTime = tz.TZDateTime.from(dateTime, bangkokTimezone);
-        // localDateTime = localDateTime.subtract(Duration(hours: 7));
-
-        // Format the local DateTime
         String formattedTime = DateFormat('HH.mm').format(localDateTime);
         String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
         String time = DateFormat('yyyy-MM-dd HH.mm').format(localDateTime);
@@ -75,59 +173,17 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
         combinedData.map((item) => item["mews"].toString()).toList();
 
     int latestIndex = -1;
-
     for (int i = scores.length - 1; i >= 0; i--) {
       if (int.tryParse(scores[i]) != null) {
-        // Check if it can be converted to a number
         latestIndex = i;
         break;
       }
     }
 
-    List<String> times =
-        combinedData.map((item) => item["time"].toString()).toList();
-    // print(times);
-
-    DateTime now = DateTime.now();
-    DateFormat format = DateFormat("yyyy-MM-dd HH.mm");
-
-    List<DateTime> dateTimeList = times.map((t) => format.parse(t)).toList();
-
-    // Filter future times
-    List<DateTime> futureTimes =
-        dateTimeList.where((t) => t.isAfter(now)).toList();
-
-    String latestTime;
-
-    // Get the nearest future time
-    if (futureTimes.isNotEmpty) {
-      futureTimes.sort((a, b) => a.compareTo(b));
-      DateTime nearestFutureTime = futureTimes.first;
-      // print("Nearest future time: ${format.format(nearestFutureTime)}");
-
-      // Find index in dateTimeList
-      int index = dateTimeList.indexOf(nearestFutureTime);
-      latestTime =
-          (index != -1 && combinedData.isNotEmpty)
-              ? combinedData[index]["formatted_time"]
-              : "-";
-    } else {
-      // print("No future times available.");
-      latestTime = "-";
-    }
-
-    // print("Latest time: $latestTime");
-
-    // Get latest values
-    // String latestTime =
-    //     combinedData.isNotEmpty ? combinedData.last["formatted_time"] : "-";
-
     String latestMews =
         combinedData.isNotEmpty
             ? (latestIndex == -1 ? '-' : scores[latestIndex])
             : "-";
-
-    // print(combinedData);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
@@ -237,7 +293,26 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                               style: TextStyle(fontSize: 16),
                             ),
                             const SizedBox(height: 2),
-                            Text(latestTime, style: TextStyle(fontSize: 16)),
+                            Text.rich(
+                              TextSpan(
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ), // Default style for the entire Text.rich
+                                children: [
+                                  TextSpan(
+                                    text: _latestTimeText,
+                                  ), // First part: _latestTimeText
+                                  TextSpan(
+                                    text:
+                                        _countdownText, // Second part: Countdown with parentheses
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
