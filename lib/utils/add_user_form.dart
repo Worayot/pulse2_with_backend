@@ -29,7 +29,7 @@ class _AddUserFormState extends State<AddUserForm> {
     super.dispose();
   }
 
-  void submitData() {
+  void submitData() async {
     if (_isSubmitting) {
       // If already submitting, do nothing
       return;
@@ -73,14 +73,11 @@ class _AddUserFormState extends State<AddUserForm> {
       return;
     } else {
       // Only pop once if the form submission is successful
-      if (mounted) {
-        Navigator.pop(context); // Pop the current form
-      }
 
       String password = nurseID.padLeft(6, '0');
 
       // Uncomment the following line when you want to add user data
-      UserServices().addUser(
+      bool status = await UserServices().addUser(
         User(
           fullname: '$name $surname',
           nurseId: nurseID,
@@ -94,6 +91,12 @@ class _AddUserFormState extends State<AddUserForm> {
         setState(() {
           _isSubmitting = false;
         });
+      }
+
+      if (status) {
+        if (mounted) {
+          Navigator.pop(context); // Pop the current form
+        }
       }
     }
   }
@@ -260,14 +263,19 @@ class _AddUserFormState extends State<AddUserForm> {
                       alignment: Alignment.centerRight,
                       child: ElevatedButton.icon(
                         onPressed: submitData,
-                        label: Text(
-                          'save'.tr(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                        label:
+                            !_isSubmitting
+                                ? Text(
+                                  'save'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff407BFF),
                           shape: RoundedRectangleBorder(

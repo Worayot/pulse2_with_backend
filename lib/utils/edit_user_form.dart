@@ -23,6 +23,8 @@ class _EditUserFormState extends State<EditUserForm> {
     text: "",
   );
 
+  bool enableButton = false;
+
   String selectedRole = '';
 
   @override
@@ -97,7 +99,7 @@ class _EditUserFormState extends State<EditUserForm> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.sizeOf(context);
-    TextWidgetSize tws = TextWidgetSize(context: context);
+    // TextWidgetSize tws = TextWidgetSize(context: context);
 
     return Dialog(
       child: Container(
