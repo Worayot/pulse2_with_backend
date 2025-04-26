@@ -61,46 +61,47 @@ class _PatientPageState extends State<PatientPage> {
                     fontSize: getPageTitleSize(context),
                   ),
                 ),
-                Row(
-                  children: [
-                    buildActionButton(
-                      FontAwesomeIcons.solidBell,
-                      () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              backgroundColor: Color(0xffE0EAFF),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: NotificationsDialogContent(),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                      const Color(0xff3362CC),
-                      Colors.white,
-                    ),
-                    SizedBox(width: 8),
-                    buildActionButton(
-                      FontAwesomeIcons.calculator,
-                      () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return MEWsFormsGeneral();
-                          },
-                        );
-                      },
-                      const Color(0xff3362CC),
-                      Colors.white,
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     buildActionButton(
+                //       FontAwesomeIcons.solidBell,
+                //       () {
+                //         showDialog(
+                //           context: context,
+                //           builder: (context) {
+                //             return Dialog(
+                //               backgroundColor: Color(0xffE0EAFF),
+                //               shape: RoundedRectangleBorder(
+                //                 borderRadius: BorderRadius.circular(16),
+                //               ),
+                //               child: Padding(
+                //                 padding: const EdgeInsets.all(16.0),
+                //                 child: NotificationsDialogContent(),
+                //               ),
+                //             );
+                //           },
+                //         );
+                //       },
+                //       const Color(0xff3362CC),
+                //       Colors.white,
+                //     ),
+                //     SizedBox(width: 8),
+                //     buildActionButton(
+                //       FontAwesomeIcons.calculator,
+                //       () {
+                //         showDialog(
+                //           context: context,
+                //           builder: (BuildContext context) {
+                //             return MEWsFormsGeneral();
+                //           },
+                //         );
+                //       },
+                //       const Color(0xff3362CC),
+                //       Colors.white,
+                //     ),
+                //   ],
+                // ),
+                //! --------
                 // buildActionButton(
                 //   FontAwesomeIcons.calculator,
                 //   () {

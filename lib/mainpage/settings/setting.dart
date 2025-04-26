@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/settings/aboutapp.dart';
+import 'package:tuh_mews/mainpage/settings/aboutapp_ori.dart';
 import 'package:tuh_mews/mainpage/settings/admin.dart';
 import 'package:tuh_mews/mainpage/settings/bug_report.dart';
 import 'package:tuh_mews/mainpage/settings/language.dart';
@@ -95,7 +96,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap:
                       () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AboutAppPage()),
+                        // MaterialPageRoute(builder: (context) => AboutAppPage()),
+                        MaterialPageRoute(
+                          builder: (context) => AboutAppPageTwo(),
+                        ),
                       ),
                 ),
                 _buildSettingsTile(
@@ -111,6 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   },
                 ),
+
                 _buildSettingsTile(
                   title: 'bugReport'.tr(),
                   leadingIcon: FontAwesomeIcons.solidPaperPlane,
@@ -122,7 +127,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ),
                 ),
-
                 FutureBuilder<String?>(
                   future: loadStringPreference('role'),
                   builder: (context, snapshot) {

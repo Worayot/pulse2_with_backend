@@ -49,19 +49,11 @@ class MEWsService {
     }
   }
 
-  //* Tested
-  addMEWs(String noteID, Parameters parameters) async {
+  //* Used
+  Future<bool> addMEWs(String noteID, Parameters parameters) async {
     final _storage = FlutterSecureStorage();
 
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
-
-    // if (idToken != null) {
-    //   print('ID Token');
-    // } else {
-    //   print('No token found');
-    //   return false;
-    // }
 
     if (idToken == null) {
       print('No token found');
@@ -94,8 +86,8 @@ class MEWsService {
     }
   }
 
-  //* Tested
-  addNote({required String noteID, required Note note}) async {
+  //* Used
+  Future<bool> addNote({required String noteID, required Note note}) async {
     final _storage = FlutterSecureStorage();
 
     // Later in your code...
@@ -137,7 +129,7 @@ class MEWsService {
     }
   }
 
-  //* Tested
+  //* Used
   Future<String> addNewInspection({
     required InspectionNote inspectionNote,
   }) async {
@@ -146,12 +138,6 @@ class MEWsService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    // if (idToken != null) {
-    //   print('ID Token: $idToken');
-    // } else {
-    //   print('No token found');
-    //   return "";
-    // }
     if (idToken == null) {
       print('No token found');
       return "";

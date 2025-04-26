@@ -6,8 +6,8 @@ import 'package:tuh_mews/utils/custom_header.dart';
 import 'package:async/async.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class AboutAppPage extends StatelessWidget {
-  const AboutAppPage({super.key});
+class AboutAppPageTwo extends StatelessWidget {
+  const AboutAppPageTwo({super.key});
 
   @override
   Widget build(BuildContext context) {

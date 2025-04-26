@@ -13,7 +13,6 @@ class ExportServices {
   Future<bool> export(List<String> patientIds) async {
     final _storage = FlutterSecureStorage();
 
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken != null) {

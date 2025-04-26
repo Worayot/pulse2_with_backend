@@ -205,8 +205,8 @@ class PatientService {
     }
   }
 
-  //* Tested
-  updatePatient(String patientId, Patient patientData) async {
+  //* Used
+  Future<bool> updatePatient(String patientId, Patient patientData) async {
     final _storage = FlutterSecureStorage();
 
     // Later in your code...

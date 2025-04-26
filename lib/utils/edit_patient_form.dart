@@ -5,9 +5,11 @@ import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/gender_dropdown.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 import 'package:tuh_mews/utils/warning_dialog.dart';
+
 // import 'package:pulse/services/'
 
 class EditPatientForm extends StatefulWidget {
@@ -121,8 +123,39 @@ class _EditPatientFormState extends State<EditPatientForm> {
         hospitalNumber: hn,
       );
 
-      patientService.updatePatient(widget.patientId, patient);
-      Navigator.pop(context);
+      // Call the updatePatient function and await its result
+      bool updateSuccess = await patientService.updatePatient(
+        widget.patientId,
+        patient,
+      );
+
+      // Check if the update was successful before popping the navigator
+      if (updateSuccess) {
+        if (mounted) {
+          Navigator.pop(context);
+          FlushbarService().showCustomFlushbar(
+            context: context,
+            title: 'Success',
+            titleColor: Colors.green,
+            message: "Successfully updated patient",
+            duration: 2,
+          );
+        } else {
+          if (mounted) {
+            FlushbarService().showErrorMessage(
+              context: context,
+              message: "Failed to update patient.",
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: "Failed to update patient.",
+          );
+        }
+      }
     }
   }
 
