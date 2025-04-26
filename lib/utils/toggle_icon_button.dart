@@ -58,9 +58,7 @@ class _ToggleIconButtonState extends State<ToggleIconButton> {
                   } else {
                     widget.removePatientFunc();
                   }
-                  setState(() {
-                    _isPlus = !_isPlus; // Toggle button state
-                  });
+                  setState(() {});
                 }
                 : () {},
         style: ElevatedButton.styleFrom(

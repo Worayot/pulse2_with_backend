@@ -247,14 +247,6 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     ],
                                   ),
                                 ),
-                                // if (!enableToggleButton)
-                                //   buildActionButton(
-                                //     FontAwesomeIcons.clipboardList,
-                                //     () {},
-                                //     Colors.white,
-                                //     Colors.white,
-                                //   ),
-                                // if (enableToggleButton)
                                 ToggleIconButton(
                                   enableButton: enableToggleButton,
                                   addPatientFunc: () async {
