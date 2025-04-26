@@ -150,6 +150,7 @@
   "spo2": "SpO2 (when ",
   "stop": "Stop",
   "success": "Success",
+  "successfullyDeletedPatientData": "Successfully deleted patient data",
   "successfullyUpdatedPatientData": "Successfully updated patient data",
   "surname": "Surname",
   "symbolDescription": "Symbol description",

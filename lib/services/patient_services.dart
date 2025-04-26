@@ -133,9 +133,7 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }
@@ -171,9 +169,7 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }

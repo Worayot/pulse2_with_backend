@@ -46,6 +46,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
   late TextEditingController bedNumController;
 
   bool enableSaveButton = true;
+  bool enableDeleteButton = true;
 
   String? _selectedGender;
 
@@ -336,34 +337,61 @@ class _EditPatientFormState extends State<EditPatientForm> {
                               );
                             } else if (snapshot.data == "admin") {
                               return TextButton(
-                                onPressed: () async {
-                                  bool result = await showWarningDialog(
-                                    context,
-                                  ); // Wait for user choice
-                                  if (result) {
-                                    // print(
-                                    //   "✅ User confirmed: Deleting patient...",
-                                    // );
-                                    Navigator.pop(context);
-                                    await removePatientID(widget.patientId);
-                                    PatientService patientService =
-                                        PatientService();
-                                    patientService.deletePatient(
-                                      widget.patientId,
-                                    );
-                                    // await deleteUser();
-                                    // Only pop if it makes sense in this context
-                                  } else {
-                                    // print("❌ User canceled deletion.");
-                                  }
-                                },
+                                onPressed:
+                                    enableDeleteButton
+                                        ? () async {
+                                          bool result = await showWarningDialog(
+                                            context,
+                                          ); // Wait for user choice
+                                          if (result) {
+                                            setState(() {
+                                              enableDeleteButton = false;
+                                            });
+                                            PatientService patientService =
+                                                PatientService();
+                                            bool deleteSuccess =
+                                                await patientService
+                                                    .deletePatient(
+                                                      widget.patientId,
+                                                    );
+
+                                            if (deleteSuccess && mounted) {
+                                              Navigator.pop(context);
+                                              FlushbarService().showSuccessMessage(
+                                                context: context,
+                                                message:
+                                                    "successfullyDeletedPatientData"
+                                                        .tr(),
+                                              );
+                                            } else {
+                                              // Handle deletion failure, e.g., show a SnackBar
+                                              if (mounted) {
+                                                FlushbarService().showErrorMessage(
+                                                  context: context,
+                                                  message:
+                                                      "failedToDeletePatientData"
+                                                          .tr(),
+                                                );
+                                                setState(() {
+                                                  enableDeleteButton = true;
+                                                });
+                                              }
+                                            }
+                                          } else {
+                                            // User cancelled or dismissed the dialog
+                                            setState(() {
+                                              enableDeleteButton = true;
+                                            });
+                                          }
+                                        }
+                                        : () {},
                                 child: Text(
                                   'deletePatient'.tr(),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.red, // Red text color
+                                    color: Colors.red,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: Colors.red, // Underline
+                                    decorationColor: Colors.red,
                                   ),
                                 ),
                               );

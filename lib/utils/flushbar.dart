@@ -27,6 +27,22 @@ class FlushbarService {
     ).show(context);
   }
 
+  void showSuccessMessage({
+    required BuildContext context,
+    String? title,
+    required String message,
+  }) {
+    showCustomFlushbar(
+      context: context,
+      title: title ?? 'success'.tr(),
+      message: message,
+      titleColor: Colors.green,
+      messageColor: Colors.black,
+      backgroundColor: Color(0xffD1FFBD),
+      duration: 2,
+    );
+  }
+
   void showErrorMessage({
     required BuildContext context,
     String? title,
@@ -36,8 +52,10 @@ class FlushbarService {
       context: context,
       title: title ?? 'error'.tr(),
       message: message,
-      backgroundColor: Colors.white,
-      messageColor: Colors.red,
+      backgroundColor: Color(0xffFFDDE4),
+      titleColor: Colors.red,
+      messageColor: Colors.black,
+      duration: 2,
     );
   }
 }

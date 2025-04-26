@@ -67,30 +67,30 @@ Future<int?> loadIntPreference(String key) async {
 }
 
 // Function to load patient preference
-Future<List<String>> loadPatientPreference(String key) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getStringList('patient_list') ?? [];
-}
+// Future<List<String>> loadPatientPreference(String key) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   return prefs.getStringList('patient_list') ?? [];
+// }
 
-Future<void> addPatientID(String newID) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
+// Future<void> addPatientID(String newID) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
 
-  if (!patientIDs.contains(newID)) {
-    patientIDs.add(newID);
-    await prefs.setStringList('patient_ids', patientIDs);
-  }
-  print('Updated List After Adding: $patientIDs'); // Debugging
-}
+//   if (!patientIDs.contains(newID)) {
+//     patientIDs.add(newID);
+//     await prefs.setStringList('patient_ids', patientIDs);
+//   }
+//   print('Updated List After Adding: $patientIDs'); // Debugging
+// }
 
-Future<void> removePatientID(String id) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
+// Future<void> removePatientID(String id) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
 
-  patientIDs.remove(id);
-  await prefs.setStringList('patient_ids', patientIDs);
-  print('Updated List After Removing: $patientIDs'); // Debugging
-}
+//   patientIDs.remove(id);
+//   await prefs.setStringList('patient_ids', patientIDs);
+//   // print('Updated List After Removing: $patientIDs'); // Debugging
+// }
 
 Future<void> saveAlarmToPrefs(AlarmSettings alarmSettings) async {
   final prefs = await SharedPreferences.getInstance();
