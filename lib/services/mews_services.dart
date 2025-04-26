@@ -93,9 +93,7 @@ class MEWsService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }
@@ -140,7 +138,8 @@ class MEWsService {
 
     if (idToken == null) {
       print('No token found');
-      return "";
+      // return "noTokenFound";
+      return 'failed';
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/noti-fetch/set_inspection_time/',
@@ -157,16 +156,19 @@ class MEWsService {
       );
 
       if (response.statusCode == 200) {
-        print("Successfully adding new inspection time: ${response.body}");
+        // print("Successfully adding new inspection time: ${response.body}");
         return response.body; // Success
+        // return 'success';
       } else {
         // print("Failed to new inspection time: ${response.body}");
-        return "Failed to new inspection time: ${response.body}";
+        // return "Failed to new inspection time: ${response.body}";
+        return 'failed';
         // return false; // Failure
       }
     } catch (e) {
       // print("Error adding new inspection time: $e");
-      return '$e';
+      // return '$e';
+      return 'failed';
     }
   }
 }

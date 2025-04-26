@@ -18,7 +18,7 @@ class AlarmService {
     if (!_isInitialized) {
       await Alarm.init(); // Corrected: Removed showDebugLogs
       Alarm.ringStream.stream.listen((AlarmSettings triggeredAlarm) {
-        print('Alarm with ID ${triggeredAlarm.id} is ringing!');
+        // print('Alarm with ID ${triggeredAlarm.id} is ringing!');
         deleteAlarmFromPrefs(triggeredAlarm.id); // Use your delete function
         // Add your logic to handle the ringing alarm (e.g., show a dialog, play sound)
       });
@@ -26,25 +26,25 @@ class AlarmService {
           .load('assets/audio/alarm.mp3')
           .then((_) => true)
           .catchError((_) => false);
-      print("Audio file exists: $fileExists");
+      // print("Audio file exists: $fileExists");
 
       _isInitialized = true;
-      print('Alarm Service Initialized');
+      // print('Alarm Service Initialized');
     }
   }
 
   Future<void> setAlarm(AlarmSettings alarmSettings) async {
     await Alarm.set(alarmSettings: alarmSettings);
     await saveAlarmToPrefs(alarmSettings); // Use your save function
-    print(
-      'Alarm set and saved in preference with ID: ${alarmSettings.id}, Time: ${alarmSettings.dateTime}',
-    );
+    // print(
+    //   'Alarm set and saved in preference with ID: ${alarmSettings.id}, Time: ${alarmSettings.dateTime}',
+    // );
   }
 
   Future<void> stopAlarm(int alarmId) async {
     await Alarm.stop(alarmId);
     await removeAlarmFromPrefs(alarmId); // Implement this if needed
-    print('Alarm $alarmId stopped and has been removed from preference');
+    // print('Alarm $alarmId stopped and has been removed from preference');
   }
 
   Future<void> stopAllAlarms() async {
@@ -58,16 +58,16 @@ class AlarmService {
           final int? alarmId = alarmMap['id'];
           if (alarmId != null) {
             await Alarm.stop(alarmId);
-            print('Stopped alarm with ID: $alarmId');
+            // print('Stopped alarm with ID: $alarmId');
           }
         } catch (e) {
-          print('Error decoding alarm JSON: $e');
+          // print('Error decoding alarm JSON: $e');
         }
       }
       await prefs.remove('scheduled_alarms');
-      print('All alarms stopped and removed from preferences.');
+      // print('All alarms stopped and removed from preferences.');
     } else {
-      print('No alarms found in preferences to stop.');
+      // print('No alarms found in preferences to stop.');
     }
   }
 
@@ -96,8 +96,6 @@ class AlarmService {
       final alarmMap = jsonDecode(alarmJson);
       return alarmMap['id'] == alarmId;
     });
-
-    print('Alarm $alarmId has been removed from preference');
 
     await prefs.setStringList('scheduled_alarms', savedAlarms);
   }

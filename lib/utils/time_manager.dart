@@ -18,7 +18,7 @@ import 'package:timezone/data/latest.dart'
 import 'package:timezone/timezone.dart'
     as tz; // Import for timezone functionality
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 
 void showTimeManager({
   required BuildContext context,
@@ -43,353 +43,399 @@ void showTimeManager({
       initialItem: selectedMinute,
     );
 
+    bool enableButton = true;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Padding(
-          padding: EdgeInsets.symmetric(vertical: screenWidth * 0.03),
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            contentPadding: const EdgeInsets.only(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              top: 0,
-            ),
-            content: SizedBox(
-              height: 400,
-              child: Stack(
-                children: [
-                  Positioned(
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15.0),
-                          child: Text(
-                            "notifications".tr(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.black,
-                            size: 30,
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: -20,
-                    child: Opacity(
-                      opacity: 1,
-                      child: Image.asset(
-                        './assets/images/timeline.png',
-                        width: 270,
-                        height: 270,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                  Stack(
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: screenWidth * 0.03),
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                contentPadding: const EdgeInsets.only(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: 0,
+                ),
+                content: SizedBox(
+                  height: 400,
+                  child: Stack(
                     children: [
                       Positioned(
-                        top: 38,
-                        bottom: 0,
-                        right: 0,
-                        left: 0,
-                        child: FractionallySizedBox(
-                          alignment: Alignment.center,
-                          widthFactor: 0.6,
-                          heightFactor: 0.2,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              color: const Color(0xffC6D8FF),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.15),
-                                  offset: const Offset(0.5, 0.25),
-                                  blurRadius: 1,
-                                  spreadRadius: 1,
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15.0),
+                              child: Text(
+                                "notifications".tr(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
                                 ),
-                              ],
+                              ),
                             ),
+                            const Spacer(),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.black,
+                                size: 30,
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: -20,
+                        child: Opacity(
+                          opacity: 1,
+                          child: Image.asset(
+                            './assets/images/timeline.png',
+                            width: 270,
+                            height: 270,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
+                      Stack(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 60.0),
-                            child: Text(
-                              "setTimer".tr(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                          Positioned(
+                            top: 38,
+                            bottom: 0,
+                            right: 0,
+                            left: 0,
+                            child: FractionallySizedBox(
+                              alignment: Alignment.center,
+                              widthFactor: 0.6,
+                              heightFactor: 0.2,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  color: const Color(0xffC6D8FF),
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.15),
+                                      offset: const Offset(0.5, 0.25),
+                                      blurRadius: 1,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 40),
-                          Center(
-                            child: SizedBox(
-                              height: 130,
-                              width: 160,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const SizedBox(width: 30),
-                                  Expanded(
-                                    child: ListWheelScrollView.useDelegate(
-                                      controller: hourController,
-                                      itemExtent: 50,
-                                      perspective: 0.005,
-                                      physics: const FixedExtentScrollPhysics(),
-                                      onSelectedItemChanged: (index) {
-                                        selectedHour = index;
-                                      },
-                                      childDelegate:
-                                          ListWheelChildLoopingListDelegate(
-                                            children: List<Widget>.generate(
-                                              24,
-                                              (index) {
-                                                return Center(
-                                                  child: Text(
-                                                    index.toString().padLeft(
-                                                      2,
-                                                      '0',
-                                                    ),
-                                                    style: const TextStyle(
-                                                      fontSize: 24,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                    ),
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 60.0),
+                                child: Text(
+                                  "setTimer".tr(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  const Text(
-                                    ":",
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ListWheelScrollView.useDelegate(
-                                      controller: minuteController,
-                                      itemExtent: 50,
-                                      perspective: 0.005,
-                                      physics: const FixedExtentScrollPhysics(),
-                                      onSelectedItemChanged: (index) {
-                                        selectedMinute = index;
-                                      },
-                                      childDelegate:
-                                          ListWheelChildLoopingListDelegate(
-                                            children: List<Widget>.generate(
-                                              60,
-                                              (index) {
-                                                return Center(
-                                                  child: Text(
-                                                    index.toString().padLeft(
-                                                      2,
-                                                      '0',
-                                                    ),
-                                                    style: const TextStyle(
-                                                      fontSize: 24,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 30),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(height: 30),
-                          ElevatedButton(
-                            onPressed: () async {
-                              DateTime now = DateTime.now();
-                              DateTime recordTime = DateTime(
-                                now.year,
-                                now.month,
-                                now.day,
-                                selectedHour,
-                                selectedMinute,
-                                now.second,
-                              );
-
-                              DateTime notificationTime = DateTime(
-                                now.year,
-                                now.month,
-                                now.day,
-                                selectedHour,
-                                selectedMinute,
-                              );
-
-                              if (notificationTime.isBefore(now)) {
-                                notificationTime = notificationTime.add(
-                                  Duration(days: 1),
-                                );
-                              }
-
-                              if (recordTime.isBefore(now)) {
-                                recordTime = recordTime.add(Duration(days: 1));
-                              }
-
-                              // print('stringToHash');
-                              // print(stringToHash);
-                              InspectionNote newInspection = InspectionNote(
-                                patientID: patientID,
-                                auditorID: auditorID,
-                                time: recordTime,
-                              );
-
-                              try {
-                                //! This does not verify that MEWsService() has successfully added new inspection note
-                                await MEWsService().addNewInspection(
-                                  inspectionNote: newInspection,
-                                );
-                                print('Inspection added to Firestore');
-
-                                String stringToHash =
-                                    patientID + recordTime.toString();
-
-                                int alarmId = StringTransformer().generateID(
-                                  stringToHash,
-                                );
-
-                                // print(stringToHash);
-
-                                var alarmSettings = AlarmSettings(
-                                  id: alarmId,
-                                  // id: Uuid().v4().hashCode,
-                                  dateTime: notificationTime,
-                                  assetAudioPath: "assets/audio/alarm.mp3",
-                                  loopAudio: false,
-                                  vibrate: true,
-                                  warningNotificationOnKill: true,
-                                  androidFullScreenIntent: true,
-                                  volumeSettings: VolumeSettings.fixed(
-                                    volume: 0.8,
-                                    volumeEnforced: true,
-                                  ),
-                                  notificationSettings: NotificationSettings(
-                                    title: 'TUH MEWs',
-                                    body:
-                                        '${'remindAssess'.tr()} "$patientName"',
-                                    stopButton: 'stop'.tr(),
-                                    icon: 'notification_icon',
-                                  ),
-                                );
-
-                                print("Record Time: $recordTime");
-                                print("First Alarm Time: $notificationTime");
-                                print("First string: $stringToHash");
-                                print("First alarm id: $alarmId");
-
-                                await AlarmService().setAlarm(alarmSettings);
-
-                                // Set alarm 5 minutes before the initial alarm
-                                if (notificationTime.difference(now).inMinutes >
-                                    5) {
-                                  print(
-                                    "Scheduling Time before 5 minutes of the set time.",
-                                  );
-
-                                  DateTime secondNotificationTime = recordTime
-                                      .subtract(const Duration(minutes: 5));
-                                  String secondStringToHash =
-                                      patientID +
-                                      secondNotificationTime.toString();
-
-                                  int secondAlarmId = StringTransformer()
-                                      .generateID(secondStringToHash);
-
-                                  // print('secondStringToHash');
-                                  // print(secondStringToHash);
-                                  final alarmSettingsBefore = alarmSettings
-                                      .copyWith(
-                                        // id: Uuid().v4().hashCode,
-                                        id: secondAlarmId,
-                                        dateTime: notificationTime.subtract(
-                                          const Duration(minutes: 5),
+                              const SizedBox(height: 40),
+                              Center(
+                                child: SizedBox(
+                                  height: 130,
+                                  width: 160,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(width: 30),
+                                      Expanded(
+                                        child: ListWheelScrollView.useDelegate(
+                                          controller: hourController,
+                                          itemExtent: 50,
+                                          perspective: 0.005,
+                                          physics:
+                                              const FixedExtentScrollPhysics(),
+                                          onSelectedItemChanged: (index) {
+                                            selectedHour = index;
+                                          },
+                                          childDelegate:
+                                              ListWheelChildLoopingListDelegate(
+                                                children: List<Widget>.generate(
+                                                  24,
+                                                  (index) {
+                                                    return Center(
+                                                      child: Text(
+                                                        index
+                                                            .toString()
+                                                            .padLeft(2, '0'),
+                                                        style: const TextStyle(
+                                                          fontSize: 24,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
                                         ),
-                                      );
-                                  await AlarmService().setAlarm(
-                                    alarmSettingsBefore,
-                                  ); // Use the service
-                                  print(
-                                    "Second alarm Time: $secondNotificationTime",
-                                  );
-                                  print("Second string $secondStringToHash");
-                                  print("Second alarm id: $secondAlarmId");
-                                }
+                                      ),
+                                      const Text(
+                                        ":",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ListWheelScrollView.useDelegate(
+                                          controller: minuteController,
+                                          itemExtent: 50,
+                                          perspective: 0.005,
+                                          physics:
+                                              const FixedExtentScrollPhysics(),
+                                          onSelectedItemChanged: (index) {
+                                            selectedMinute = index;
+                                          },
+                                          childDelegate:
+                                              ListWheelChildLoopingListDelegate(
+                                                children: List<Widget>.generate(
+                                                  60,
+                                                  (index) {
+                                                    return Center(
+                                                      child: Text(
+                                                        index
+                                                            .toString()
+                                                            .padLeft(2, '0'),
+                                                        style: const TextStyle(
+                                                          fontSize: 24,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 30),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 30),
+                              ElevatedButton(
+                                onPressed:
+                                    enableButton
+                                        ? () async {
+                                          setState(() {
+                                            enableButton = false;
+                                          });
+                                          DateTime now = DateTime.now();
+                                          DateTime recordTime = DateTime(
+                                            now.year,
+                                            now.month,
+                                            now.day,
+                                            selectedHour,
+                                            selectedMinute,
+                                            now.second,
+                                          );
 
-                                // print(
-                                //   'Scheduled Time: ${notificationTime.subtract(Duration(minutes: 5))}',
-                                // );
-                              } catch (e) {
-                                print(
-                                  'Failed to add inspection to Firestore: $e',
-                                );
-                              }
+                                          DateTime notificationTime = DateTime(
+                                            now.year,
+                                            now.month,
+                                            now.day,
+                                            selectedHour,
+                                            selectedMinute,
+                                          );
 
-                              if (!context.mounted) {
-                                return; // Check before popping
-                              }
-                              Navigator.of(context).pop();
-                              onPop();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 20,
+                                          if (notificationTime.isBefore(now)) {
+                                            notificationTime = notificationTime
+                                                .add(Duration(days: 1));
+                                          }
+
+                                          if (recordTime.isBefore(now)) {
+                                            recordTime = recordTime.add(
+                                              Duration(days: 1),
+                                            );
+                                          }
+
+                                          InspectionNote newInspection =
+                                              InspectionNote(
+                                                patientID: patientID,
+                                                auditorID: auditorID,
+                                                time: recordTime,
+                                              );
+
+                                          try {
+                                            String state = await MEWsService()
+                                                .addNewInspection(
+                                                  inspectionNote: newInspection,
+                                                );
+
+                                            if (state != "failed") {
+                                              String desc = "";
+                                              String stringToHash =
+                                                  patientID +
+                                                  recordTime.toString();
+
+                                              int alarmId = StringTransformer()
+                                                  .generateID(stringToHash);
+
+                                              var alarmSettings = AlarmSettings(
+                                                id: alarmId,
+
+                                                dateTime: notificationTime,
+                                                assetAudioPath:
+                                                    "assets/audio/alarm.mp3",
+                                                loopAudio: false,
+                                                vibrate: true,
+                                                warningNotificationOnKill: true,
+                                                androidFullScreenIntent: true,
+                                                volumeSettings:
+                                                    VolumeSettings.fixed(
+                                                      volume: 0.8,
+                                                      volumeEnforced: true,
+                                                    ),
+                                                notificationSettings:
+                                                    NotificationSettings(
+                                                      title: 'TUH MEWs',
+                                                      body:
+                                                          '${'remindAssess'.tr()} "$patientName"',
+                                                      stopButton: 'stop'.tr(),
+                                                      icon: 'notification_icon',
+                                                    ),
+                                              );
+
+                                              await AlarmService().setAlarm(
+                                                alarmSettings,
+                                              );
+
+                                              desc +=
+                                                  '${'successfullySetNotificationFor'.tr()}\n$patientName\n${notificationTime.toString().split('.')[0]}';
+
+                                              // Set alarm 5 minutes before the initial alarm
+                                              if (notificationTime
+                                                      .difference(now)
+                                                      .inMinutes >
+                                                  5) {
+                                                DateTime
+                                                secondNotificationTime =
+                                                    recordTime.subtract(
+                                                      const Duration(
+                                                        minutes: 5,
+                                                      ),
+                                                    );
+                                                String secondStringToHash =
+                                                    patientID +
+                                                    secondNotificationTime
+                                                        .toString();
+
+                                                int secondAlarmId =
+                                                    StringTransformer()
+                                                        .generateID(
+                                                          secondStringToHash,
+                                                        );
+
+                                                final alarmSettingsBefore =
+                                                    alarmSettings.copyWith(
+                                                      id: secondAlarmId,
+                                                      dateTime: notificationTime
+                                                          .subtract(
+                                                            const Duration(
+                                                              minutes: 5,
+                                                            ),
+                                                          ),
+                                                    );
+                                                await AlarmService().setAlarm(
+                                                  alarmSettingsBefore,
+                                                ); // Use the service
+                                                desc +=
+                                                    ', ${secondNotificationTime.toString().split('.')[0]}';
+                                              }
+                                              if (context.mounted) {
+                                                Navigator.of(context).pop();
+                                                FlushbarService()
+                                                    .showSuccessMessage(
+                                                      context: context,
+                                                      message: desc,
+                                                      duration: 3,
+                                                    );
+                                              }
+                                              onPop();
+                                            } else {
+                                              setState(() {
+                                                enableButton = true;
+                                              });
+                                              if (context.mounted) {
+                                                FlushbarService().showErrorMessage(
+                                                  context: context,
+                                                  message:
+                                                      'failedToSetNotification'
+                                                          .tr(),
+                                                );
+                                                return;
+                                              }
+                                            }
+                                          } catch (e) {
+                                            setState(() {
+                                              enableButton = true;
+                                            });
+                                            if (context.mounted) {
+                                              FlushbarService().showErrorMessage(
+                                                context: context,
+                                                message:
+                                                    'failedToSetNotification'
+                                                        .tr(),
+                                              );
+                                              return; // Check before popping
+                                            }
+                                          }
+                                        }
+                                        : () {},
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 20,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  backgroundColor: const Color(0xffC6D8FF),
+                                ),
+                                child:
+                                    enableButton
+                                        ? Text(
+                                          "setNotification".tr(),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        )
+                                        : CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              backgroundColor: const Color(0xffC6D8FF),
-                            ),
-                            child: Text(
-                              "setNotification".tr(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
+                              const SizedBox(height: 10),
+                            ],
                           ),
-                          const SizedBox(height: 10),
                         ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

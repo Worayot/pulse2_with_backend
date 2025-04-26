@@ -10,6 +10,7 @@ import 'package:tuh_mews/models/patient_user_link.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 import 'package:tuh_mews/utils/edit_patient_form.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/patient_details.dart';
 import 'package:tuh_mews/utils/toggle_icon_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -257,7 +258,22 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                       patientID: patientID,
                                       userID: userID,
                                     );
-                                    await PatientService().takeIn(link: link);
+                                    bool takeInState = await PatientService()
+                                        .takeIn(link: link);
+                                    if (mounted) {
+                                      if (takeInState) {
+                                        FlushbarService().showSuccessMessage(
+                                          context: context,
+                                          message:
+                                              'successfullyAddedPatient'.tr(),
+                                        );
+                                      } else {
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: 'failedToAddPatient'.tr(),
+                                        );
+                                      }
+                                    }
                                     setState(() {
                                       enableToggleButton = true;
                                     });
@@ -266,10 +282,26 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     setState(() {
                                       enableToggleButton = false;
                                     });
-                                    await PatientService().takeOut(
-                                      userId: userID,
-                                      patientId: patientID,
-                                    );
+                                    bool takeOutState = await PatientService()
+                                        .takeOut(
+                                          userId: userID,
+                                          patientId: patientID,
+                                        );
+                                    if (mounted) {
+                                      if (takeOutState) {
+                                        FlushbarService().showSuccessMessage(
+                                          context: context,
+                                          message:
+                                              'successfullyRemovedPatient'.tr(),
+                                        );
+                                      } else {
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: 'failedToRemovePatient'.tr(),
+                                        );
+                                      }
+                                    }
+
                                     setState(() {
                                       enableToggleButton = true;
                                     });

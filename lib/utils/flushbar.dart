@@ -31,6 +31,7 @@ class FlushbarService {
     required BuildContext context,
     String? title,
     required String message,
+    int? duration,
   }) {
     showCustomFlushbar(
       context: context,
@@ -39,7 +40,7 @@ class FlushbarService {
       titleColor: Colors.green,
       messageColor: Colors.black,
       backgroundColor: Color(0xffD1FFBD),
-      duration: 2,
+      duration: duration ?? 2,
     );
   }
 
