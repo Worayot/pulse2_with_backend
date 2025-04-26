@@ -45,6 +45,8 @@ class _EditPatientFormState extends State<EditPatientForm> {
   late TextEditingController hnController;
   late TextEditingController bedNumController;
 
+  bool enableSaveButton = true;
+
   String? _selectedGender;
 
   @override
@@ -73,6 +75,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
   }
 
   Future<void> submitData() async {
+    setState(() {
+      enableSaveButton = false;
+    });
     String age = ageController.text.trim();
 
     String name = nameController.text.trim();
@@ -93,6 +98,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
         bedNum.isEmpty ||
         _selectedGender == null ||
         _selectedGender == "-") {
+      setState(() {
+        enableSaveButton = true;
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -141,6 +149,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
             duration: 2,
           );
         } else {
+          setState(() {
+            enableSaveButton = true;
+          });
           if (mounted) {
             FlushbarService().showErrorMessage(
               context: context,
@@ -149,6 +160,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
           }
         }
       } else {
+        setState(() {
+          enableSaveButton = true;
+        });
         if (mounted) {
           FlushbarService().showErrorMessage(
             context: context,
@@ -361,15 +375,25 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
-                            onPressed: submitData,
-                            label: Text(
-                              'save'.tr(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                            onPressed: enableSaveButton ? submitData : () {},
+                            label:
+                                enableSaveButton
+                                    ? Text(
+                                      'save'.tr(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                    : Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xff407BFF),
                               shape: RoundedRectangleBorder(
