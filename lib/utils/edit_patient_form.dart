@@ -360,8 +360,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                                               FlushbarService().showSuccessMessage(
                                                 context: context,
                                                 message:
-                                                    "successfullyDeletedPatientData"
-                                                        .tr(),
+                                                    "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}",
                                               );
                                             } else {
                                               // Handle deletion failure, e.g., show a SnackBar

@@ -23,7 +23,7 @@ class _EditUserFormState extends State<EditUserForm> {
     text: "",
   );
 
-  bool enableButton = false;
+  bool enableButton = true;
 
   String selectedRole = '';
 
@@ -53,7 +53,7 @@ class _EditUserFormState extends State<EditUserForm> {
     super.dispose();
   }
 
-  void submitData() {
+  void submitData() async {
     String name = nameController.text.trim();
     String surname = surnameController.text.trim();
     String nurseID = nurseIDController.text.trim();
@@ -81,18 +81,27 @@ class _EditUserFormState extends State<EditUserForm> {
       );
       return;
     } else {
+      setState(() {
+        enableButton = false;
+      });
       User newUserData = User(
         fullname: '$name $surname',
         nurseId: nurseID,
         password: widget.user.password,
         role: selectedRole,
       );
-      UserServices().saveUserData(
+      bool status = await UserServices().saveUserData(
         newUserData: newUserData,
         uid: widget.user.nurseId,
       );
-
-      Navigator.pop(context);
+      setState(() {
+        enableButton = true;
+      });
+      if (status) {
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      }
     }
   }
 
@@ -255,15 +264,20 @@ class _EditUserFormState extends State<EditUserForm> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: ElevatedButton.icon(
-                        onPressed: submitData,
-                        label: Text(
-                          'save'.tr(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                        onPressed: enableButton ? submitData : null,
+                        label:
+                            enableButton
+                                ? Text(
+                                  'save'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff407BFF),
                           shape: RoundedRectangleBorder(

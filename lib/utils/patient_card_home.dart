@@ -262,11 +262,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                         .takeIn(link: link);
                                     if (mounted) {
                                       if (takeInState) {
-                                        FlushbarService().showSuccessMessage(
-                                          context: context,
-                                          message:
-                                              'successfullyAddedPatient'.tr(),
-                                        );
+                                        // FlushbarService().showSuccessMessage(
+                                        //   context: context,
+                                        //   message:
+                                        //       'successfullyAddedPatient'.tr(),
+                                        // );
                                       } else {
                                         FlushbarService().showErrorMessage(
                                           context: context,
@@ -289,11 +289,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                         );
                                     if (mounted) {
                                       if (takeOutState) {
-                                        FlushbarService().showSuccessMessage(
-                                          context: context,
-                                          message:
-                                              'successfullyRemovedPatient'.tr(),
-                                        );
+                                        // FlushbarService().showSuccessMessage(
+                                        //   context: context,
+                                        //   message:
+                                        //       'successfullyRemovedPatient'.tr(),
+                                        // );
                                       } else {
                                         FlushbarService().showErrorMessage(
                                           context: context,

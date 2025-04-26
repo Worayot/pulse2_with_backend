@@ -166,15 +166,16 @@ class UserServices {
   }
 
   //* Tested
-  saveUserData({required User newUserData, required String uid}) async {
+  Future<bool> saveUserData({
+    required User newUserData,
+    required String uid,
+  }) async {
     final _storage = FlutterSecureStorage();
 
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }
