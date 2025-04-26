@@ -277,8 +277,7 @@ class PatientService {
     }
   }
 
-  //* Tested
-  takeIn({required PatientUserLink link}) async {
+  Future<bool> takeIn({required PatientUserLink link}) async {
     final _storage = FlutterSecureStorage();
 
     // Later in your code...
@@ -312,8 +311,10 @@ class PatientService {
     }
   }
 
-  //* Tested
-  takeOut({required String userId, required String patientId}) async {
+  Future<bool> takeOut({
+    required String userId,
+    required String patientId,
+  }) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {

@@ -31,6 +31,7 @@ class HomeExpandableCards extends StatefulWidget {
 }
 
 class _HomeExpandableCardsState extends State<HomeExpandableCards> {
+  bool enableToggleButton = true;
   late StreamSubscription<List<String>>
   _streamSubscription; // Updated type to match the data (List<String>)
   late List<String> _linkedPatient; // Initialize it with an empty list
@@ -246,19 +247,40 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     ],
                                   ),
                                 ),
+                                // if (!enableToggleButton)
+                                //   buildActionButton(
+                                //     FontAwesomeIcons.clipboardList,
+                                //     () {},
+                                //     Colors.white,
+                                //     Colors.white,
+                                //   ),
+                                // if (enableToggleButton)
                                 ToggleIconButton(
+                                  enableButton: enableToggleButton,
                                   addPatientFunc: () async {
+                                    setState(() {
+                                      enableToggleButton = false;
+                                    });
                                     PatientUserLink link = PatientUserLink(
                                       patientID: patientID,
                                       userID: userID,
                                     );
                                     await PatientService().takeIn(link: link);
+                                    setState(() {
+                                      enableToggleButton = true;
+                                    });
                                   },
                                   removePatientFunc: () async {
+                                    setState(() {
+                                      enableToggleButton = false;
+                                    });
                                     await PatientService().takeOut(
                                       userId: userID,
                                       patientId: patientID,
                                     );
+                                    setState(() {
+                                      enableToggleButton = true;
+                                    });
                                   },
                                   buttonState:
                                       !_linkedPatient.contains(patientID),

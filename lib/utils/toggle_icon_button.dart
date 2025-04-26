@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ToggleIconButton extends StatefulWidget {
+  final bool enableButton;
   final VoidCallback addPatientFunc;
   final VoidCallback removePatientFunc;
   final bool buttonState;
-  const ToggleIconButton(
-      {super.key,
-      required this.addPatientFunc,
-      required this.removePatientFunc,
-      required this.buttonState});
+  const ToggleIconButton({
+    super.key,
+    required this.enableButton,
+    required this.addPatientFunc,
+    required this.removePatientFunc,
+    required this.buttonState,
+  });
 
   @override
   _ToggleIconButtonState createState() => _ToggleIconButtonState();
@@ -47,16 +50,19 @@ class _ToggleIconButtonState extends State<ToggleIconButton> {
       width: 30,
       height: 30,
       child: ElevatedButton(
-        onPressed: () {
-          if (_isPlus) {
-            widget.addPatientFunc();
-          } else {
-            widget.removePatientFunc();
-          }
-          setState(() {
-            _isPlus = !_isPlus; // Toggle button state
-          });
-        },
+        onPressed:
+            widget.enableButton
+                ? () {
+                  if (_isPlus) {
+                    widget.addPatientFunc();
+                  } else {
+                    widget.removePatientFunc();
+                  }
+                  setState(() {
+                    _isPlus = !_isPlus; // Toggle button state
+                  });
+                }
+                : () {},
         style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),
           backgroundColor: Colors.white,
@@ -64,10 +70,12 @@ class _ToggleIconButtonState extends State<ToggleIconButton> {
           elevation: 0,
         ),
         child: Center(
-            child: Icon(
-                _isPlus ? FontAwesomeIcons.plus : FontAwesomeIcons.minus,
-                size: 25,
-                color: _isPlus ? const Color(0xff3362CC) : Colors.red)),
+          child: Icon(
+            _isPlus ? FontAwesomeIcons.plus : FontAwesomeIcons.minus,
+            size: 25,
+            color: _isPlus ? const Color(0xff3362CC) : Colors.red,
+          ),
+        ),
       ),
     );
   }
