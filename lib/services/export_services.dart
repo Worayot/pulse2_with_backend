@@ -15,12 +15,6 @@ class ExportServices {
 
     String? idToken = await _storage.read(key: 'id_token');
 
-    // if (idToken != null) {
-    //   print('ID Token: $idToken');
-    // } else {
-    //   print('No token found');
-    //   return false;
-    // }
     if (idToken == null) {
       return false;
     }

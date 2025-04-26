@@ -137,8 +137,6 @@ class MEWsService {
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
-      print('No token found');
-      // return "noTokenFound";
       return 'failed';
     }
     final url = Uri.parse(

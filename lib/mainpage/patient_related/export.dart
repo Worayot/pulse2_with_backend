@@ -8,11 +8,8 @@ import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
-import 'package:tuh_mews/utils/action_button.dart';
-import 'package:tuh_mews/utils/gender_dropdown.dart';
 import 'package:tuh_mews/utils/info_text_field_filter.dart';
 import 'package:tuh_mews/utils/patient_card_export.dart';
-import 'package:tuh_mews/utils/symbols_dialog/info_dialog.dart';
 import 'package:tuh_mews/utils/toggle_button.dart';
 import 'package:tuh_mews/utils/warning_dialog.dart';
 
@@ -32,6 +29,7 @@ class _ExportPageState extends State<ExportPage> {
   final TextEditingController _searchController = TextEditingController();
   bool _maleToggle = false;
   bool _femaleToggle = false;
+  bool enableButton = true;
 
   List<Patient> _patients = [];
   List<Patient> _filteredPatients = [];
@@ -172,7 +170,7 @@ class _ExportPageState extends State<ExportPage> {
   }
 
   void showFilterDialog(context) {
-    TextWidgetSize tws = TextWidgetSize(context: context);
+    // TextWidgetSize tws = TextWidgetSize(context: context);
     showDialog(
       context: context,
       builder: (context) {
@@ -475,10 +473,10 @@ class _ExportPageState extends State<ExportPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    SearchBarSetting sbs = SearchBarSetting(context: context);
-    ButtonNextToSearchBarSetting btnsb = ButtonNextToSearchBarSetting(
-      context: context,
-    );
+    // SearchBarSetting sbs = SearchBarSetting(context: context);
+    // ButtonNextToSearchBarSetting btnsb = ButtonNextToSearchBarSetting(
+    //   context: context,
+    // );
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -614,27 +612,42 @@ class _ExportPageState extends State<ExportPage> {
                 ),
                 SizedBox(width: size.width * 0.035),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    bool result = await showWarningDialog(
-                      context,
-                    ); // Wait for user choice
-                    if (result) {
-                      _exportAll();
-                    } else {
-                      print("❌ User canceled deletion.");
-                    }
-                  },
-                  label: Text(
-                    '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      // fontSize: size.width * 0.035,
-                      fontSize: 14,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
+                  onPressed:
+                      enableButton
+                          ? () async {
+                            bool result = await showWarningDialog(
+                              context,
+                            ); // Wait for user choice
+                            if (result) {
+                              setState(() {
+                                enableButton = false;
+                              });
+                              // bool status = await _exportAll();
+                              await _exportAll();
+                              setState(() {
+                                enableButton = true;
+                              });
+                            } else {
+                              // setState(() {
+                              //   enableButton = true;
+                              // });
+                            }
+                          }
+                          : () {},
+                  label:
+                      enableButton
+                          ? Text(
+                            '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              // fontSize: size.width * 0.035,
+                              fontSize: 14,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          )
+                          : CircularProgressIndicator(color: Colors.white),
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
                     backgroundColor: const Color(
@@ -655,11 +668,12 @@ class _ExportPageState extends State<ExportPage> {
     );
   }
 
-  void _exportAll() {
+  Future<bool> _exportAll() async {
     final exportServices = ExportServices();
     List<String> patientIds =
         _filteredPatients.map((patient) => patient.patientId ?? '').toList();
-    print('Exporting: $patientIds');
-    exportServices.export(patientIds);
+
+    bool status = await exportServices.export(patientIds);
+    return status;
   }
 }
