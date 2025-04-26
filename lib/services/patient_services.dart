@@ -212,9 +212,7 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }
@@ -251,10 +249,9 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
+      return null;
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/home-fetch/get-links-by-user/$userId',
@@ -291,9 +288,7 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }
@@ -370,9 +365,7 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }
@@ -409,9 +402,7 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
     }
     final url = Uri.parse(
@@ -450,9 +441,7 @@ class PatientService {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
       return false;
     }

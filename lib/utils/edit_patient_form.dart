@@ -135,16 +135,16 @@ class _EditPatientFormState extends State<EditPatientForm> {
           Navigator.pop(context);
           FlushbarService().showCustomFlushbar(
             context: context,
-            title: 'Success',
+            title: 'success'.tr(),
             titleColor: Colors.green,
-            message: "Successfully updated patient",
+            message: "successfullyUpdatedPatientData".tr(),
             duration: 2,
           );
         } else {
           if (mounted) {
             FlushbarService().showErrorMessage(
               context: context,
-              message: "Failed to update patient.",
+              message: "failedToUpdatePatientData".tr(),
             );
           }
         }
@@ -152,7 +152,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
         if (mounted) {
           FlushbarService().showErrorMessage(
             context: context,
-            message: "Failed to update patient.",
+            message: "failedToUpdatePatientData".tr(),
           );
         }
       }
