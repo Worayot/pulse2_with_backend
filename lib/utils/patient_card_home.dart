@@ -268,8 +268,8 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                         '$statusCode ${status.values.first}';
                                     // bool takeInState = await PatientService()
                                     //     .takeIn(link: link);
-
-                                    if (statusCode == 401) {
+                                    if (statusCode == 200) {
+                                    } else if (statusCode == 401) {
                                       if (mounted) {
                                         LogoutService(
                                           navigator: Navigator.of(context),
@@ -303,11 +303,6 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                         );
                                     if (mounted) {
                                       if (takeOutState) {
-                                        // FlushbarService().showSuccessMessage(
-                                        //   context: context,
-                                        //   message:
-                                        //       'successfullyRemovedPatient'.tr(),
-                                        // );
                                       } else {
                                         FlushbarService().showErrorMessage(
                                           context: context,

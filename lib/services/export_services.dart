@@ -4,15 +4,17 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
+import 'package:tuh_mews/services/session_service.dart';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
-import 'package:tuh_mews/services/server_url.dart';
 import 'package:tuh_mews/services/url.dart';
 
 class ExportServices {
   Future<Map<int, String>> export(List<String> patientIds) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: "Unauthorized: Invalid or missing token."};

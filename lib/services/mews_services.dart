@@ -4,13 +4,15 @@ import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/note.dart';
 import 'package:tuh_mews/models/parameters.dart';
+import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
 
 class MEWsService {
   //! Not used
   Future<Map<int, String>> getNoteByMEWsId(String mewsId) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -40,8 +42,10 @@ class MEWsService {
 
   //* Used
   Future<Map<int, String>> addMEWs(String noteID, Parameters parameters) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: 'No token found'};
@@ -71,8 +75,9 @@ class MEWsService {
     required String noteID,
     required Note note,
   }) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       // print('No token found');
@@ -102,8 +107,10 @@ class MEWsService {
   Future<Map<int, String>> addNewInspection({
     required InspectionNote inspectionNote,
   }) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: 'No token found'};

@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
 import '../models/user.dart';
 
 class UserServices {
   //* Tested
   Future<Map<String, dynamic>?> loadAccount(String userId) async {
-    final _storage = FlutterSecureStorage();
-
-    // Later in your code...
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -29,24 +29,23 @@ class UserServices {
       );
 
       if (response.statusCode == 200) {
-        print("Successfully received response: ${response.body}");
+        // print("Successfully received response: ${response.body}");
         return jsonDecode(response.body); // Return parsed JSON data
       } else {
-        print("Failed to receive data: ${response.body}");
+        // print("Failed to receive data: ${response.body}");
         return null; // Return null if failed
       }
     } catch (e) {
-      print("Error getting account data: $e");
+      // print("Error getting account data: $e");
       return null;
     }
   }
 
   //! Not tested, Won't be used
   Future<bool> getUsersList(String userId) async {
-    final _storage = FlutterSecureStorage();
-
-    // Later in your code...
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken != null) {
       print('ID Token: $idToken');
@@ -83,8 +82,9 @@ class UserServices {
 
   //* Tested
   Future<Map<int, String>> addUser(User user) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: 'No token found'};
@@ -109,8 +109,9 @@ class UserServices {
 
   //? May not be used.
   Future<Map<int, String>> getUserData(String userId) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: 'No token found'};
@@ -139,8 +140,9 @@ class UserServices {
     required User newUserData,
     required String uid,
   }) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: 'No token found'};
@@ -164,8 +166,9 @@ class UserServices {
 
   //* Tested
   Future<Map<int, String>> deleteUser(String userId) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: 'No token found'};

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/patient_user_link.dart';
+import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
 import 'server_url.dart';
 import '../models/patient.dart';
@@ -127,8 +128,9 @@ class FirebasePatientService {
 class PatientService {
   //* Tested
   Future<Map<int, String>> addPatient(Patient patientData) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -153,8 +155,9 @@ class PatientService {
 
   //* Tested
   Future<Map<int, String>> deletePatient(String patientId) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -184,8 +187,9 @@ class PatientService {
     String patientId,
     Patient patientData,
   ) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -213,10 +217,9 @@ class PatientService {
 
   //* Tested
   Future<Map<String, dynamic>?> getMonitoredPatient(String userId) async {
-    final _storage = FlutterSecureStorage();
-
-    // Later in your code...
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -251,8 +254,9 @@ class PatientService {
   }
 
   Future<Map<int, String>> takeIn({required PatientUserLink link}) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -311,8 +315,9 @@ class PatientService {
 
   //! Not tested
   Future<Map<int, String>> getPatientData(String patientId) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -339,10 +344,9 @@ class PatientService {
 
   //* Tested
   Future<Map<String, dynamic>?> getPatientReport(String patientId) async {
-    final _storage = FlutterSecureStorage();
-
-    // Later in your code...
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');
@@ -378,8 +382,9 @@ class PatientService {
 
   //! Not tested
   Future<Map<int, String>> loadMonitoredPatient(String userId) async {
-    final _storage = FlutterSecureStorage();
-    String? idToken = await _storage.read(key: 'id_token');
+    // final _storage = FlutterSecureStorage();
+    // String? idToken = await _storage.read(key: 'id_token');
+    String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       print('No token found');

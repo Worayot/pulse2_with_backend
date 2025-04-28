@@ -145,10 +145,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
       if (updateStatusCode == 200) {
         if (mounted) {
           Navigator.pop(context);
-          FlushbarService().showCustomFlushbar(
+          FlushbarService().showSuccessMessage(
             context: context,
             title: 'success'.tr(),
-            titleColor: Colors.green,
             message: "successfullyUpdatedPatientData".tr(),
             duration: 2,
           );

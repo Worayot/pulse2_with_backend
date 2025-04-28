@@ -13,6 +13,7 @@ import 'package:tuh_mews/mainpage/settings/bug_report.dart';
 import 'package:tuh_mews/mainpage/settings/language.dart';
 import 'package:tuh_mews/mainpage/settings/profile.dart';
 import 'package:tuh_mews/services/alarm_services.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/utils/custom_header.dart';
 import 'dart:io';
 
@@ -158,15 +159,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: () async {
                     bool shouldProceed = await showWarningDialog(context);
                     if (shouldProceed) {
-                      await AlarmService().stopAllAlarms();
-                      await Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                        (Route<dynamic> route) =>
-                            false, // Removes all previous screens
-                      );
+                      // await AlarmService().stopAllAlarms();
+                      // await Navigator.pushAndRemoveUntil(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const LoginPage(),
+                      //   ),
+                      //   (Route<dynamic> route) =>
+                      //       false, // Removes all previous screens
+                      // );
+                      if (mounted) {
+                        LogoutService(
+                          navigator: Navigator.of(context),
+                        ).logout();
+                      }
                     } else {
                       return;
                     }
