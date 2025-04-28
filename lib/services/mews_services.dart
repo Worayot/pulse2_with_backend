@@ -1,27 +1,22 @@
 import 'dart:convert';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/note.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/services/url.dart';
-import 'server_url.dart';
 
 class MEWsService {
   //! Not used
-  Future<bool> getNoteByMEWsId(String mewsId) async {
+  Future<Map<int, String>> getNoteByMEWsId(String mewsId) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
-      return false;
+      return {401: 'No token found'}; // Return a map with status code
     }
+
     final url = Uri.parse(
       '${URL().getServerURL()}/home-fetch/delete-patient/$mewsId',
     );
@@ -33,31 +28,23 @@ class MEWsService {
           "Content-Type": "application/json",
           "Authorization": "Bearer $idToken",
         },
-        // body: jsonEncode(patientId),
       );
 
-      if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to receive note: ${response.body}");
-        return false;
-      }
+      return {
+        response.statusCode: response.body,
+      }; // Return map with status code and body
     } catch (e) {
-      print("Error getting note: $e");
-      return false;
+      return {500: 'Error getting note: $e'}; // Return map for error
     }
   }
 
   //* Used
-  Future<bool> addMEWs(String noteID, Parameters parameters) async {
+  Future<Map<int, String>> addMEWs(String noteID, Parameters parameters) async {
     final _storage = FlutterSecureStorage();
-
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
-      print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/noti-fetch/add_mews/$noteID',
@@ -73,29 +60,23 @@ class MEWsService {
         body: jsonEncode(parameters),
       );
 
-      if (response.statusCode == 200) {
-        print("Successfully added MEWS: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to add MEWS: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error adding MEWS: $e");
-      return false;
+      return {500: 'Error adding MEWS: $e'};
     }
   }
 
   //* Used
-  Future<bool> addNote({required String noteID, required Note note}) async {
+  Future<Map<int, String>> addNote({
+    required String noteID,
+    required Note note,
+  }) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
-      print('No token found');
-      return false;
+      // print('No token found');
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/noti-fetch/add_notes/$noteID',
@@ -108,36 +89,24 @@ class MEWsService {
           "Content-Type": "application/json",
           "Authorization": "Bearer $idToken",
         },
-        body: jsonEncode({
-          // "note_id": noteId,
-          ...note.toJson(), // Assuming Note has a `toJson()` method
-        }),
+        body: jsonEncode({...note.toJson()}),
       );
 
-      if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to receive note: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error getting note: $e");
-      return false;
+      return {500: 'Error getting note: $e'};
     }
   }
 
   //* Used
-  Future<String> addNewInspection({
+  Future<Map<int, String>> addNewInspection({
     required InspectionNote inspectionNote,
   }) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
-      return 'failed';
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/noti-fetch/set_inspection_time/',
@@ -153,20 +122,9 @@ class MEWsService {
         body: jsonEncode({...inspectionNote.toJson()}),
       );
 
-      if (response.statusCode == 200) {
-        // print("Successfully adding new inspection time: ${response.body}");
-        return response.body; // Success
-        // return 'success';
-      } else {
-        // print("Failed to new inspection time: ${response.body}");
-        // return "Failed to new inspection time: ${response.body}";
-        return 'failed';
-        // return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      // print("Error adding new inspection time: $e");
-      // return '$e';
-      return 'failed';
+      return {500: 'Error adding inspection: $e'};
     }
   }
 }

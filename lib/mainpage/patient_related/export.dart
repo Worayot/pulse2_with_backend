@@ -4,10 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
+import 'package:tuh_mews/services/logout_service.dart';
+import 'package:tuh_mews/services/validate_service.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field_filter.dart';
 import 'package:tuh_mews/utils/patient_card_export.dart';
 import 'package:tuh_mews/utils/toggle_button.dart';
@@ -615,22 +619,35 @@ class _ExportPageState extends State<ExportPage> {
                   onPressed:
                       enableButton
                           ? () async {
-                            bool result = await showWarningDialog(
-                              context,
-                            ); // Wait for user choice
-                            if (result) {
-                              setState(() {
-                                enableButton = false;
-                              });
-                              // bool status = await _exportAll();
-                              await _exportAll();
-                              setState(() {
-                                enableButton = true;
-                              });
-                            } else {
-                              // setState(() {
-                              //   enableButton = true;
-                              // });
+                            setState(() {
+                              enableButton = false;
+                            });
+                            try {
+                              bool result = await showWarningDialog(
+                                context,
+                              ); // Wait for user choice
+                              final navigator = Navigator.of(context);
+                              if (result && mounted) {
+                                // bool status = await _exportAll();
+                                Map<int, String> status = await _exportAll();
+                                ValidateService(
+                                  status: status,
+                                  navigator: navigator,
+                                ).validate();
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                FlushbarService().showErrorMessage(
+                                  context: context,
+                                  message: 'An unexpected error occurred: $e',
+                                );
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  enableButton = true;
+                                });
+                              }
                             }
                           }
                           : () {},
@@ -647,7 +664,9 @@ class _ExportPageState extends State<ExportPage> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           )
-                          : CircularProgressIndicator(color: Colors.white),
+                          : const CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
                     backgroundColor: const Color(
@@ -668,12 +687,12 @@ class _ExportPageState extends State<ExportPage> {
     );
   }
 
-  Future<bool> _exportAll() async {
+  Future<Map<int, String>> _exportAll() async {
     final exportServices = ExportServices();
     List<String> patientIds =
         _filteredPatients.map((patient) => patient.patientId ?? '').toList();
 
-    bool status = await exportServices.export(patientIds);
+    Map<int, String> status = await exportServices.export(patientIds);
     return status;
   }
 }

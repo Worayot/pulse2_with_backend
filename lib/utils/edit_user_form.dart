@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/user.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/user_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 
 class EditUserForm extends StatefulWidget {
@@ -90,16 +92,35 @@ class _EditUserFormState extends State<EditUserForm> {
         password: widget.user.password,
         role: selectedRole,
       );
-      bool status = await UserServices().saveUserData(
+      Map<int, String> status = await UserServices().saveUserData(
         newUserData: newUserData,
         uid: widget.user.nurseId,
       );
       setState(() {
         enableButton = true;
       });
-      if (status) {
+
+      int statusCode = status.keys.first;
+      String message = '$statusCode ${status.values.first}';
+
+      if (statusCode == 200) {
         if (mounted) {
           Navigator.pop(context);
+        }
+      } else if (statusCode == 401) {
+        if (mounted) {
+          LogoutService(navigator: Navigator.of(context)).logout();
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
+        }
+      } else {
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
         }
       }
     }

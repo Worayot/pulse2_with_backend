@@ -277,12 +277,14 @@ void showTimeManager({
                                               );
 
                                           try {
-                                            String state = await MEWsService()
-                                                .addNewInspection(
-                                                  inspectionNote: newInspection,
-                                                );
-
-                                            if (state != "failed") {
+                                            Map<int, String> status =
+                                                await MEWsService()
+                                                    .addNewInspection(
+                                                      inspectionNote:
+                                                          newInspection,
+                                                    );
+                                            //! Change this later
+                                            if (status.containsKey(200)) {
                                               String desc = "";
                                               String stringToHash =
                                                   patientID +

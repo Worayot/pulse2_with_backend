@@ -5,10 +5,11 @@ import 'package:tuh_mews/models/note.dart';
 import 'package:tuh_mews/utils/note_adder.dart';
 
 void showResultDialog({
-  required BuildContext context,
+  // required BuildContext context,
   required int MEWs,
   required String noteID,
   required VoidCallback onPop,
+  required NavigatorState navigator,
 }) {
   List<dynamic> components = getComponent(MEWs);
   String nursing = components[0];
@@ -16,11 +17,10 @@ void showResultDialog({
   Color bgColor = components[2];
   String title = components[3];
 
-  Size size = MediaQuery.of(context).size;
-
   showDialog(
-    context: context,
-    builder: (BuildContext context) {
+    context: navigator.context,
+    builder: (context) {
+      Size size = MediaQuery.of(context).size;
       return Card(
         margin: const EdgeInsets.all(16),
         color: Colors.transparent,

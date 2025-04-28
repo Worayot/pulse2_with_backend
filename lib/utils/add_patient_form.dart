@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/gender_dropdown.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 import '../models/patient.dart';
@@ -48,14 +50,23 @@ class _AddPatientFormState extends State<AddPatientForm> {
         hospitalNumber: hnController.text,
       );
 
-      bool success = await _patientService.addPatient(patient);
+      Map<int, String> status = await _patientService.addPatient(patient);
+      int statusCode = status.keys.first;
+      String message = '$statusCode ${status.values.first}';
 
       if (mounted) {
-        if (success) {
+        if (statusCode == 200) {
           Navigator.pop(context); // Pop the form if successful
+        } else if (statusCode == 401) {
+          LogoutService(navigator: Navigator.of(context)).logout();
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to add patient.")),
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
           );
         }
         setState(() {

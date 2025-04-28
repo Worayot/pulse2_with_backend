@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/patient_related/patient_ind_data.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 import 'package:tuh_mews/utils/edit_patient_form.dart';
@@ -258,22 +259,35 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                       patientID: patientID,
                                       userID: userID,
                                     );
-                                    bool takeInState = await PatientService()
-                                        .takeIn(link: link);
-                                    if (mounted) {
-                                      if (takeInState) {
-                                        // FlushbarService().showSuccessMessage(
-                                        //   context: context,
-                                        //   message:
-                                        //       'successfullyAddedPatient'.tr(),
-                                        // );
-                                      } else {
+                                    Map<int, String> status =
+                                        await PatientService().takeIn(
+                                          link: link,
+                                        );
+                                    int statusCode = status.keys.first;
+                                    String message =
+                                        '$statusCode ${status.values.first}';
+                                    // bool takeInState = await PatientService()
+                                    //     .takeIn(link: link);
+
+                                    if (statusCode == 401) {
+                                      if (mounted) {
+                                        LogoutService(
+                                          navigator: Navigator.of(context),
+                                        ).logout();
                                         FlushbarService().showErrorMessage(
                                           context: context,
-                                          message: 'failedToAddPatient'.tr(),
+                                          message: message,
+                                        );
+                                      }
+                                    } else {
+                                      if (mounted) {
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: message,
                                         );
                                       }
                                     }
+
                                     setState(() {
                                       enableToggleButton = true;
                                     });

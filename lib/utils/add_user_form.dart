@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/user.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/user_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 
 class AddUserForm extends StatefulWidget {
@@ -77,7 +79,7 @@ class _AddUserFormState extends State<AddUserForm> {
       String password = nurseID.padLeft(6, '0');
 
       // Uncomment the following line when you want to add user data
-      bool status = await UserServices().addUser(
+      Map<int, String> status = await UserServices().addUser(
         User(
           fullname: '$name $surname',
           nurseId: nurseID,
@@ -86,6 +88,9 @@ class _AddUserFormState extends State<AddUserForm> {
         ),
       );
 
+      int statusCode = status.keys.first;
+      String message = '$statusCode ${status.values.first}';
+
       // Set _isSubmitting back to false after submission completes
       if (mounted) {
         setState(() {
@@ -93,9 +98,24 @@ class _AddUserFormState extends State<AddUserForm> {
         });
       }
 
-      if (status) {
+      if (statusCode == 200) {
         if (mounted) {
           Navigator.pop(context); // Pop the current form
+        }
+      } else if (statusCode == 401) {
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
+          LogoutService(navigator: Navigator.of(context));
+        }
+      } else {
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
         }
       }
     }

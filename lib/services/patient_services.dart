@@ -21,8 +21,7 @@ class FirebasePatientService {
 
           if (querySnapshot.docs.isNotEmpty) {
             for (var doc in querySnapshot.docs) {
-              Map<String, dynamic> patientData =
-                  doc.data() as Map<String, dynamic>;
+              Map<String, dynamic> patientData = doc.data();
               String patientId = patientData['patient_id'];
 
               // Fetch patient details from the 'patients' collection
@@ -127,15 +126,13 @@ class FirebasePatientService {
 
 class PatientService {
   //* Tested
-  Future<bool> addPatient(Patient patientData) async {
+  Future<Map<int, String>> addPatient(Patient patientData) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
       print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/add_patient/');
 
@@ -148,30 +145,20 @@ class PatientService {
         },
         body: jsonEncode(patientData.toJson()),
       );
-
-      if (response.statusCode == 200) {
-        return true; // Success
-      } else {
-        print("Failed to add patient: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error adding patient: $e");
-      return false;
+      return {500: 'Error adding patient: $e'};
     }
   }
 
   //* Tested
-  Future<bool> deletePatient(String patientId) async {
-    // Create storage instance (if not already created)
+  Future<Map<int, String>> deletePatient(String patientId) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
       print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/home-fetch/delete-patient/$patientId',
@@ -184,33 +171,25 @@ class PatientService {
           "Content-Type": "application/json",
           "Authorization": "Bearer $idToken",
         },
-
-        // body: jsonEncode(patientId),
       );
 
-      if (response.statusCode == 200) {
-        print("Successfully deleted patient: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to delete patient: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error deleting patient: $e");
-      return false;
+      return {500: 'Error deleting patient: $e'};
     }
   }
 
   //* Used
-  Future<bool> updatePatient(String patientId, Patient patientData) async {
+  Future<Map<int, String>> updatePatient(
+    String patientId,
+    Patient patientData,
+  ) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
       print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/home-fetch/update_patient/$patientId',
@@ -226,15 +205,9 @@ class PatientService {
         body: jsonEncode(patientData.toJson()),
       );
 
-      if (response.statusCode == 200) {
-        return true; // Success
-      } else {
-        print("Failed to update patient: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error updating patient: $e");
-      return false;
+      return {500: 'Error updating patient: $e'};
     }
   }
 
@@ -277,15 +250,13 @@ class PatientService {
     }
   }
 
-  Future<bool> takeIn({required PatientUserLink link}) async {
+  Future<Map<int, String>> takeIn({required PatientUserLink link}) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
       print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/take-in/');
 
@@ -299,15 +270,9 @@ class PatientService {
         body: jsonEncode(link.toJson()), // Only one jsonEncode needed
       );
 
-      if (response.statusCode == 200) {
-        return true; // Success
-      } else {
-        print("Failed to take in patient: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error taking in patient: $e");
-      return false;
+      return {500: 'Error taking in patient: $e'};
     }
   }
 
@@ -344,27 +309,14 @@ class PatientService {
     }
   }
 
-  // Example usage:
-  // String userId = "someUserId";
-  // String patientId = "somePatientId";
-  // takeOut(userId, patientId).then((success) {
-  //   if (success) {
-  //     print("Patient removed successfully.");
-  //   } else {
-  //     print("Patient removal failed (or patient not found).");
-  //   }
-  // });
-
   //! Not tested
-  Future<bool> getPatientData(String patientId) async {
+  Future<Map<int, String>> getPatientData(String patientId) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
       print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/home-fetch/get_patient/$patientId',
@@ -377,18 +329,11 @@ class PatientService {
           "Content-Type": "application/json",
           "Authorization": "Bearer $idToken",
         },
-        // body: jsonEncode(patientData.toJson()),
       );
 
-      if (response.statusCode == 200) {
-        return true; // Success
-      } else {
-        print("Failed to get patient data: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error getting patient data: $e");
-      return false;
+      return {500: 'Error getting patient data: $e'};
     }
   }
 
@@ -432,15 +377,13 @@ class PatientService {
   }
 
   //! Not tested
-  Future<bool> loadMonitoredPatient(String userId) async {
+  Future<Map<int, String>> loadMonitoredPatient(String userId) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
       print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/noti-fetch/load_take_in/$userId',
@@ -453,18 +396,11 @@ class PatientService {
           "Content-Type": "application/json",
           "Authorization": "Bearer $idToken",
         },
-        // body: jsonEncode(patientData.toJson()),
       );
 
-      if (response.statusCode == 200) {
-        return true; // Success
-      } else {
-        print("Failed to get patient report: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error getting patient report: $e");
-      return false;
+      return {500: 'Error loading monitored patient: $e'};
     }
   }
 }

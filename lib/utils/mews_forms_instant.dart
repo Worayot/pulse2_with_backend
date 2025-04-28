@@ -7,6 +7,7 @@ import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';
 import 'package:tuh_mews/services/mews_services.dart';
+import 'package:tuh_mews/services/validate_service.dart';
 
 class InstantMEWsForm extends StatefulWidget {
   final String patientID;
@@ -702,11 +703,17 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
 
                                     try {
                                       // Get NoteID from response
-                                      String response = await MEWsService()
-                                          .addNewInspection(
+                                      Map<int, String> status =
+                                          await MEWsService().addNewInspection(
                                             inspectionNote: newInspection,
                                           );
-                                      // print('Inspection added to Firestore');
+                                      ValidateService(
+                                        navigator: Navigator.of(context),
+                                        status: status,
+                                        showSuccessFlushbar: false,
+                                      ).validate();
+                                      String response = status.values.first;
+
                                       Map<String, dynamic> decoded = jsonDecode(
                                         response,
                                       );
@@ -783,20 +790,21 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                       assessTime: DateTime.now(),
                                     );
 
-                                    bool state = await MEWsService().addMEWs(
-                                      inspectionNotesID,
-                                      parameters,
-                                    );
-                                    if (state) {
+                                    Map<int, String> state = await MEWsService()
+                                        .addMEWs(inspectionNotesID, parameters);
+                                    final navigator = Navigator.of(context);
+                                    if (state.containsKey(200)) {
                                       if (mounted) {
                                         Navigator.pop(context);
+                                        showResultDialog(
+                                          // context: context,
+                                          MEWs: MEWs,
+                                          noteID: inspectionNotesID,
+                                          onPop: widget.onPop,
+                                          navigator: navigator,
+                                        );
                                       }
-                                      showResultDialog(
-                                        context: context,
-                                        MEWs: MEWs,
-                                        noteID: inspectionNotesID,
-                                        onPop: widget.onPop,
-                                      );
+
                                       widget.onPop();
                                     } else {
                                       setState(() {

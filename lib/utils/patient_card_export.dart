@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
+import 'package:tuh_mews/services/validate_service.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 
 class PatientCardExport extends StatefulWidget {
@@ -158,9 +159,13 @@ class _PatientCardExportState extends State<PatientCardExport> {
                         });
 
                         final exportService = ExportServices();
-                        await exportService.export([
+                        Map<int, String> status = await exportService.export([
                           widget.patient.patientId ?? '',
                         ]);
+                        ValidateService(
+                          status: status,
+                          navigator: Navigator.of(context),
+                        ).validate();
 
                         setState(() {
                           enableButton = true;

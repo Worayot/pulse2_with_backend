@@ -731,11 +731,13 @@ class _MEWsFormsState extends State<MEWsForms> {
                               isAssessed: true,
                               assessTime: DateTime.now(),
                             );
+                            final navigator = Navigator.of(context);
                             showResultDialog(
-                              context: context,
+                              // context: context,
                               MEWs: MEWs,
                               noteID: widget.noteID,
                               onPop: widget.onPop,
+                              navigator: navigator,
                             );
                             MEWsService().addMEWs(widget.noteID, parameters);
 

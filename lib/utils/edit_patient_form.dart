@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/patient.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
@@ -133,13 +134,15 @@ class _EditPatientFormState extends State<EditPatientForm> {
       );
 
       // Call the updatePatient function and await its result
-      bool updateSuccess = await patientService.updatePatient(
+      Map<int, String> updateStatus = await patientService.updatePatient(
         widget.patientId,
         patient,
       );
 
+      int updateStatusCode = updateStatus.keys.first;
+
       // Check if the update was successful before popping the navigator
-      if (updateSuccess) {
+      if (updateStatusCode == 200) {
         if (mounted) {
           Navigator.pop(context);
           FlushbarService().showCustomFlushbar(
@@ -149,6 +152,14 @@ class _EditPatientFormState extends State<EditPatientForm> {
             message: "successfullyUpdatedPatientData".tr(),
             duration: 2,
           );
+        } else if (updateStatusCode == 401) {
+          if (mounted) {
+            LogoutService(navigator: Navigator.of(context)).logout();
+            FlushbarService().showErrorMessage(
+              context: context,
+              message: '$updateStatusCode ${updateStatus.values.first}',
+            );
+          }
         } else {
           setState(() {
             enableSaveButton = true;
@@ -349,21 +360,39 @@ class _EditPatientFormState extends State<EditPatientForm> {
                                             });
                                             PatientService patientService =
                                                 PatientService();
-                                            bool deleteSuccess =
+                                            Map<int, String> deleteStatus =
                                                 await patientService
                                                     .deletePatient(
                                                       widget.patientId,
                                                     );
 
-                                            if (deleteSuccess && mounted) {
+                                            int deleteStatusCode =
+                                                deleteStatus.keys.first;
+                                            String deleteStatusMessage =
+                                                '$deleteStatusCode ${deleteStatus.values.first}';
+
+                                            if ((deleteStatusCode == 200) &&
+                                                mounted) {
                                               Navigator.pop(context);
                                               FlushbarService().showSuccessMessage(
                                                 context: context,
                                                 message:
                                                     "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}",
                                               );
+                                            } else if (deleteStatusCode ==
+                                                401) {
+                                              LogoutService(
+                                                navigator: Navigator.of(
+                                                  context,
+                                                ),
+                                              ).logout();
+                                              FlushbarService()
+                                                  .showErrorMessage(
+                                                    context: context,
+                                                    message:
+                                                        deleteStatusMessage,
+                                                  );
                                             } else {
-                                              // Handle deletion failure, e.g., show a SnackBar
                                               if (mounted) {
                                                 FlushbarService().showErrorMessage(
                                                   context: context,

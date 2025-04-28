@@ -1,11 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:tuh_mews/models/note.dart';
-import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/services/url.dart';
 import '../models/user.dart';
-import 'server_url.dart';
 
 class UserServices {
   //* Tested
@@ -15,11 +12,8 @@ class UserServices {
     // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
+    if (idToken == null) {
       print('No token found');
-      // return false;
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/sett-fetch/account_load/$userId',
@@ -88,17 +82,12 @@ class UserServices {
   }
 
   //* Tested
-  Future<bool> addUser(User user) async {
+  Future<Map<int, String>> addUser(User user) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
-      print('No token found');
-      return false;
+    if (idToken == null) {
+      return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/authenticate/signup');
 
@@ -112,31 +101,19 @@ class UserServices {
         body: jsonEncode(user),
       );
 
-      if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to receive note: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error getting note: $e");
-      return false;
+      return {500: 'Error adding user: $e'};
     }
   }
 
   //? May not be used.
-  Future<bool> getUserData(String userId) async {
+  Future<Map<int, String>> getUserData(String userId) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
-      print('No token found');
-      return false;
+    if (idToken == null) {
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/sett-fetch/get_user_data/$userId',
@@ -149,35 +126,24 @@ class UserServices {
           "Content-Type": "application/json",
           "Authorization": "Bearer $idToken",
         },
-        // body: jsonEncode(user),
       );
 
-      if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to receive note: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error getting note: $e");
-      return false;
+      return {500: 'Error getting user data: $e'};
     }
   }
 
   //* Tested
-  Future<bool> saveUserData({
+  Future<Map<int, String>> saveUserData({
     required User newUserData,
     required String uid,
   }) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
     if (idToken == null) {
-      print('No token found');
-      return false;
+      return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/sett-fetch/save_user/$uid');
 
@@ -190,34 +156,19 @@ class UserServices {
         },
         body: jsonEncode(newUserData.toJson()),
       );
-
-      if (response.statusCode == 200) {
-        print("Successfully edited user's data: ${response.body}");
-        return true; // Success
-      } else if (response.statusCode == 404) {
-        print("User not found: ${response.body}");
-      } else {
-        print("Failed to edit user's data: ${response.body}");
-      }
-      return false; // Failure
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error during request: $e");
-      return false;
+      return {500: 'Error saving user data: $e'};
     }
   }
 
   //* Tested
-  Future<bool> deleteUser(String userId) async {
+  Future<Map<int, String>> deleteUser(String userId) async {
     final _storage = FlutterSecureStorage();
-
-    // Later in your code...
     String? idToken = await _storage.read(key: 'id_token');
 
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
-      print('No token found');
-      return false;
+    if (idToken == null) {
+      return {401: 'No token found'};
     }
     final url = Uri.parse(
       '${URL().getServerURL()}/sett-fetch/del_user/$userId',
@@ -230,19 +181,11 @@ class UserServices {
           "Content-Type": "application/json",
           "Authorization": "Bearer $idToken",
         },
-        // body: jsonEncode(user),
       );
 
-      if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to receive note: ${response.body}");
-        return false; // Failure
-      }
+      return {response.statusCode: response.body};
     } catch (e) {
-      print("Error getting note: $e");
-      return false;
+      return {500: 'Error deleting user: $e'};
     }
   }
 }
