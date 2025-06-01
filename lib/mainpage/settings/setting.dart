@@ -99,8 +99,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         context,
                         // MaterialPageRoute(builder: (context) => AboutAppPage()),
                         MaterialPageRoute(
-                          builder: (context) => AboutAppPageTwo(),
-                        ),
+                          builder: (context) => AboutAppPage(),
+                        ), //* TUH MEWS 2.0
                       ),
                 ),
                 _buildSettingsTile(
@@ -116,18 +116,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   },
                 ),
-
-                _buildSettingsTile(
-                  title: 'bugReport'.tr(),
-                  leadingIcon: FontAwesomeIcons.solidPaperPlane,
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BugReportPage(),
-                        ),
-                      ),
-                ),
+                //* TUH MEWS 2.0
+                // _buildSettingsTile(
+                //   title: 'bugReport'.tr(),
+                //   leadingIcon: FontAwesomeIcons.solidPaperPlane,
+                //   onTap:
+                //       () => Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //           builder: (context) => BugReportPage(),
+                //         ),
+                //       ),
+                // ),
                 FutureBuilder<String?>(
                   future: loadStringPreference('role'),
                   builder: (context, snapshot) {
