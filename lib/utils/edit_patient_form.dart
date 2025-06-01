@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/patient.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/gender_dropdown.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 import 'package:tuh_mews/utils/warning_dialog.dart';
+
 // import 'package:pulse/services/'
 
 class EditPatientForm extends StatefulWidget {
@@ -43,6 +46,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
   late TextEditingController hnController;
   late TextEditingController bedNumController;
 
+  bool enableSaveButton = true;
+  bool enableDeleteButton = true;
+
   String? _selectedGender;
 
   @override
@@ -71,12 +77,20 @@ class _EditPatientFormState extends State<EditPatientForm> {
   }
 
   Future<void> submitData() async {
+    setState(() {
+      enableSaveButton = false;
+    });
+    String age = ageController.text.trim();
+
     String name = nameController.text.trim();
     String surname = surnameController.text.trim();
-    String age = ageController.text.trim();
     String ward = wardController.text.trim();
     String hn = hnController.text.trim();
     String bedNum = bedNumController.text.trim();
+
+    if (age.isNotEmpty && (int.parse(age) > 120 || int.parse(age) < 1)) {
+      return;
+    }
 
     if (name.isEmpty ||
         surname.isEmpty ||
@@ -86,6 +100,9 @@ class _EditPatientFormState extends State<EditPatientForm> {
         bedNum.isEmpty ||
         _selectedGender == null ||
         _selectedGender == "-") {
+      setState(() {
+        enableSaveButton = true;
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -116,8 +133,54 @@ class _EditPatientFormState extends State<EditPatientForm> {
         hospitalNumber: hn,
       );
 
-      patientService.updatePatient(widget.patientId, patient);
-      Navigator.pop(context);
+      // Call the updatePatient function and await its result
+      Map<int, String> updateStatus = await patientService.updatePatient(
+        widget.patientId,
+        patient,
+      );
+
+      int updateStatusCode = updateStatus.keys.first;
+
+      // Check if the update was successful before popping the navigator
+      if (updateStatusCode == 200) {
+        if (mounted) {
+          Navigator.pop(context);
+          FlushbarService().showSuccessMessage(
+            context: context,
+            title: 'success'.tr(),
+            message: "successfullyUpdatedPatientData".tr(),
+            duration: 2,
+          );
+        } else if (updateStatusCode == 401) {
+          if (mounted) {
+            LogoutService(navigator: Navigator.of(context)).logout();
+            FlushbarService().showErrorMessage(
+              context: context,
+              message: '$updateStatusCode ${updateStatus.values.first}',
+            );
+          }
+        } else {
+          setState(() {
+            enableSaveButton = true;
+          });
+          if (mounted) {
+            FlushbarService().showErrorMessage(
+              context: context,
+              message: "failedToUpdatePatientData".tr(),
+            );
+          }
+        }
+      } else {
+        setState(() {
+          enableSaveButton = true;
+        });
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: "failedToUpdatePatientData".tr(),
+          );
+        }
+      }
     }
   }
 
@@ -194,14 +257,25 @@ class _EditPatientFormState extends State<EditPatientForm> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: SizedBox(
-                            child: infoTextField(
-                              title: "age".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: ageController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                            ),
+                          child: infoTextField(
+                            title: "age".tr(),
+                            fontSize: tws.getInfoBoxTextSize(),
+                            controller: ageController,
+                            boxColor: const Color(0xffE0EAFF),
+                            minWidth: 140,
+                            numberOnly: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return null;
+                              }
+                              final number = int.tryParse(value);
+                              if (number == null ||
+                                  number < 1 ||
+                                  number > 120) {
+                                return '1-120';
+                              }
+                              return null;
+                            },
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -273,34 +347,78 @@ class _EditPatientFormState extends State<EditPatientForm> {
                               );
                             } else if (snapshot.data == "admin") {
                               return TextButton(
-                                onPressed: () async {
-                                  bool result = await showWarningDialog(
-                                    context,
-                                  ); // Wait for user choice
-                                  if (result) {
-                                    // print(
-                                    //   "✅ User confirmed: Deleting patient...",
-                                    // );
-                                    Navigator.pop(context);
-                                    await removePatientID(widget.patientId);
-                                    PatientService patientService =
-                                        PatientService();
-                                    patientService.deletePatient(
-                                      widget.patientId,
-                                    );
-                                    // await deleteUser();
-                                    // Only pop if it makes sense in this context
-                                  } else {
-                                    // print("❌ User canceled deletion.");
-                                  }
-                                },
+                                onPressed:
+                                    enableDeleteButton
+                                        ? () async {
+                                          bool result = await showWarningDialog(
+                                            context,
+                                          ); // Wait for user choice
+                                          if (result) {
+                                            setState(() {
+                                              enableDeleteButton = false;
+                                            });
+                                            PatientService patientService =
+                                                PatientService();
+                                            Map<int, String> deleteStatus =
+                                                await patientService
+                                                    .deletePatient(
+                                                      widget.patientId,
+                                                    );
+
+                                            int deleteStatusCode =
+                                                deleteStatus.keys.first;
+                                            String deleteStatusMessage =
+                                                '$deleteStatusCode ${deleteStatus.values.first}';
+
+                                            if ((deleteStatusCode == 200) &&
+                                                mounted) {
+                                              Navigator.pop(context);
+                                              FlushbarService().showSuccessMessage(
+                                                context: context,
+                                                message:
+                                                    "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}",
+                                              );
+                                            } else if (deleteStatusCode ==
+                                                401) {
+                                              LogoutService(
+                                                navigator: Navigator.of(
+                                                  context,
+                                                ),
+                                              ).logout();
+                                              FlushbarService()
+                                                  .showErrorMessage(
+                                                    context: context,
+                                                    message:
+                                                        deleteStatusMessage,
+                                                  );
+                                            } else {
+                                              if (mounted) {
+                                                FlushbarService().showErrorMessage(
+                                                  context: context,
+                                                  message:
+                                                      "failedToDeletePatientData"
+                                                          .tr(),
+                                                );
+                                                setState(() {
+                                                  enableDeleteButton = true;
+                                                });
+                                              }
+                                            }
+                                          } else {
+                                            // User cancelled or dismissed the dialog
+                                            setState(() {
+                                              enableDeleteButton = true;
+                                            });
+                                          }
+                                        }
+                                        : () {},
                                 child: Text(
                                   'deletePatient'.tr(),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.red, // Red text color
+                                    color: Colors.red,
                                     decoration: TextDecoration.underline,
-                                    decorationColor: Colors.red, // Underline
+                                    decorationColor: Colors.red,
                                   ),
                                 ),
                               );
@@ -312,15 +430,25 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
-                            onPressed: submitData,
-                            label: Text(
-                              'save'.tr(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                            onPressed: enableSaveButton ? submitData : () {},
+                            label:
+                                enableSaveButton
+                                    ? Text(
+                                      'save'.tr(),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                    : Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xff407BFF),
                               shape: RoundedRectangleBorder(

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/user.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/user_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 
 class EditUserForm extends StatefulWidget {
@@ -22,6 +24,8 @@ class _EditUserFormState extends State<EditUserForm> {
   final TextEditingController nurseIDController = TextEditingController(
     text: "",
   );
+
+  bool enableButton = true;
 
   String selectedRole = '';
 
@@ -51,7 +55,7 @@ class _EditUserFormState extends State<EditUserForm> {
     super.dispose();
   }
 
-  void submitData() {
+  void submitData() async {
     String name = nameController.text.trim();
     String surname = surnameController.text.trim();
     String nurseID = nurseIDController.text.trim();
@@ -79,25 +83,53 @@ class _EditUserFormState extends State<EditUserForm> {
       );
       return;
     } else {
+      setState(() {
+        enableButton = false;
+      });
       User newUserData = User(
         fullname: '$name $surname',
         nurseId: nurseID,
         password: widget.user.password,
         role: selectedRole,
       );
-      UserServices().saveUserData(
+      Map<int, String> status = await UserServices().saveUserData(
         newUserData: newUserData,
         uid: widget.user.nurseId,
       );
+      setState(() {
+        enableButton = true;
+      });
 
-      Navigator.pop(context);
+      int statusCode = status.keys.first;
+      String message = '$statusCode ${status.values.first}';
+
+      if (statusCode == 200) {
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      } else if (statusCode == 401) {
+        if (mounted) {
+          LogoutService(navigator: Navigator.of(context)).logout();
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
+        }
+      } else {
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.sizeOf(context);
-    TextWidgetSize tws = TextWidgetSize(context: context);
+    // TextWidgetSize tws = TextWidgetSize(context: context);
 
     return Dialog(
       child: Container(
@@ -241,7 +273,7 @@ class _EditUserFormState extends State<EditUserForm> {
                     SizedBox(
                       width: double.infinity,
                       child: infoTextField(
-                        title: "nurseID".tr(),
+                        title: "${"nurseID".tr()} (${"uneditable".tr()})",
                         fontSize: 14,
                         controller: nurseIDController,
                         blockEditing: true,
@@ -253,15 +285,20 @@ class _EditUserFormState extends State<EditUserForm> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: ElevatedButton.icon(
-                        onPressed: submitData,
-                        label: Text(
-                          'save'.tr(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                        onPressed: enableButton ? submitData : null,
+                        label:
+                            enableButton
+                                ? Text(
+                                  'save'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff407BFF),
                           shape: RoundedRectangleBorder(

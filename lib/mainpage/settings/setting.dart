@@ -7,9 +7,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/settings/aboutapp.dart';
+import 'package:tuh_mews/mainpage/settings/aboutapp_ori.dart';
 import 'package:tuh_mews/mainpage/settings/admin.dart';
+import 'package:tuh_mews/mainpage/settings/bug_report.dart';
 import 'package:tuh_mews/mainpage/settings/language.dart';
 import 'package:tuh_mews/mainpage/settings/profile.dart';
+import 'package:tuh_mews/services/alarm_services.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/utils/custom_header.dart';
 import 'dart:io';
 
@@ -93,7 +97,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap:
                       () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => AboutAppPage()),
+                        // MaterialPageRoute(builder: (context) => AboutAppPage()),
+                        MaterialPageRoute(
+                          builder: (context) => AboutAppPage(),
+                        ), //* TUH MEWS 2.0
                       ),
                 ),
                 _buildSettingsTile(
@@ -109,18 +116,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   },
                 ),
-                // if (_role == "admin")
-                //   _buildSettingsTile(
-                //     title: 'admin'.tr(),
-                //     leadingIcon: FontAwesomeIcons.userTie,
-                //     onTap: () async {
-                //       await Navigator.push(
+                //* TUH MEWS 2.0
+                // _buildSettingsTile(
+                //   title: 'bugReport'.tr(),
+                //   leadingIcon: FontAwesomeIcons.solidPaperPlane,
+                //   onTap:
+                //       () => Navigator.push(
                 //         context,
                 //         MaterialPageRoute(
-                //             builder: (context) => const AdminPage()),
-                //       );
-                //     },
-                //   ),
+                //           builder: (context) => BugReportPage(),
+                //         ),
+                //       ),
+                // ),
                 FutureBuilder<String?>(
                   future: loadStringPreference('role'),
                   builder: (context, snapshot) {
@@ -152,14 +159,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: () async {
                     bool shouldProceed = await showWarningDialog(context);
                     if (shouldProceed) {
-                      await Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                        (Route<dynamic> route) =>
-                            false, // Removes all previous screens
-                      );
+                      // await AlarmService().stopAllAlarms();
+                      // await Navigator.pushAndRemoveUntil(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const LoginPage(),
+                      //   ),
+                      //   (Route<dynamic> route) =>
+                      //       false, // Removes all previous screens
+                      // );
+                      if (mounted) {
+                        LogoutService(
+                          navigator: Navigator.of(context),
+                        ).logout();
+                      }
                     } else {
                       return;
                     }

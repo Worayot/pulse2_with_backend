@@ -1,5 +1,5 @@
 pluginManagement {
-    val flutterSdkPath = File(System.getenv("FLUTTER_SDK") ?: run {
+    val flutterSdkPath = File(System.getenv("FLUTTER_SDK")) ?: run {
         val localProperties = File("local.properties")
         if (localProperties.exists()) {
             val properties = java.util.Properties().apply {
@@ -23,7 +23,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
         mavenCentral()

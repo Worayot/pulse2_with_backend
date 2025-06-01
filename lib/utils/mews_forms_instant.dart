@@ -7,6 +7,7 @@ import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';
 import 'package:tuh_mews/services/mews_services.dart';
+import 'package:tuh_mews/services/validate_service.dart';
 
 class InstantMEWsForm extends StatefulWidget {
   final String patientID;
@@ -43,6 +44,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
   final FocusNode sysBpFocusNode = FocusNode();
   final FocusNode diasBpFocusNode = FocusNode();
   String consciousnessValue = "-";
+  bool enableButton = true;
 
   @override
   void dispose() {
@@ -189,7 +191,8 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d*\.?\d*$'),
+                          // RegExp(r'^\d*\.?\d*$'), //! Many decimal place
+                          RegExp(r'^\d{0,3}(\.\d{0,1})?$'), //* 1 decimal place
                         ), // Allows only numbers and one decimal point
                       ],
                       decoration: InputDecoration(
@@ -680,103 +683,149 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                               ), // Set border radius here
                             ),
                           ),
-                          onPressed: () async {
-                            DateTime now = DateTime.now();
+                          onPressed:
+                              enableButton
+                                  ? () async {
+                                    setState(() {
+                                      enableButton = false;
+                                    });
+                                    DateTime now = DateTime.now();
 
-                            // Add new Note in Database collection
-                            InspectionNote newInspection = InspectionNote(
-                              patientID: widget.patientID,
-                              auditorID: widget.auditorID,
-                              time: now,
-                            );
+                                    // Add new Note in Database collection
+                                    InspectionNote newInspection =
+                                        InspectionNote(
+                                          patientID: widget.patientID,
+                                          auditorID: widget.auditorID,
+                                          time: now,
+                                        );
 
-                            String inspectionNotesID = '';
+                                    String inspectionNotesID = '';
 
-                            try {
-                              // Get NoteID from response
-                              String response = await MEWsService()
-                                  .addNewInspection(
-                                    inspectionNote: newInspection,
-                                  );
-                              print('Inspection added to Firestore');
-                              Map<String, dynamic> decoded = jsonDecode(
-                                response,
-                              );
-                              inspectionNotesID =
-                                  decoded['inspection_notes_id'];
-                              // print(inspectionNotesId);
-                            } catch (e) {
-                              print('Failed: $e');
-                            }
+                                    try {
+                                      // Get NoteID from response
+                                      Map<int, String> status =
+                                          await MEWsService().addNewInspection(
+                                            inspectionNote: newInspection,
+                                          );
+                                      ValidateService(
+                                        navigator: Navigator.of(context),
+                                        status: status,
+                                        showSuccessFlushbar: false,
+                                      ).validate();
+                                      String response = status.values.first;
 
-                            String hr = heartRateController.text.trim();
-                            String temp = temperatureController.text.trim();
-                            String sBp = sysBloodPressureController.text.trim();
-                            String dBp = diaBloodPressureController.text.trim();
-                            String spO2 = spo2Controller.text.trim();
-                            String rr = respiratoryRateController.text.trim();
-                            String urine = urineController.text.trim();
-                            String conscious = consciousnessValue;
-                            String cvp = cvpController.text.trim();
+                                      Map<String, dynamic> decoded = jsonDecode(
+                                        response,
+                                      );
+                                      inspectionNotesID =
+                                          decoded['inspection_notes_id'];
+                                      // print(inspectionNotesId);
+                                    } catch (e) {
+                                      setState(() {
+                                        enableButton = true;
+                                      });
+                                      return;
+                                      // print('Failed: $e');
+                                    }
 
-                            hr = (hr == ' ') ? '-' : hr;
-                            temp = (temp == ' ') ? '-' : temp;
-                            sBp = (sBp == ' ') ? '-' : sBp;
-                            dBp = (dBp == ' ') ? '-' : dBp;
-                            spO2 = (spO2 == ' ') ? '-' : spO2;
-                            rr = (rr == ' ') ? '-' : rr;
-                            urine = (urine == ' ') ? '-' : urine;
-                            cvp = (cvp == ' ') ? '-' : cvp;
+                                    String hr = heartRateController.text.trim();
+                                    String temp =
+                                        temperatureController.text.trim();
+                                    String sBp =
+                                        sysBloodPressureController.text.trim();
+                                    String dBp =
+                                        diaBloodPressureController.text.trim();
+                                    String spO2 = spo2Controller.text.trim();
+                                    String rr =
+                                        respiratoryRateController.text.trim();
+                                    String urine = urineController.text.trim();
+                                    String conscious = consciousnessValue;
+                                    String cvp = cvpController.text.trim();
 
-                            int MEWs = calculateMEWs(
-                              consciousness: conscious,
-                              heartRate: (hr != '-') ? int.tryParse(hr) : null,
-                              temperature:
-                                  (temp != '-') ? double.tryParse(temp) : null,
-                              respiratoryRate:
-                                  (rr != '-') ? int.tryParse(rr) : null,
-                              systolicBp:
-                                  (sBp != '-') ? int.tryParse(sBp) : null,
-                              spo2: (spO2 != '-') ? int.tryParse(spO2) : null,
-                              urine:
-                                  (urine != '-') ? int.tryParse(urine) : null,
-                            );
+                                    hr = (hr == ' ') ? '-' : hr;
+                                    temp = (temp == ' ') ? '-' : temp;
+                                    sBp = (sBp == ' ') ? '-' : sBp;
+                                    dBp = (dBp == ' ') ? '-' : dBp;
+                                    spO2 = (spO2 == ' ') ? '-' : spO2;
+                                    rr = (rr == ' ') ? '-' : rr;
+                                    urine = (urine == ' ') ? '-' : urine;
+                                    cvp = (cvp == ' ') ? '-' : cvp;
 
-                            Navigator.pop(context);
+                                    int MEWs = calculateMEWs(
+                                      consciousness: conscious,
+                                      heartRate:
+                                          (hr != '-') ? int.tryParse(hr) : null,
+                                      temperature:
+                                          (temp != '-')
+                                              ? double.tryParse(temp)
+                                              : null,
+                                      respiratoryRate:
+                                          (rr != '-') ? int.tryParse(rr) : null,
+                                      systolicBp:
+                                          (sBp != '-')
+                                              ? int.tryParse(sBp)
+                                              : null,
+                                      spo2:
+                                          (spO2 != '-')
+                                              ? int.tryParse(spO2)
+                                              : null,
+                                      urine:
+                                          (urine != '-')
+                                              ? int.tryParse(urine)
+                                              : null,
+                                    );
 
-                            Parameters parameters = Parameters(
-                              patientId: widget.patientID,
-                              consciousness: conscious,
-                              heartRate: hr,
-                              urine: urine,
-                              spo2: spO2,
-                              temperature: temp,
-                              respiratoryRate: rr,
-                              bloodPressure: '$sBp/$dBp',
-                              mews: MEWs.toString(),
-                              cvp: cvp,
-                              isAssessed: true,
-                              assessTime: DateTime.now(),
-                            );
-                            showResultDialog(
-                              context: context,
-                              MEWs: MEWs,
-                              noteID: inspectionNotesID,
-                              onPop: widget.onPop,
-                            );
-                            MEWsService().addMEWs(
-                              inspectionNotesID,
-                              parameters,
-                            );
-                            widget.onPop();
-                          },
-                          child: Text(
-                            'calculate'.tr(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
+                                    Parameters parameters = Parameters(
+                                      patientId: widget.patientID,
+                                      consciousness: conscious,
+                                      heartRate: hr,
+                                      urine: urine,
+                                      spo2: spO2,
+                                      temperature: temp,
+                                      respiratoryRate: rr,
+                                      bloodPressure: '$sBp/$dBp',
+                                      mews: MEWs.toString(),
+                                      cvp: cvp,
+                                      isAssessed: true,
+                                      assessTime: DateTime.now(),
+                                    );
+
+                                    Map<int, String> state = await MEWsService()
+                                        .addMEWs(inspectionNotesID, parameters);
+                                    final navigator = Navigator.of(context);
+                                    if (state.containsKey(200)) {
+                                      if (mounted) {
+                                        Navigator.pop(context);
+                                        showResultDialog(
+                                          // context: context,
+                                          MEWs: MEWs,
+                                          noteID: inspectionNotesID,
+                                          onPop: widget.onPop,
+                                          navigator: navigator,
+                                        );
+                                      }
+
+                                      widget.onPop();
+                                    } else {
+                                      setState(() {
+                                        enableButton = true;
+                                      });
+                                      return;
+                                    }
+                                  }
+                                  : () {},
+                          child:
+                              enableButton
+                                  ? Text(
+                                    'calculate'.tr(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  )
+                                  : CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
                         ),
                       ],
                     ),

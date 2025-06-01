@@ -1,26 +1,30 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")  // This is necessary for Kotlin integration
+    id("kotlin-android")
     id("com.google.gms.google-services")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.tuhmews.app"  // Replace with your app's package name
+        applicationId = "com.tuhmews.app"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
 
-    // Add the 'namespace' property here
-    namespace = "com.tuhmews.app"  // Replace with your app's package name
+    namespace = "com.tuhmews.app"
 
-    buildFeatures {
-        // Add or remove build features as necessary
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     buildTypes {
@@ -28,9 +32,17 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
 
-    dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+}
+
+repositories {
+    google()
+    mavenCentral()
+    maven {
+        url = uri("https://storage.googleapis.com/download.dartlang.org")
     }
 }
 

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:tuh_mews/func/get_color.dart';
+import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/utils/mews_forms.dart';
 import 'package:tuh_mews/utils/note_editor.dart';
 
@@ -20,7 +21,9 @@ class AssessTableRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // print(combinedData['formatted_time']);
     final String time = combinedData['formatted_time'].split(' ')[0];
+    final fullTime = combinedData['time'];
     // final String time = combinedData['formatted_time'];
     final dynamic MEWs = combinedData['mews'];
     // final String auditorID = combinedData['auditor'];
@@ -33,7 +36,24 @@ class AssessTableRowWidget extends StatelessWidget {
     final double screenWidth = size.width;
     final double screenHeight = size.height;
 
+    DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+    // DateFormat formatter = DateFormat('yyyy-MM-dd HH.mm');
+
+    // print("assTableRow $fullTime");
+
+    // Step 1: Parse string to DateTime
+    DateTime parsedTime = formatter.parse(fullTime);
+
+    // Step 2: Subtract 5 minutes
+    DateTime fiveMinutesBefore = parsedTime.subtract(
+      const Duration(minutes: 5),
+    );
+
+    // Step 3: Format back to string
+    String newTime = formatter.format(fiveMinutesBefore);
+
     final bool isButtonEnabled = !isAssessed;
+
     return Padding(
       padding: const EdgeInsets.only(left: 10.0, right: 10, top: 8),
       child: Row(
@@ -103,6 +123,14 @@ class AssessTableRowWidget extends StatelessWidget {
               onPressed:
                   isButtonEnabled
                       ? () {
+                        String stringToHash = '$patientID$fullTime.000';
+                        String secondStringToHash = '$patientID$newTime.000';
+
+                        print("$stringToHash stringToHash assTableRow");
+                        print(
+                          "$secondStringToHash secondStringToHash secondStringToHash",
+                        );
+
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -110,6 +138,10 @@ class AssessTableRowWidget extends StatelessWidget {
                               patientID: patientID,
                               noteID: noteID,
                               onPop: onPop,
+                              alarmStringIDs: [
+                                stringToHash,
+                                secondStringToHash,
+                              ],
                             );
                           },
                         );

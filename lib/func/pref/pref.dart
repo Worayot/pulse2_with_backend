@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuh_mews/provider/user_data_provider.dart';
@@ -64,27 +67,57 @@ Future<int?> loadIntPreference(String key) async {
 }
 
 // Function to load patient preference
-Future<List<String>> loadPatientPreference(String key) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getStringList('patient_list') ?? [];
+// Future<List<String>> loadPatientPreference(String key) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   return prefs.getStringList('patient_list') ?? [];
+// }
+
+// Future<void> addPatientID(String newID) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
+
+//   if (!patientIDs.contains(newID)) {
+//     patientIDs.add(newID);
+//     await prefs.setStringList('patient_ids', patientIDs);
+//   }
+//   print('Updated List After Adding: $patientIDs'); // Debugging
+// }
+
+// Future<void> removePatientID(String id) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
+
+//   patientIDs.remove(id);
+//   await prefs.setStringList('patient_ids', patientIDs);
+//   // print('Updated List After Removing: $patientIDs'); // Debugging
+// }
+
+Future<void> saveAlarmToPrefs(AlarmSettings alarmSettings) async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
+
+  savedAlarms.add(
+    jsonEncode({
+      'id': alarmSettings.id,
+      'dateTime': alarmSettings.dateTime.toIso8601String(),
+      'title': alarmSettings.notificationSettings.title,
+      'body': alarmSettings.notificationSettings.body,
+    }),
+  );
+
+  await prefs.setStringList('scheduled_alarms', savedAlarms);
 }
 
-Future<void> addPatientID(String newID) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
+Future<void> deleteAlarmFromPrefs(int alarmId) async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
 
-  if (!patientIDs.contains(newID)) {
-    patientIDs.add(newID);
-    await prefs.setStringList('patient_ids', patientIDs);
-  }
-  print('Updated List After Adding: $patientIDs'); // Debugging
-}
+  // Find the alarm with the given ID and remove it from the list
+  savedAlarms.removeWhere((alarmJson) {
+    final alarmMap = jsonDecode(alarmJson);
+    return alarmMap['id'] == alarmId;
+  });
 
-Future<void> removePatientID(String id) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  List<String> patientIDs = prefs.getStringList('patient_ids') ?? [];
-
-  patientIDs.remove(id);
-  await prefs.setStringList('patient_ids', patientIDs);
-  print('Updated List After Removing: $patientIDs'); // Debugging
+  // Save the updated list back to SharedPreferences
+  await prefs.setStringList('scheduled_alarms', savedAlarms);
 }

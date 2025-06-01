@@ -7,9 +7,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/patient_related/patient_ind_data.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 import 'package:tuh_mews/utils/edit_patient_form.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/patient_details.dart';
 import 'package:tuh_mews/utils/toggle_icon_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +33,7 @@ class HomeExpandableCards extends StatefulWidget {
 }
 
 class _HomeExpandableCardsState extends State<HomeExpandableCards> {
+  bool enableToggleButton = true;
   late StreamSubscription<List<String>>
   _streamSubscription; // Updated type to match the data (List<String>)
   late List<String> _linkedPatient; // Initialize it with an empty list
@@ -247,18 +250,70 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                   ),
                                 ),
                                 ToggleIconButton(
+                                  enableButton: enableToggleButton,
                                   addPatientFunc: () async {
+                                    setState(() {
+                                      enableToggleButton = false;
+                                    });
                                     PatientUserLink link = PatientUserLink(
                                       patientID: patientID,
                                       userID: userID,
                                     );
-                                    await PatientService().takeIn(link: link);
+                                    Map<int, String> status =
+                                        await PatientService().takeIn(
+                                          link: link,
+                                        );
+                                    int statusCode = status.keys.first;
+                                    String message =
+                                        '$statusCode ${status.values.first}';
+                                    // bool takeInState = await PatientService()
+                                    //     .takeIn(link: link);
+                                    if (statusCode == 200) {
+                                    } else if (statusCode == 401) {
+                                      if (mounted) {
+                                        LogoutService(
+                                          navigator: Navigator.of(context),
+                                        ).logout();
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: message,
+                                        );
+                                      }
+                                    } else {
+                                      if (mounted) {
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: message,
+                                        );
+                                      }
+                                    }
+
+                                    setState(() {
+                                      enableToggleButton = true;
+                                    });
                                   },
                                   removePatientFunc: () async {
-                                    await PatientService().takeOut(
-                                      userId: userID,
-                                      patientId: patientID,
-                                    );
+                                    setState(() {
+                                      enableToggleButton = false;
+                                    });
+                                    bool takeOutState = await PatientService()
+                                        .takeOut(
+                                          userId: userID,
+                                          patientId: patientID,
+                                        );
+                                    if (mounted) {
+                                      if (takeOutState) {
+                                      } else {
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: 'failedToRemovePatient'.tr(),
+                                        );
+                                      }
+                                    }
+
+                                    setState(() {
+                                      enableToggleButton = true;
+                                    });
                                   },
                                   buttonState:
                                       !_linkedPatient.contains(patientID),
@@ -341,8 +396,12 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                         });
                       },
                     ),
-                    Icon(
-                      isExpanded[index] ? Icons.expand_less : Icons.expand_more,
+                    IgnorePointer(
+                      child: Icon(
+                        isExpanded[index]
+                            ? Icons.expand_less
+                            : Icons.expand_more,
+                      ),
                     ),
                   ],
                 ),

@@ -3,19 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/calculateMEWs.dart';
+import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';
+import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/mews_services.dart';
 
 class MEWsForms extends StatefulWidget {
   final String patientID;
   final String noteID;
   final VoidCallback onPop;
+  final List<String> alarmStringIDs;
   const MEWsForms({
     super.key,
     required this.patientID,
     required this.noteID,
     required this.onPop,
+    required this.alarmStringIDs,
   });
 
   @override
@@ -185,7 +189,8 @@ class _MEWsFormsState extends State<MEWsForms> {
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d*\.?\d*$'),
+                          // RegExp(r'^\d*\.?\d*$'), //! Many decimal place
+                          RegExp(r'^\d{0,3}(\.\d{0,1})?$'), //* 1 decimal place
                         ), // Allows only numbers and one decimal point
                       ],
                       decoration: InputDecoration(
@@ -726,13 +731,23 @@ class _MEWsFormsState extends State<MEWsForms> {
                               isAssessed: true,
                               assessTime: DateTime.now(),
                             );
+                            final navigator = Navigator.of(context);
                             showResultDialog(
-                              context: context,
+                              // context: context,
                               MEWs: MEWs,
                               noteID: widget.noteID,
                               onPop: widget.onPop,
+                              navigator: navigator,
                             );
                             MEWsService().addMEWs(widget.noteID, parameters);
+
+                            for (String alarmStringID
+                                in widget.alarmStringIDs) {
+                              int alarmID = StringTransformer().generateID(
+                                alarmStringID,
+                              );
+                              AlarmService().stopAlarm(alarmID);
+                            }
                           },
                           child: Text(
                             'calculate'.tr(),

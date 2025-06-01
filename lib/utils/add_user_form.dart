@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/user.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/user_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 
 class AddUserForm extends StatefulWidget {
@@ -29,7 +31,7 @@ class _AddUserFormState extends State<AddUserForm> {
     super.dispose();
   }
 
-  void submitData() {
+  void submitData() async {
     if (_isSubmitting) {
       // If already submitting, do nothing
       return;
@@ -73,14 +75,11 @@ class _AddUserFormState extends State<AddUserForm> {
       return;
     } else {
       // Only pop once if the form submission is successful
-      if (mounted) {
-        Navigator.pop(context); // Pop the current form
-      }
 
       String password = nurseID.padLeft(6, '0');
 
       // Uncomment the following line when you want to add user data
-      UserServices().addUser(
+      Map<int, String> status = await UserServices().addUser(
         User(
           fullname: '$name $surname',
           nurseId: nurseID,
@@ -89,11 +88,35 @@ class _AddUserFormState extends State<AddUserForm> {
         ),
       );
 
+      int statusCode = status.keys.first;
+      String message = '$statusCode ${status.values.first}';
+
       // Set _isSubmitting back to false after submission completes
       if (mounted) {
         setState(() {
           _isSubmitting = false;
         });
+      }
+
+      if (statusCode == 200) {
+        if (mounted) {
+          Navigator.pop(context); // Pop the current form
+        }
+      } else if (statusCode == 401) {
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
+          LogoutService(navigator: Navigator.of(context));
+        }
+      } else {
+        if (mounted) {
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
+        }
       }
     }
   }
@@ -260,14 +283,19 @@ class _AddUserFormState extends State<AddUserForm> {
                       alignment: Alignment.centerRight,
                       child: ElevatedButton.icon(
                         onPressed: submitData,
-                        label: Text(
-                          'save'.tr(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                        label:
+                            !_isSubmitting
+                                ? Text(
+                                  'save'.tr(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff407BFF),
                           shape: RoundedRectangleBorder(

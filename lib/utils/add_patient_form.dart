@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/gender_dropdown.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 import '../models/patient.dart';
@@ -25,7 +27,6 @@ class _AddPatientFormState extends State<AddPatientForm> {
   String? _selectedGender;
   final PatientService _patientService = PatientService();
   final _formKey = GlobalKey<FormState>();
-
   bool _isSubmitting = false; // Flag to prevent multiple submissions
 
   Future<void> _submitForm() async {
@@ -49,14 +50,23 @@ class _AddPatientFormState extends State<AddPatientForm> {
         hospitalNumber: hnController.text,
       );
 
-      bool success = await _patientService.addPatient(patient);
+      Map<int, String> status = await _patientService.addPatient(patient);
+      int statusCode = status.keys.first;
+      String message = '$statusCode ${status.values.first}';
 
       if (mounted) {
-        if (success) {
+        if (statusCode == 200) {
           Navigator.pop(context); // Pop the form if successful
+        } else if (statusCode == 401) {
+          LogoutService(navigator: Navigator.of(context)).logout();
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
+          );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Failed to add patient.")),
+          FlushbarService().showErrorMessage(
+            context: context,
+            message: message,
           );
         }
         setState(() {
@@ -199,8 +209,24 @@ class _AddPatientFormState extends State<AddPatientForm> {
                               controller: ageController,
                               boxColor: const Color(0xffE0EAFF),
                               minWidth: 140,
+                              numberOnly: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  _isSubmitting = false;
+                                  return null;
+                                }
+                                final number = int.tryParse(value);
+                                if (number == null ||
+                                    number < 1 ||
+                                    number > 120) {
+                                  _isSubmitting = false;
+                                  return '1-120';
+                                }
+                                return null;
+                              },
                             ),
                           ),
+
                           const SizedBox(width: 8),
                           Expanded(
                             child: Padding(
@@ -269,7 +295,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                               _isSubmitting
                                   ? CircularProgressIndicator(
                                     color: Colors.white,
-                                  ) // Show progress indicator
+                                  )
                                   : Text(
                                     'save'.tr(),
                                     style: const TextStyle(
@@ -279,7 +305,10 @@ class _AddPatientFormState extends State<AddPatientForm> {
                                     ),
                                   ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff407BFF),
+                            backgroundColor:
+                                _isSubmitting
+                                    ? const Color(0xffE0EAFF)
+                                    : const Color(0xff407BFF),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),

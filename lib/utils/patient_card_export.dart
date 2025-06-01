@@ -3,12 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
+import 'package:tuh_mews/services/validate_service.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 
-class PatientCardExport extends StatelessWidget {
+class PatientCardExport extends StatefulWidget {
   final Patient patient;
 
   const PatientCardExport({super.key, required this.patient});
+
+  @override
+  _PatientCardExportState createState() => _PatientCardExportState();
+}
+
+class _PatientCardExportState extends State<PatientCardExport> {
+  bool enableButton = true;
 
   @override
   Widget build(BuildContext context) {
@@ -40,20 +48,20 @@ class PatientCardExport extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              patient.fullname,
+                              widget.patient.fullname,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                             const SizedBox(width: 2),
-                            if (patient.gender == "Male")
+                            if (widget.patient.gender == "Male")
                               const Icon(
                                 Icons.male, // For male
                                 color: Colors.blue,
                                 size: 26.0,
                               ),
-                            if (patient.gender == "Female")
+                            if (widget.patient.gender == "Female")
                               const Icon(
                                 Icons.female, // For female
                                 color: Colors.pink,
@@ -61,7 +69,7 @@ class PatientCardExport extends StatelessWidget {
                               ),
                             const SizedBox(width: 3),
                             Text(
-                              "(${patient.age} ${"yrs".tr()})",
+                              "(${widget.patient.age} ${"yrs".tr()})",
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
@@ -76,7 +84,7 @@ class PatientCardExport extends StatelessWidget {
                               style: const TextStyle(fontSize: 11),
                             ),
                             Text(
-                              patient.ward,
+                              widget.patient.ward,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
@@ -87,7 +95,7 @@ class PatientCardExport extends StatelessWidget {
                               style: const TextStyle(fontSize: 11),
                             ),
                             Text(
-                              patient.bedNumber,
+                              widget.patient.bedNumber,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
@@ -102,7 +110,7 @@ class PatientCardExport extends StatelessWidget {
                               style: const TextStyle(fontSize: 11),
                             ),
                             Text(
-                              patient.hospitalNumber,
+                              widget.patient.hospitalNumber,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 11,
@@ -142,14 +150,30 @@ class PatientCardExport extends StatelessWidget {
             bottom: 0,
             right: 10,
             child: buildExportButton(
-              FontAwesomeIcons.fileExport,
-              () {
-                print('Exporting: ${patient.fullname} ${patient.patientId}');
-                final exportService = ExportServices();
-                exportService.export([patient.patientId ?? '']);
-              },
-              Colors.white,
-              const Color(0xff4B74D1),
+              icon: enableButton ? FontAwesomeIcons.fileExport : null,
+              onPressed:
+                  enableButton
+                      ? () async {
+                        setState(() {
+                          enableButton = false;
+                        });
+
+                        final exportService = ExportServices();
+                        Map<int, String> status = await exportService.export([
+                          widget.patient.patientId ?? '',
+                        ]);
+                        ValidateService(
+                          status: status,
+                          navigator: Navigator.of(context),
+                        ).validate();
+
+                        setState(() {
+                          enableButton = true;
+                        });
+                      }
+                      : () {},
+              bgColor: Colors.white,
+              iconColor: const Color(0xff4B74D1),
             ),
           ),
         ],

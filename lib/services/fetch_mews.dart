@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart'; // For date formatting
 
+//* Completed
 Future<Map<String, dynamic>> fetchLatestPatientData(String patientId) async {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
