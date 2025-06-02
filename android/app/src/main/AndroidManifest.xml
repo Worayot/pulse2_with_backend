@@ -4,8 +4,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 
     <!-- Queries moved outside of application -->
     <queries>
@@ -19,7 +21,19 @@
         android:label="TUH MEWS"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:theme="@style/LaunchTheme">
+        android:theme="@style/LaunchTheme"
+        android:requestLegacyExternalStorage="true">
+
+        <!-- Add FileProvider here -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <!-- Service and Receiver for local notifications moved inside application -->
         <service android:name="com.dexterous.flutterlocalnotifications.notifications.NotificationService"
@@ -39,7 +53,7 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
-            
+
             <!-- Flutter's initial theme -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
