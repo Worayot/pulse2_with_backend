@@ -6,10 +6,8 @@ import 'package:tuh_mews/authentication/loading_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tuh_mews/services/url.dart';
-import 'package:tuh_mews/state/app_state/app_state_notifier.dart';
 import 'package:tuh_mews/state/secure_storage/secure_storage.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 
@@ -22,8 +20,9 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nurseIDController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  bool rememberMe = false;
+  late TextEditingController _nurseIDController;
+  late TextEditingController _passwordController;
   int _selectedLanguageIndex = 1;
   bool isLoading = false;
   String errorMessage = '';
@@ -31,7 +30,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _nurseIDController = TextEditingController();
+    _passwordController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final username = await secureStorage.read(key: 'username');
+      final password = await secureStorage.read(key: 'password');
+      final String remember = await secureStorage.read(key: 'rememberMe') ?? 'false';
+
+      if (remember == 'true') {
+        setState(() {
+          rememberMe = true;
+        });
+      } else {
+        rememberMe = false;
+      }
+
+      _nurseIDController.text = username ?? '';
+      _passwordController.text = password ?? '';
+
       _loadSelectedLocale();
     });
     super.initState();
@@ -75,18 +91,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _login() async {
-    final appStateNotifier = ref.read(appStateNotifierProvider.notifier);
     if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
       return;
     }
 
-    bool rememberMe = ref.read(appStateNotifierProvider).rememberMe;
     if (rememberMe) {
-      appStateNotifier.updateUsername(_nurseIDController.text.trim());
-      await secureStorage.write(key: 'session_cookie', value: _passwordController.text.trim());
+      await secureStorage.write(key: 'username', value: _nurseIDController.text.trim());
+      await secureStorage.write(key: 'password', value: _passwordController.text.trim());
+      await secureStorage.write(key: 'rememberMe', value: rememberMe.toString());
     } else {
-      appStateNotifier.updateUsername(null);
-      secureStorage.delete(key: 'session_cookie');
+      secureStorage.delete(key: 'username');
+      secureStorage.delete(key: 'password');
+      secureStorage.delete(key: 'rememberMe');
     }
 
     setState(() {
@@ -168,20 +184,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  Future<void> updateRememberMe(bool val) async {
-    final appStateNotifier = ref.read(appStateNotifierProvider.notifier);
-    appStateNotifier.updateRememberMe(val);
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
-    ref.watch(appStateNotifierProvider);
-    final appStateNotifier = ref.read(appStateNotifierProvider.notifier);
-
-    bool rememberMe = ref.read(appStateNotifierProvider).rememberMe;
 
     return Stack(
       children: [
@@ -271,7 +277,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                     value: rememberMe,
                                     onChanged: (value) {
                                       if (value == null) return;
-                                      appStateNotifier.updateRememberMe(value);
+                                      setState(() {
+                                        rememberMe = value;
+                                        secureStorage.write(key: 'rememberMe', value: (value).toString());
+                                      });
+                                      print(rememberMe);
                                     },
                                   ),
                                   Text("rememberMe?".tr()),
