@@ -20,6 +20,7 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  bool obscurePassword = true;
   bool rememberMe = false;
   late TextEditingController _nurseIDController;
   late TextEditingController _passwordController;
@@ -260,8 +261,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   floatingLabelBehavior: FloatingLabelBehavior.always,
                                   errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                                   focusedErrorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 2)),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(obscurePassword ? Icons.visibility_off : Icons.visibility),
+                                    onPressed: () {
+                                      setState(() {
+                                        obscurePassword = !obscurePassword;
+                                      });
+                                    },
+                                  ),
                                 ),
-                                obscureText: true,
+                                keyboardType: TextInputType.visiblePassword,
+                                obscureText: obscurePassword,
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return "plsEnterPassword".tr();
