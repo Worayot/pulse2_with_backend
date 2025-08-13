@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/mainpage/patient_related/patient_ind_data.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
@@ -199,13 +200,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                 ToggleIconButton(
                                   enableButton: enableToggleButton,
                                   addPatientFunc: () async {
+                                    EasyLoading.show();
                                     setState(() {
                                       enableToggleButton = false;
                                     });
                                     PatientUserLink link = PatientUserLink(patientID: patientID, userID: userID);
-                                    print(patientID);
-                                    print('Link: $_linkedPatient');
-                                    print(_linkedPatient.contains(patientID));
 
                                     Map<int, String> status = await PatientService().takeIn(link: link);
                                     int statusCode = status.keys.first;
@@ -226,11 +225,10 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     setState(() {
                                       enableToggleButton = true;
                                     });
+                                    EasyLoading.dismiss();
                                   },
                                   removePatientFunc: () async {
-                                    print(patientID);
-                                    print('Link: $_linkedPatient');
-                                    print(_linkedPatient.contains(patientID));
+                                    EasyLoading.show();
                                     setState(() {
                                       enableToggleButton = false;
                                     });
@@ -245,6 +243,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     setState(() {
                                       enableToggleButton = true;
                                     });
+                                    EasyLoading.dismiss();
                                   },
                                   buttonState: !_linkedPatient.contains(patientID),
                                 ),

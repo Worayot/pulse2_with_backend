@@ -42,6 +42,23 @@ void main() async {
       ),
     ),
   );
+  configLoading();
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..indicatorType = EasyLoadingIndicatorType.ring
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.blue
+    ..backgroundColor = Colors.transparent
+    ..indicatorColor = Colors.blue
+    ..textColor = Colors.blue
+    ..maskColor = Colors.transparent
+    ..maskType = EasyLoadingMaskType.black
+    ..userInteractions = false
+    ..dismissOnTap = false;
 }
 
 class MyApp extends StatelessWidget {

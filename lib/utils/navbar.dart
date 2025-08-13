@@ -35,23 +35,20 @@ class CustomAnimatedBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? const Color(0xff3362CC);
-    final Size size = MediaQuery.of(context).size;
-    final bool isAndroid = Platform.isAndroid;
+    // final Size size = MediaQuery.of(context).size;
+    // final bool isAndroid = Platform.isAndroid;
 
     return Container(
-      height: isAndroid ? size.height * 0.09 : size.height * 0.11,
+      height: 80,
+      // height: isAndroid ? size.height * 0.09 : size.height * 0.11,
       decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
         color: bgColor,
-        boxShadow: [
-          if (showElevation)
-            const BoxShadow(color: Colors.black12, blurRadius: 2),
-        ],
+        boxShadow: [if (showElevation) const BoxShadow(color: Colors.black12, blurRadius: 2)],
       ),
       child: SafeArea(
+        bottom: false,
+        top: false,
         child: Container(
           width: double.infinity,
           height: containerHeight,
@@ -114,40 +111,20 @@ class _ItemWidget extends StatelessWidget {
         height: double.maxFinite,
         duration: animationDuration,
         curve: curve,
-        decoration: BoxDecoration(
-          color:
-              isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor,
-          borderRadius: BorderRadius.circular(itemCornerRadius),
-        ),
+        decoration: BoxDecoration(color: isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor, borderRadius: BorderRadius.circular(itemCornerRadius)),
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              IconTheme(
-                data: IconThemeData(
-                  size: iconSize,
-                  color:
-                      isSelected
-                          ? item.activeColor.withOpacity(1)
-                          : item.inactiveColor ?? item.activeColor,
-                ),
-                child: item.icon,
-              ),
-              if (isSelected)
-                SizedBox(
-                  width: size.width * 0.025,
-                ), // Space between icon and text
+              IconTheme(data: IconThemeData(size: iconSize, color: isSelected ? item.activeColor.withOpacity(1) : item.inactiveColor ?? item.activeColor), child: item.icon),
+              if (isSelected) SizedBox(width: size.width * 0.025), // Space between icon and text
               if (isSelected)
                 Flexible(
                   child: DefaultTextStyle.merge(
-                    style: TextStyle(
-                      color: item.activeColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
                     maxLines: 1,
-                    overflow:
-                        TextOverflow.ellipsis, // Handles overflow with ellipsis
+                    overflow: TextOverflow.ellipsis, // Handles overflow with ellipsis
                     textAlign: item.textAlign,
                     child: item.title,
                   ),
@@ -161,14 +138,7 @@ class _ItemWidget extends StatelessWidget {
 }
 
 class BottomNavyBarItem {
-  BottomNavyBarItem({
-    required this.icon,
-    required this.title,
-    this.activeColor = const Color(0xff407BFF),
-    this.textAlign,
-    this.inactiveColor,
-    required this.boxWidth,
-  });
+  BottomNavyBarItem({required this.icon, required this.title, this.activeColor = const Color(0xff407BFF), this.textAlign, this.inactiveColor, required this.boxWidth});
 
   final Widget icon;
   final Widget title;

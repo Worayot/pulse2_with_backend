@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/utils/patient_card_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../utils/add_patient_form.dart';
