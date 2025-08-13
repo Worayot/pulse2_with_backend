@@ -15,6 +15,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tuh_mews/services/alarm_services.dart';
+import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       // home: const NavigationPage(),
-      home: const LoginPage(),
+      home: const NavigationPage(),
       builder: EasyLoading.init(),
     );
   }

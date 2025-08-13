@@ -25,6 +25,7 @@ class LocaleConverter implements JsonConverter<Locale, String> {
   }
 }
 
+//! Maybe unused
 @freezed
 abstract class AppState with _$AppState {
   const factory AppState({String? username, @LocaleConverter() required Locale locale, @JsonKey(includeFromJson: false) String? sessionCookie, required bool rememberMe}) =

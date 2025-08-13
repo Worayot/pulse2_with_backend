@@ -281,7 +281,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         rememberMe = value;
                                         secureStorage.write(key: 'rememberMe', value: (value).toString());
                                       });
-                                      print(rememberMe);
                                     },
                                   ),
                                   Text("rememberMe?".tr()),
