@@ -1,4 +1,4 @@
-package com.example.tuh_mews
+package com.soften.tuhmews
 
 import io.flutter.embedding.android.FlutterActivity
 
