@@ -1,12 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/utils/patient_card_home.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../utils/add_patient_form.dart';
 
@@ -40,20 +38,10 @@ class _PatientInSystemState extends State<PatientInSystem> {
     super.dispose();
   }
 
-  List<Map<String, dynamic>> _getFilteredPatients(
-    List<Map<String, dynamic>> patients,
-  ) {
+  List<Map<String, dynamic>> _getFilteredPatients(List<Map<String, dynamic>> patients) {
     if (_searchQuery.isEmpty) return patients;
 
-    return patients
-        .where(
-          (patient) =>
-              patient["fullname"]?.toString().toLowerCase().contains(
-                _searchQuery,
-              ) ??
-              false,
-        )
-        .toList();
+    return patients.where((patient) => patient["fullname"]?.toString().toLowerCase().contains(_searchQuery) ?? false).toList();
   }
 
   // Stream to listen to real-time updates from Firestore
@@ -91,13 +79,6 @@ class _PatientInSystemState extends State<PatientInSystem> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    final double screenWidth = size.width;
-    SearchBarSetting sbs = SearchBarSetting(context: context);
-    ButtonNextToSearchBarSetting btnsb = ButtonNextToSearchBarSetting(
-      context: context,
-    );
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Padding(
@@ -126,17 +107,9 @@ class _PatientInSystemState extends State<PatientInSystem> {
                                   : null,
                           fillColor: const Color(0xffCADBFF),
                           filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: const Icon(
-                            FontAwesomeIcons.magnifyingGlass,
-                            color: Colors.black,
-                          ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 60,
-                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                          prefixIconConstraints: const BoxConstraints(minWidth: 60),
                         ),
                       ),
                     ),
@@ -151,31 +124,15 @@ class _PatientInSystemState extends State<PatientInSystem> {
                         },
                       );
                     },
-                    icon: Icon(
-                      FontAwesomeIcons.userPlus,
-                      color: Colors.white,
-                      size: 26,
-                    ),
+                    icon: Icon(FontAwesomeIcons.userPlus, color: Colors.white, size: 26),
                     label: Padding(
                       padding: const EdgeInsets.only(left: 4.0),
-                      child: Text(
-                        "addPatient".tr(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Text("addPatient".tr(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff407BFF),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                       // fixedSize: Size.fromHeight(60),
                     ),
@@ -207,18 +164,9 @@ class _PatientInSystemState extends State<PatientInSystem> {
                     return NoPatientWidget();
                   }
 
-                  // Synchronize _isExpanded with filteredPatients
-                  List isExpanded = List.generate(
-                    filteredPatients.length,
-                    (index) => false,
-                  );
+                  List isExpanded = List.generate(filteredPatients.length, (index) => false);
 
-                  return HomeExpandableCards(
-                    filteredPatients: filteredPatients,
-                    context: context,
-                    isExpanded: isExpanded,
-                  );
-                  // return Text('a');
+                  return HomeExpandableCards(filteredPatients: filteredPatients, context: context, isExpanded: isExpanded);
                 },
               ),
             ),

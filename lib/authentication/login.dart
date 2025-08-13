@@ -34,7 +34,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     _nurseIDController = TextEditingController();
     _passwordController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final username = await secureStorage.read(key: 'username');
+      final nurseId = await secureStorage.read(key: 'nurseId');
       final password = await secureStorage.read(key: 'password');
       final String remember = await secureStorage.read(key: 'rememberMe') ?? 'false';
 
@@ -46,7 +46,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         rememberMe = false;
       }
 
-      _nurseIDController.text = username ?? '';
+      _nurseIDController.text = nurseId ?? '';
       _passwordController.text = password ?? '';
 
       _loadSelectedLocale();
@@ -97,11 +97,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
 
     if (rememberMe) {
-      await secureStorage.write(key: 'username', value: _nurseIDController.text.trim());
+      await secureStorage.write(key: 'nurseId', value: _nurseIDController.text.trim());
       await secureStorage.write(key: 'password', value: _passwordController.text.trim());
       await secureStorage.write(key: 'rememberMe', value: rememberMe.toString());
     } else {
-      secureStorage.delete(key: 'username');
+      secureStorage.delete(key: 'nurseId');
       secureStorage.delete(key: 'password');
       secureStorage.delete(key: 'rememberMe');
     }
