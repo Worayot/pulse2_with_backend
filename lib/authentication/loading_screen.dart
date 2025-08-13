@@ -5,16 +5,11 @@ import 'package:tuh_mews/mainpage/navigation.dart';
 import 'package:tuh_mews/services/user_services.dart';
 import 'package:tuh_mews/utils/loading_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:tuh_mews/func/notification_scheduler.dart';
 
 class LoadingScreen extends StatefulWidget {
   final String userId;
   final String password;
-  const LoadingScreen({
-    super.key,
-    required this.userId,
-    required this.password,
-  });
+  const LoadingScreen({super.key, required this.userId, required this.password});
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -28,9 +23,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   void initState() {
-    super.initState();
-    // Save preferences and navigate once done
     _initialize();
+    super.initState();
   }
 
   Future<void> _initialize() async {
@@ -42,11 +36,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
     UserServices userServices = UserServices();
     accountData = await userServices.loadAccount(widget.userId);
 
-    if (accountData != null && accountData!.isNotEmpty) {
-      print("Successfully loaded account data.");
-    } else {
-      print("Failed to load account data.");
-    }
+    // if (accountData != null && accountData!.isNotEmpty) {
+    //   print("Successfully loaded account data.");
+    // } else {
+    //   print("Failed to load account data.");
+    // }
   }
 
   // Save encrypted password
@@ -56,10 +50,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   Future<void> _savePreferences() async {
     if (accountData != null && accountData!.isNotEmpty) {
-      String fullname =
-          accountData!['fullname'] ?? 'N/A'; // Default to 'N/A' if null
-      String nurseId =
-          accountData!['nurse_id'] ?? 'N/A'; // Default to 'N/A' if null
+      String fullname = accountData!['fullname'] ?? 'N/A'; // Default to 'N/A' if null
+      String nurseId = accountData!['nurse_id'] ?? 'N/A'; // Default to 'N/A' if null
       String role = accountData!['role'] ?? 'N/A'; // Default to 'N/A' if null
 
       // Save preferences
@@ -73,23 +65,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
       });
 
       // Call the function to schedule notifications for this user
-      await fetchAndScheduleNotification(
-        accountData!['nurse_id'],
-      ); // Pass userId to fetch notifications
+      await fetchAndScheduleNotification(accountData!['nurse_id']); // Pass userId to fetch notifications
 
       // Navigate to the main page
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const NavigationPage()),
-        (route) => false,
-      );
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigationPage()), (route) => false);
     } else {
       print("Error loading user's data");
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
     }
   }
 
@@ -97,9 +79,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Future<void> fetchAndScheduleNotification(String userId) async {
     // Mock notification time fetch
     // Replace this with your logic to fetch user-specific notification time from Firestore or any backend
-    var notificationTime = DateTime.now().add(
-      Duration(seconds: 10),
-    ); // Just for testing
+    var notificationTime = DateTime.now().add(Duration(seconds: 10)); // Just for testing
 
     await _scheduleNotification(notificationTime);
   }

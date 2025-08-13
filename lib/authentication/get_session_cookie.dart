@@ -10,7 +10,7 @@ Future<String?> getSessionCookie() async {
     String? sessionCookie = await _storage.read(key: 'session_cookie');
     return sessionCookie; // returns the value or null if it doesn't exist
   } catch (e) {
-    print("Error reading session cookie: $e");
+    // print("Error reading session cookie: $e");
     return null;
   }
 }
