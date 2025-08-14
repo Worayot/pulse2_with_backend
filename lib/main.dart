@@ -6,16 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart' as provider;
-import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/firebase_options.dart';
-import 'package:tuh_mews/func/notification_scheduler.dart';
 import 'package:tuh_mews/mainpage/navigation.dart';
 import 'package:tuh_mews/provider/user_data_provider.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tuh_mews/services/alarm_services.dart';
-import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

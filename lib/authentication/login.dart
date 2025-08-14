@@ -139,7 +139,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           if (sessionResponse.statusCode == 200) {
             final sessionData = jsonDecode(sessionResponse.body);
             try {
-              await secureStorage.write(key: 'session_cookie', value: sessionData['session_cookie']);
+              await secureStorage.write(key: 'session_cookie', value: sessionData['session_cookie'], expiry: Duration(days: 7));
+
               // print("Session cookie stored successfully");
 
               // await secureStorage.write(key: 'id_token', value: idToken);
