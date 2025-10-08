@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
-import 'package:tuh_mews/mainpage/settings/aboutapp_ori.dart';
+import 'package:tuh_mews/mainpage/settings/aboutapp.dart';
 import 'package:tuh_mews/mainpage/settings/admin.dart';
 import 'package:tuh_mews/mainpage/settings/language.dart';
 import 'package:tuh_mews/mainpage/settings/profile.dart';
@@ -100,18 +100,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   },
                 ),
-                //* TUH MEWS 2.0
-                // _buildSettingsTile(
-                //   title: 'bugReport'.tr(),
-                //   leadingIcon: FontAwesomeIcons.solidPaperPlane,
-                //   onTap:
-                //       () => Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //           builder: (context) => BugReportPage(),
-                //         ),
-                //       ),
-                // ),
                 if (isAdmin)
                   _buildSettingsTile(
                     title: 'adminFeature'.tr(),

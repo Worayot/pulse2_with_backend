@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tuh_mews/authentication/login.dart';
+import 'package:gap/gap.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
-import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/validate_service.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
@@ -37,7 +37,6 @@ class _ExportPageState extends State<ExportPage> {
 
   List<Patient> _patients = [];
   List<Patient> _filteredPatients = [];
-  late StreamSubscription<QuerySnapshot> _streamSubscription;
 
   String _fullnameFilter = '';
   double _minAge = 0;
@@ -46,7 +45,7 @@ class _ExportPageState extends State<ExportPage> {
   @override
   void initState() {
     super.initState();
-    _streamSubscription = FirebaseFirestore.instance.collection('patients').snapshots().listen((snapshot) {
+    FirebaseFirestore.instance.collection('patients').snapshots().listen((snapshot) {
       final patients =
           snapshot.docs.map((doc) {
             var patientData = doc.data();
@@ -327,6 +326,8 @@ class _ExportPageState extends State<ExportPage> {
   Widget buildPatientCards() {
     // Build the ListView for the patient list
     return ListView.builder(
+      // separatorBuilder: (context, index) => const Gap(8),
+      padding: EdgeInsets.zero,
       itemCount: _filteredPatients.length,
       itemBuilder: (context, index) {
         final patient = _filteredPatients[index];
@@ -338,27 +339,23 @@ class _ExportPageState extends State<ExportPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    // SearchBarSetting sbs = SearchBarSetting(context: context);
-    // ButtonNextToSearchBarSetting btnsb = ButtonNextToSearchBarSetting(
-    //   context: context,
-    // );
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 15),
-          child: Align(alignment: Alignment.topLeft, child: Text("exportData".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
-        ),
-      ),
       body: Column(
         children: [
+          const Gap(28),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Align(alignment: Alignment.topLeft, child: Text("exportData".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
+          ),
+          const Gap(20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
                 Expanded(
                   child: SizedBox(
-                    // height: sbs.getHeight(),
                     child: TextField(
                       onChanged: (value) {
                         setState(() {
@@ -394,7 +391,7 @@ class _ExportPageState extends State<ExportPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const Gap(8),
                 SizedBox(
                   // height: sbs.getHeight(),
                   child: ElevatedButton(
@@ -404,7 +401,7 @@ class _ExportPageState extends State<ExportPage> {
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      padding: EdgeInsets.symmetric(vertical: 17, horizontal: 10),
+                      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
                       backgroundColor: const Color(0xff407BFF),
                       // fixedSize: Size.fromHeight(sbs.getHeight()),
                     ),
@@ -420,9 +417,11 @@ class _ExportPageState extends State<ExportPage> {
               ],
             ),
           ),
-          Expanded(child: buildPatientCards()),
+          const Gap(8),
+          Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: buildPatientCards())),
+          const Gap(8),
           Padding(
-            padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
+            padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -470,19 +469,16 @@ class _ExportPageState extends State<ExportPage> {
                           }
                           : () {},
                   child: Container(
-                    width: 200,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     height: 40,
                     decoration: BoxDecoration(color: const Color(0xff407BFF), borderRadius: BorderRadius.circular(8)),
                     child: Center(
-                      child:
-                          enableButton
-                              ? Text(
-                                '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              )
-                              : const CircularProgressIndicator(color: Colors.white),
+                      child: Text(
+                        '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
                     ),
                   ),
                 ),
@@ -495,10 +491,13 @@ class _ExportPageState extends State<ExportPage> {
   }
 
   Future<Map<int, String>> _exportAll() async {
+    EasyLoading.show();
     final exportServices = ExportServices();
+
     List<String> patientIds = _filteredPatients.map((patient) => patient.patientId ?? '').toList();
 
     Map<int, String> status = await exportServices.export(patientIds);
+    EasyLoading.dismiss();
     return status;
   }
 }

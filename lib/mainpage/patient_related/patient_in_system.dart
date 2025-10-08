@@ -1,10 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
+import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/utils/patient_card_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tuh_mews/utils/symbols_dialog/home_symbols.dart';
+import 'package:tuh_mews/utils/symbols_dialog/info_dialog.dart';
 import '../../utils/add_patient_form.dart';
 
 class PatientInSystem extends StatefulWidget {
@@ -85,8 +89,30 @@ class _PatientInSystemState extends State<PatientInSystem> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Gap(20),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Align(alignment: Alignment.topLeft, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        showInfoDialog(context, homeSymbols());
+                      });
+                    },
+                    child: const FaIcon(
+                      FontAwesomeIcons.circleInfo,
+                      size: 28, // Responsive icon size
+                      color: Color(0xff3362CC),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: Row(
                 children: [
                   Expanded(
@@ -113,7 +139,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  const Gap(8),
                   ElevatedButton.icon(
                     onPressed: () {
                       showDialog(
@@ -139,7 +165,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const Gap(8),
             Expanded(
               child: StreamBuilder<List<Map<String, dynamic>>>(
                 stream: getPatientsStream(),

@@ -29,7 +29,6 @@ void main() async {
 
   runApp(
     ProviderScope(
-      // <-- Riverpod root
       child: EasyLocalization(
         supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
         path: 'lang',
@@ -43,15 +42,17 @@ void main() async {
 
 void configLoading() {
   EasyLoading.instance
+    ..loadingStyle = EasyLoadingStyle.custom
     ..indicatorType = EasyLoadingIndicatorType.ring
-    ..loadingStyle = EasyLoadingStyle.dark
+    ..maskType = EasyLoadingMaskType.custom
+    ..backgroundColor = Colors.transparent
+    ..boxShadow = []
+    ..indicatorColor = Colors.lightBlueAccent
+    ..maskColor = Colors.transparent
     ..indicatorSize = 45.0
     ..radius = 10.0
     ..progressColor = Colors.blue
-    ..backgroundColor = Colors.transparent
-    ..indicatorColor = Colors.blue
     ..textColor = Colors.blue
-    ..maskColor = Colors.transparent
     ..maskType = EasyLoadingMaskType.black
     ..userInteractions = false
     ..dismissOnTap = false;

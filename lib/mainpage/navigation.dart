@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
-import 'package:tuh_mews/mainpage/patient_related/patient_in_system_initilizer.dart';
+import 'package:tuh_mews/mainpage/patient_related/patient_in_system.dart';
 import 'package:tuh_mews/mainpage/patient_related/export.dart';
 import 'package:tuh_mews/mainpage/patient_related/monitored_patient.dart';
 // import 'package:tuh_mews/mainpage/patient_data/monitored_patient_original.dart';
@@ -23,7 +23,7 @@ class _NavigationPageState extends State<NavigationPage> {
   int _selectedIndex = 0;
 
   // Different pages for each tab
-  static final List<Widget> _pages = <Widget>[const NotificationPage(), const PatientPage(), const ExportPage(), SettingsPage()];
+  static final List<Widget> _pages = <Widget>[const PatientInSystem(), const PatientPage(), const ExportPage(), SettingsPage()];
 
   void _onItemTapped(int index) {
     setState(() {

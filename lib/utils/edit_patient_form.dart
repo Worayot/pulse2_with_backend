@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:gap/gap.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/logout_service.dart';
@@ -49,7 +50,6 @@ class _EditPatientFormState extends State<EditPatientForm> {
   bool isAdmin = false;
 
   bool enableSaveButton = true;
-  bool enableDeleteButton = true;
 
   String? _selectedGender;
 
@@ -132,6 +132,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
       );
       return;
     } else {
+      EasyLoading.show();
       PatientService patientService = PatientService();
       Patient patient = Patient(
         patientId: widget.patientId,
@@ -145,6 +146,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
 
       // Call the updatePatient function and await its result
       Map<int, String> updateStatus = await patientService.updatePatient(widget.patientId, patient);
+      EasyLoading.dismiss();
 
       int updateStatusCode = updateStatus.keys.first;
 
@@ -304,61 +306,42 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (isAdmin)
-                          TextButton(
-                            onPressed:
-                                enableDeleteButton
-                                    ? () async {
-                                      bool result = await showWarningDialog(context); // Wait for user choice
-                                      if (result) {
-                                        setState(() {
-                                          enableDeleteButton = false;
-                                        });
-                                        PatientService patientService = PatientService();
-                                        Map<int, String> deleteStatus = await patientService.deletePatient(widget.patientId);
+                        TextButton(
+                          onPressed: () async {
+                            bool result = await showWarningDialog(context);
+                            if (result) {
+                              EasyLoading.show();
+                              PatientService patientService = PatientService();
+                              Map<int, String> deleteStatus = await patientService.deletePatient(widget.patientId);
+                              EasyLoading.dismiss();
 
-                                        int deleteStatusCode = deleteStatus.keys.first;
-                                        String deleteStatusMessage = '$deleteStatusCode ${deleteStatus.values.first}';
+                              int deleteStatusCode = deleteStatus.keys.first;
+                              String deleteStatusMessage = '$deleteStatusCode ${deleteStatus.values.first}';
 
-                                        if ((deleteStatusCode == 200) && mounted) {
-                                          Navigator.pop(context);
-                                          FlushbarService().showSuccessMessage(
-                                            context: context,
-                                            message: "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}",
-                                          );
-                                        } else if (deleteStatusCode == 401) {
-                                          LogoutService(navigator: Navigator.of(context)).logout();
-                                          FlushbarService().showErrorMessage(context: context, message: deleteStatusMessage);
-                                        } else {
-                                          if (mounted) {
-                                            FlushbarService().showErrorMessage(context: context, message: "failedToDeletePatientData".tr());
-                                            setState(() {
-                                              enableDeleteButton = true;
-                                            });
-                                          }
-                                        }
-                                      } else {
-                                        // User cancelled or dismissed the dialog
-                                        setState(() {
-                                          enableDeleteButton = true;
-                                        });
-                                      }
-                                    }
-                                    : () {},
-                            child: Text(
-                              'deletePatient'.tr(),
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, decoration: TextDecoration.underline, decorationColor: Colors.red),
-                            ),
+                              if ((deleteStatusCode == 200) && mounted) {
+                                Navigator.pop(context);
+                                FlushbarService().showSuccessMessage(context: context, message: "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}");
+                              } else if (deleteStatusCode == 401) {
+                                LogoutService(navigator: Navigator.of(context)).logout();
+                                FlushbarService().showErrorMessage(context: context, message: deleteStatusMessage);
+                              } else {
+                                if (mounted) {
+                                  FlushbarService().showErrorMessage(context: context, message: "failedToDeletePatientData".tr());
+                                }
+                              }
+                            } else {}
+                          },
+                          child: Text(
+                            'deletePatient'.tr(),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, decoration: TextDecoration.underline, decorationColor: Colors.red),
                           ),
+                        ),
 
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
                             onPressed: enableSaveButton ? submitData : () {},
-                            label:
-                                enableSaveButton
-                                    ? Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white))
-                                    : Padding(padding: const EdgeInsets.symmetric(horizontal: 4.0), child: CircularProgressIndicator(color: Colors.white)),
+                            label: Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xff407BFF),
                               shape: RoundedRectangleBorder(
