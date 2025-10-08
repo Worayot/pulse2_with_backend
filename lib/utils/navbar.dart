@@ -8,13 +8,12 @@ class CustomAnimatedBottomBar extends StatelessWidget {
     this.iconSize = 24,
     this.backgroundColor,
     this.itemCornerRadius = 20,
-    this.containerHeight = 80,
+    this.containerHeight = 70,
     this.animationDuration = const Duration(milliseconds: 270),
     this.mainAxisAlignment = MainAxisAlignment.spaceBetween,
     required this.items,
     required this.onItemSelected,
     this.curve = Curves.linear,
-    required double height,
   }) : assert(items.length >= 2 && items.length <= 5);
 
   final int selectedIndex;
@@ -32,44 +31,33 @@ class CustomAnimatedBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? const Color(0xff3362CC);
-    // final Size size = MediaQuery.of(context).size;
-    // final bool isAndroid = Platform.isAndroid;
-
-    return Container(
-      height: 80,
-      // height: isAndroid ? size.height * 0.09 : size.height * 0.11,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-        color: bgColor,
-        boxShadow: [if (showElevation) const BoxShadow(color: Colors.black12, blurRadius: 2)],
-      ),
-      child: SafeArea(
-        bottom: false,
-        top: false,
-        child: Container(
-          width: double.infinity,
-          height: containerHeight,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: Row(
-            mainAxisAlignment: mainAxisAlignment,
-            children:
-                items.map((item) {
-                  var index = items.indexOf(item);
-                  return GestureDetector(
-                    onTap: () => onItemSelected(index),
-                    child: _ItemWidget(
-                      item: item,
-                      iconSize: iconSize,
-                      isSelected: index == selectedIndex,
-                      backgroundColor: bgColor,
-                      itemCornerRadius: itemCornerRadius,
-                      animationDuration: animationDuration,
-                      curve: curve,
-                      boxWidth: item.boxWidth,
-                    ),
-                  );
-                }).toList(),
-          ),
+    return SafeArea(
+      bottom: false,
+      top: false,
+      child: Container(
+        decoration: BoxDecoration(borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)), color: bgColor),
+        width: double.infinity,
+        height: containerHeight,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Row(
+          mainAxisAlignment: mainAxisAlignment,
+          children:
+              items.map((item) {
+                var index = items.indexOf(item);
+                return GestureDetector(
+                  onTap: () => onItemSelected(index),
+                  child: _ItemWidget(
+                    item: item,
+                    iconSize: iconSize,
+                    isSelected: index == selectedIndex,
+                    backgroundColor: bgColor,
+                    itemCornerRadius: itemCornerRadius,
+                    animationDuration: animationDuration,
+                    curve: curve,
+                    boxWidth: item.boxWidth,
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );

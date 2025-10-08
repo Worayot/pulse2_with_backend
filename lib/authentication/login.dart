@@ -204,6 +204,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(height: size.height * 0.1),
+                    Align(alignment: Alignment.center, child: Text('MEWS', style: TextStyle(fontSize: size.height * 0.095, fontWeight: FontWeight.bold, color: Colors.black))),
                     Card(
                       elevation: 5,
                       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
@@ -285,6 +286,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Checkbox(
+                                    checkColor: Colors.white,
+                                    focusColor: const Color(0xff1225A4),
+                                    activeColor: const Color(0xff1225A4),
                                     value: rememberMe,
                                     onChanged: (value) {
                                       if (value == null) return;
@@ -327,7 +331,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
         Positioned(
-          top: size.height / 12 - keyboardHeight,
+          top: size.height / 12,
           left: -36,
           child: SizedBox(
             width: size.width * 0.35,
@@ -339,34 +343,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
           ),
         ),
-        Positioned.fill(
-          bottom: size.height / 2 + keyboardHeight,
-          child: Align(
-            alignment: Alignment.center,
-            child: Text(
-              // textAlign: TextAlign.center,
-              'MEWS',
-              style: TextStyle(fontSize: size.height * 0.095, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-          ),
-        ),
 
-        // Bottom image positioned above the green card
-        Positioned(
-          bottom: -keyboardHeight, // Adjust bottom position so it overlaps with the card
-          left: 0,
-          right: 0,
-          child: SizedBox(
-            width: size.width / 4.5, // Full width of the screen
-            height: size.height / 4.5, // Adjust height as needed
-            child: IgnorePointer(
-              child: Image.asset(
-                'assets/images/img_login_bottom.png',
-                fit: BoxFit.contain, // Stretch the image to cover the container
-              ),
-            ),
-          ),
-        ),
+        // Positioned(
+        //   bottom: -keyboardHeight, // Adjust bottom position so it overlaps with the card
+        //   left: 0,
+        //   right: 0,
+        //   child: SizedBox(
+        //     width: size.width / 4.5, // Full width of the screen
+        //     height: size.height / 4.5, // Adjust height as needed
+        //     child: IgnorePointer(
+        //       child: Image.asset(
+        //         'assets/images/img_login_bottom.png',
+        //         fit: BoxFit.contain, // Stretch the image to cover the container
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

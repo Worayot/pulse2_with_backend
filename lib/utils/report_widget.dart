@@ -6,11 +6,7 @@ class ReportWidget extends StatefulWidget {
   final double tableHeight;
   final String patientID;
 
-  const ReportWidget({
-    super.key,
-    required this.tableHeight,
-    required this.patientID,
-  });
+  const ReportWidget({super.key, required this.tableHeight, required this.patientID});
 
   @override
   _ReportWidgetState createState() => _ReportWidgetState();
@@ -29,7 +25,7 @@ class _ReportWidgetState extends State<ReportWidget> {
   @override
   void initState() {
     super.initState();
-    _tableHeight = widget.tableHeight; // Initialize the height from the widget
+    _tableHeight = widget.tableHeight;
   }
 
   @override
@@ -42,17 +38,10 @@ class _ReportWidgetState extends State<ReportWidget> {
           DateNavigation(onDateChanged: _updateSelectedDate),
 
           const SizedBox(height: 20),
-          // Ensure SwipableTable rebuilds when selectedDate changes
+
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            child: SizedBox(
-              key: ValueKey<DateTime>(selectedDate), // Use selectedDate as key
-              height: _tableHeight,
-              child: SwipableTable(
-                date: selectedDate,
-                patientID: widget.patientID,
-              ),
-            ),
+            child: SizedBox(key: ValueKey<DateTime>(selectedDate), height: _tableHeight, child: SwipableTable(date: selectedDate, patientID: widget.patientID)),
           ),
         ],
       ),
