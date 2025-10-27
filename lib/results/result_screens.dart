@@ -1,16 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tuh_mews/models/note.dart';
-import 'package:tuh_mews/utils/note_adder.dart';
+import 'package:tuh_mews/utils/note_adder.dart'; // Assuming this is correct
 
-void showResultDialog({
-  // required BuildContext context,
-  required int MEWs,
-  required String noteID,
-  required VoidCallback onPop,
-  required NavigatorState navigator,
-}) {
+void showResultDialog({required int MEWs, required String noteID, required VoidCallback onPop, required NavigatorState navigator}) {
   List<dynamic> components = getComponent(MEWs);
   String nursing = components[0];
   String emoji = components[1];
@@ -20,35 +13,29 @@ void showResultDialog({
   showDialog(
     context: navigator.context,
     builder: (context) {
-      Size size = MediaQuery.of(context).size;
       return Card(
         margin: const EdgeInsets.all(16),
         color: Colors.transparent,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Stack(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                width: double.infinity,
-                height: size.height,
                 color: bgColor,
+                // --- FIX: REMOVED the outer SingleChildScrollView ---
+                // The main widget is a Column, which allows
+                // Expanded to work correctly.
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    // --- 1. THE FIXED (NON-SCROLLING) PART ---
                     Row(
                       children: [
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(16),
-                            child: Center(
-                              child: Text(
-                                "finishedCalculating".tr(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
-                                ),
-                              ),
-                            ),
+                            child: Center(child: Text("finishedCalculating".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
                           ),
                         ),
                       ],
@@ -58,66 +45,42 @@ void showResultDialog({
                         Expanded(
                           child: Align(
                             alignment: Alignment.center,
-                            child: Text(
-                              "\t\t${"totalScore".tr()}: $MEWs",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 35,
-                              ),
-                            ),
+                            child: Text("\t\t${"totalScore".tr()}: $MEWs", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: SizedBox(
-                        child: Container(
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  title,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+
+                    // --- 2. THE SCROLLABLE PART ---
+                    // Expanded tells this section to fill all remaining space.
+                    Expanded(
+                      // This SingleChildScrollView now scrolls *only*
+                      // in the space given by Expanded.
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(12.0)),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(title, style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 20),
+                                    Text("${"nursing".tr()}:", style: const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold, height: 0.5)),
+                                    const SizedBox(height: 10),
+                                    Text(nursing, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  "${"nursing".tr()}:",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    height: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              SingleChildScrollView(
-                                child: Text(
-                                  nursing,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            // Padding so content can scroll above the button
+                            const SizedBox(height: 80),
+                          ],
                         ),
                       ),
                     ),
@@ -125,11 +88,12 @@ void showResultDialog({
                 ),
               ),
             ),
+            Positioned(bottom: 0, right: 0, child: IgnorePointer(child: Opacity(opacity: 0.5, child: Image.asset(emoji)))),
             Positioned(
               right: 15,
               bottom: 15,
-              child: ElevatedButton.icon(
-                onPressed: () {
+              child: GestureDetector(
+                onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -137,38 +101,22 @@ void showResultDialog({
                     },
                   );
                 },
-                icon: const Icon(
-                  FontAwesomeIcons.solidPenToSquare,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  'addNote'.tr(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF565656),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  decoration: BoxDecoration(color: const Color(0xFF565656), borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  child: Row(
+                    // Changed to Row from your original code
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(FontAwesomeIcons.solidPenToSquare, color: Colors.white, size: 16), // Added size
+                      const SizedBox(width: 8), // Added spacing
+                      Text('addNote'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    ],
                   ),
                 ),
               ),
             ),
-            // Emoji and Close Button go outside of SingleChildScrollView
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: IgnorePointer(
-                child: Opacity(opacity: 0.5, child: Image.asset(emoji)),
-              ),
-            ),
+
             Positioned(
               top: 15,
               right: 15,
@@ -186,6 +134,7 @@ void showResultDialog({
   );
 }
 
+// getComponent function (no changes)
 List<dynamic> getComponent(int MEWs) {
   // Process MEWs
   String nursing = "";

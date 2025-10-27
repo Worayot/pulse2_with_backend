@@ -1,20 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tuh_mews/models/note.dart';
-import 'package:tuh_mews/utils/note_adder.dart';
+// Removed unused FontAwesome and NoteAdder imports
 
-void showGeneralResultDialog({
-  required BuildContext context,
-  required int MEWs,
-}) {
+void showGeneralResultDialog({required BuildContext context, required int MEWs}) {
   List<dynamic> components = getComponent(MEWs);
   String nursing = components[0];
   String emoji = components[1];
   Color bgColor = components[2];
   String title = components[3];
 
-  Size size = MediaQuery.of(context).size;
+  // Removed unused 'size' variable
 
   showDialog(
     context: context,
@@ -22,31 +17,27 @@ void showGeneralResultDialog({
       return Card(
         margin: const EdgeInsets.all(16),
         color: Colors.transparent,
+        // Added clipBehavior and shape to match target
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Stack(
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Container(
+                // Removed fixed height
                 width: double.infinity,
-                height: size.height,
                 color: bgColor,
+                // Changed to a Column to use Expanded
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   children: [
+                    // --- 1. THE FIXED (NON-SCROLLING) PART ---
                     Row(
                       children: [
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(16),
-                            child: Center(
-                              child: Text(
-                                "finishedCalculating".tr(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 22,
-                                ),
-                              ),
-                            ),
+                            child: Center(child: Text("finishedCalculating".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
                           ),
                         ),
                       ],
@@ -56,66 +47,42 @@ void showGeneralResultDialog({
                         Expanded(
                           child: Align(
                             alignment: Alignment.center,
-                            child: Text(
-                              "\t\t${"totalScore".tr()}: $MEWs",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 35,
-                              ),
-                            ),
+                            child: Text("\t\t${"totalScore".tr()}: $MEWs", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: SizedBox(
-                        child: Container(
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  title,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+
+                    // --- 2. THE SCROLLABLE PART ---
+                    // Added Expanded and SingleChildScrollView
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              // Removed useless SizedBox wrapper
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(12.0)),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  // Added crossAxisAlignment
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(title, style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 20),
+                                    Text("${"nursing".tr()}:", style: const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold, height: 0.5)),
+                                    const SizedBox(height: 10),
+                                    Text(nursing, style: const TextStyle(fontSize: 16, color: Colors.black)),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 20),
-                              Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  "${"nursing".tr()}:",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    height: 0.5,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              SingleChildScrollView(
-                                child: Text(
-                                  nursing,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                            // Added bottom padding for scrolling
+                            const SizedBox(height: 20),
+                          ],
                         ),
                       ),
                     ),
@@ -123,15 +90,7 @@ void showGeneralResultDialog({
                 ),
               ),
             ),
-
-            // Emoji and Close Button go outside of SingleChildScrollView
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: IgnorePointer(
-                child: Opacity(opacity: 0.5, child: Image.asset(emoji)),
-              ),
-            ),
+            Positioned(bottom: 0, right: 0, child: IgnorePointer(child: Opacity(opacity: 0.5, child: Image.asset(emoji)))),
             Positioned(
               top: 15,
               right: 15,
@@ -149,6 +108,7 @@ void showGeneralResultDialog({
   );
 }
 
+// getComponent function (no changes)
 List<dynamic> getComponent(int MEWs) {
   // Process MEWs
   String nursing = "";

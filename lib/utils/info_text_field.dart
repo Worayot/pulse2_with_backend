@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 
 Widget infoTextField({
   required String title,
@@ -19,49 +18,21 @@ Widget infoTextField({
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            title,
-            textAlign: TextAlign.left,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
+        Align(alignment: Alignment.centerLeft, child: Text(title, textAlign: TextAlign.left, style: const TextStyle(fontWeight: FontWeight.bold))),
         const SizedBox(height: 5),
         Container(
-          constraints: BoxConstraints(
-            maxWidth: double.infinity,
-            minWidth: minWidth,
-          ),
+          constraints: BoxConstraints(maxWidth: double.infinity, minWidth: minWidth),
           height: 40,
-          decoration: BoxDecoration(
-            color: boxColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
+          decoration: BoxDecoration(color: boxColor, borderRadius: BorderRadius.circular(12)),
           child: Padding(
-            padding: const EdgeInsets.only(
-              top: 10,
-              bottom: 0,
-              left: 12,
-              right: 12,
-            ),
+            padding: const EdgeInsets.only(top: 10, bottom: 0, left: 12, right: 12),
             child: TextFormField(
               controller: controller,
-              keyboardType:
-                  numberOnly == true
-                      ? TextInputType.number
-                      : TextInputType.text,
-              inputFormatters:
-                  numberOnly == true
-                      ? [FilteringTextInputFormatter.digitsOnly]
-                      : [],
+              keyboardType: numberOnly == true ? TextInputType.number : TextInputType.text,
+              inputFormatters: numberOnly == true ? [FilteringTextInputFormatter.digitsOnly] : [],
               maxLines: 1,
               style: const TextStyle(color: Colors.black, fontSize: 14),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                isCollapsed: true,
-                hintText: hintText,
-              ),
+              decoration: InputDecoration(border: InputBorder.none, isCollapsed: true, hintText: hintText),
               enabled: block,
               validator: validator,
               autovalidateMode: AutovalidateMode.onUserInteraction,

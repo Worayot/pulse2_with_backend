@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,19 +16,10 @@ class ExportServices {
       return {401: "Unauthorized: Invalid or missing token."};
     }
 
-    final url = Uri.parse(
-      '${URL().getServerURL()}/expt-fetch/get_report_excel',
-    );
+    final url = Uri.parse('${URL().getServerURL()}/expt-fetch/get_report_excel');
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode({"patient_ids": patientIds}),
-      );
+      final response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"}, body: jsonEncode({"patient_ids": patientIds}));
 
       if (response.statusCode == 200) {
         return await _saveAndOpenFile(response.bodyBytes);
@@ -51,9 +41,7 @@ class ExportServices {
           return {403: "Forbidden: Storage permission denied."};
         }
 
-        final directories = await getExternalStorageDirectories(
-          type: StorageDirectory.downloads,
-        );
+        final directories = await getExternalStorageDirectories(type: StorageDirectory.downloads);
         directory = directories?.first;
         if (directory == null) {
           return {500: "Internal Server Error: Could not get directory."};
