@@ -1,55 +1,40 @@
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart'
-    as tzdata; // Import for initializeTimeZones
-import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // For Timestamp
+import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class InspectionNote {
   final String patientID;
   final String auditorID;
   final DateTime time;
 
-  InspectionNote({
-    required this.patientID,
-    required this.auditorID,
-    required this.time,
-  });
+  InspectionNote({required this.patientID, required this.auditorID, required this.time});
 
-  // Convert JSON to InspectionNote
+  // Convert JSON to InspectionNote (No change needed)
   factory InspectionNote.fromJson(Map<String, dynamic> json) {
-    return InspectionNote(
-      patientID: json['patient_id'],
-      auditorID: json['audit_by'],
-      time: _convertToLocalTimezone(json['time']), // Convert to local timezone
-    );
+    return InspectionNote(patientID: json['patient_id'], auditorID: json['audit_by'], time: _convertToLocalTimezone(json['time']));
   }
 
-  // Convert InspectionNote to JSON
+  // Convert InspectionNote to JSON for Firestore
   Map<String, dynamic> toJson() {
     return {
       'patient_id': patientID,
       'audit_by': auditorID,
-      'time': DateFormat("yyyy-MM-ddTHH:mm:ss").format(time),
+      'time': time, // <-- Save the DateTime object directly
     };
   }
 
-  // Function to convert UTC time to local time (Asia/Bangkok)
+  // No change needed
   static DateTime _convertToLocalTimezone(Timestamp timestamp) {
-    DateTime utcDateTime =
-        timestamp.toDate(); // Convert Firestore Timestamp to DateTime
-    final bangkokTimezone = tz.getLocation(
-      'Asia/Bangkok',
-    ); // Get the Bangkok timezone
-    final localDateTime = tz.TZDateTime.from(
-      utcDateTime,
-      bangkokTimezone,
-    ); // Convert to local time
+    DateTime utcDateTime = timestamp.toDate();
+    final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+    final localDateTime = tz.TZDateTime.from(utcDateTime, bangkokTimezone);
     return localDateTime;
   }
 
   @override
   String toString() {
-    return "time: $time\nformatted_time: ${DateFormat("yyyy-MM-ddTHH:mm:ss").format(time)}";
+    // No change needed, but saving 'time' directly is better
+    return "time: $time";
   }
 }
 
