@@ -16,7 +16,6 @@ class MEWsForms extends StatefulWidget {
   const MEWsForms({super.key, required this.patientID, required this.noteID, required this.onPop, required this.alarmStringIDs});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MEWsFormsState createState() => _MEWsFormsState();
 }
 
