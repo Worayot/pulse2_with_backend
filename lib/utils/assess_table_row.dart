@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:tuh_mews/func/get_color.dart';
-import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/utils/mews_forms.dart';
 import 'package:tuh_mews/utils/note_editor.dart';
 

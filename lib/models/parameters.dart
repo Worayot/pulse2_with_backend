@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Parameters {
   final String patientId;
   final String consciousness;
@@ -40,7 +42,7 @@ class Parameters {
       mews: json['mews'],
       cvp: json['cvp'],
       isAssessed: json['is_assessed'],
-      assessTime: json['assessed_time'],
+      assessTime: (json['assessed_time'] as Timestamp).toDate(),
     );
   }
 
@@ -57,7 +59,7 @@ class Parameters {
       'mews': mews,
       'cvp': cvp,
       'is_assessed': isAssessed,
-      'assessed_time': assessTime.toIso8601String(),
+      'assessed_time': assessTime.toUtc(),
     };
   }
 }

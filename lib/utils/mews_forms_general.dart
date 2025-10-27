@@ -1,12 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/calculateMEWs.dart';
-import 'package:tuh_mews/models/parameters.dart';
-import 'package:tuh_mews/results/result_screens.dart';
 import 'package:tuh_mews/results/result_screens_general.dart';
-import 'package:tuh_mews/services/mews_services.dart';
 
 class MEWsFormsGeneral extends StatefulWidget {
   const MEWsFormsGeneral({super.key});
@@ -20,13 +16,10 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
   // Declare TextEditingController for each input field
   final TextEditingController heartRateController = TextEditingController();
   final TextEditingController temperatureController = TextEditingController();
-  final TextEditingController sysBloodPressureController =
-      TextEditingController();
-  final TextEditingController diaBloodPressureController =
-      TextEditingController();
+  final TextEditingController sysBloodPressureController = TextEditingController();
+  final TextEditingController diaBloodPressureController = TextEditingController();
   final TextEditingController spo2Controller = TextEditingController();
-  final TextEditingController respiratoryRateController =
-      TextEditingController();
+  final TextEditingController respiratoryRateController = TextEditingController();
   final TextEditingController urineController = TextEditingController();
   final TextEditingController cvpController = TextEditingController();
   final FocusNode sysBpFocusNode = FocusNode();
@@ -55,9 +48,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
   Widget _showMEWsForms(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 20),
       child: Stack(
         children: [
           Card(
@@ -67,36 +58,18 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
             ),
             color: const Color(0xFFD7E0F5),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 8),
-                  Center(
-                    child: Text(
-                      textAlign: TextAlign.center,
-                      "calculateMEWs".tr(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ),
+                  Center(child: Text(textAlign: TextAlign.center, "calculateMEWs".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
                   const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5, bottom: 5),
-                    child: Text(
-                      "consciousness".tr(),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
+                  Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("consciousness".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                   SizedBox(
                     height: 40,
                     child: DropdownButtonFormField<String>(
-                      value: consciousnessValue,
+                      initialValue: consciousnessValue,
                       onChanged: (String? newValue) {
                         setState(() {
                           consciousnessValue = newValue!;
@@ -105,77 +78,33 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                       items: [
-                        const DropdownMenuItem(
-                          value: "-",
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 8),
-                            child: Text("-"),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: "Conscious",
-                          child: Text("conscious".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "Alert",
-                          child: Text("alert".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "verbalStimuli",
-                          child: Text("verbalStimuli".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "Pain",
-                          child: Text("pain".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "Unresponsive",
-                          child: Text("unresponsive".tr()),
-                        ),
+                        const DropdownMenuItem(value: "-", child: Padding(padding: EdgeInsets.only(left: 8), child: Text("-"))),
+                        DropdownMenuItem(value: "Conscious", child: Text("conscious".tr())),
+                        DropdownMenuItem(value: "Alert", child: Text("alert".tr())),
+                        DropdownMenuItem(value: "verbalStimuli", child: Text("verbalStimuli".tr())),
+                        DropdownMenuItem(value: "Pain", child: Text("pain".tr())),
+                        DropdownMenuItem(value: "Unresponsive", child: Text("unresponsive".tr())),
                       ],
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "temperature".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("temperature".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(°C)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(°C)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: temperatureController,
-                      keyboardType: TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
                           // RegExp(r'^\d*\.?\d*$'), //! Many decimal place
@@ -184,31 +113,16 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       ],
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text(
-                          '°C',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text('°C', style: TextStyle(fontWeight: FontWeight.bold)),
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
@@ -216,15 +130,9 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                     padding: const EdgeInsets.only(top: 5, bottom: 5),
                     child: Row(
                       children: [
-                        Text(
-                          "heartRate".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        Text("heartRate".tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
                         const Spacer(),
-                        const Text(
-                          "(bpm)",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        const Text("(bpm)", style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -236,10 +144,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: "-",
-                        suffix: const Text(
-                          "bpm",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("bpm", style: TextStyle(fontWeight: FontWeight.bold)),
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
@@ -247,36 +152,19 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                           horizontal: 16, // Adjusts height/padding
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
                           borderSide: BorderSide.none,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "respiratoryRate".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("respiratoryRate".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(bpm)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(bpm)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
@@ -286,49 +174,25 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
-                        suffix: const Text(
-                          "bpm",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("bpm", style: TextStyle(fontWeight: FontWeight.bold)),
                         hintText: '-',
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Text(
-                          "bloodPressure".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5), child: Text("bloodPressure".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(mmHg)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(mmHg)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   Row(
@@ -337,55 +201,28 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                "Systolic",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                            const Padding(padding: EdgeInsets.only(bottom: 5), child: Text("Systolic", style: TextStyle(fontWeight: FontWeight.bold))),
                             SizedBox(
                               height: 40,
                               child: TextField(
                                 focusNode: sysBpFocusNode,
                                 onChanged: (value) {
                                   if (value.length == 3) {
-                                    FocusScope.of(
-                                      context,
-                                    ).requestFocus(diasBpFocusNode);
+                                    FocusScope.of(context).requestFocus(diasBpFocusNode);
                                   }
                                 },
                                 controller: sysBloodPressureController,
                                 keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 decoration: InputDecoration(
                                   hintText: '-',
-                                  suffix: const Text(
-                                    "mmHg",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  suffix: const Text("mmHg", style: TextStyle(fontWeight: FontWeight.bold)),
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                                 ),
                               ),
                             ),
@@ -397,48 +234,23 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                "Diastolic",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                            const Padding(padding: EdgeInsets.only(bottom: 5), child: Text("Diastolic", style: TextStyle(fontWeight: FontWeight.bold))),
                             SizedBox(
                               height: 40,
                               child: TextField(
                                 focusNode: diasBpFocusNode,
                                 controller: diaBloodPressureController,
                                 keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 decoration: InputDecoration(
                                   hintText: '-',
-                                  suffix: const Text(
-                                    "mmHg",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  suffix: const Text("mmHg", style: TextStyle(fontWeight: FontWeight.bold)),
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                                 ),
                               ),
                             ),
@@ -451,16 +263,10 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "spO2 (${"whileGivingOxygen".tr()})",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        child: Text("spO2 (${"whileGivingOxygen".tr()})", style: const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                       const Spacer(),
-                      const Text(
-                        "(%)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(%)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
@@ -471,48 +277,24 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text(
-                          "%",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("%", style: TextStyle(fontWeight: FontWeight.bold)),
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "urine".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("urine".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(mL/hr)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(mL/hr)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
@@ -523,45 +305,20 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text(
-                          "mL/hr",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("mL/hr", style: TextStyle(fontWeight: FontWeight.bold)),
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "CVP",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
+                  Row(children: [Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("CVP", style: const TextStyle(fontWeight: FontWeight.bold)))]),
                   SizedBox(
                     height: 40, // Adjust height here
                     child: TextField(
@@ -572,25 +329,13 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
 
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
@@ -611,17 +356,13 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(
-                                          dialogContext,
-                                        ).pop(false); // User pressed cancel
+                                        Navigator.of(dialogContext).pop(false); // User pressed cancel
                                       },
                                       child: Text("cancel".tr()),
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(
-                                          dialogContext,
-                                        ).pop(true); // User confirmed
+                                        Navigator.of(dialogContext).pop(true); // User confirmed
                                       },
                                       child: Text("confirm".tr()),
                                     ),
@@ -640,8 +381,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                                   respiratoryRateController.text = "";
                                   urineController.text = "";
                                   cvpController.text = "";
-                                  consciousnessValue =
-                                      "-"; // Reset dropdown safely
+                                  consciousnessValue = "-"; // Reset dropdown safely
                                 });
                               }
                             });
@@ -651,9 +391,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.red, // Text color
-                              decoration:
-                                  TextDecoration
-                                      .underline, // Underline to indicate it's clickable
+                              decoration: TextDecoration.underline, // Underline to indicate it's clickable
                               decorationColor: Colors.red,
                             ),
                           ),
@@ -664,9 +402,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                             foregroundColor: Colors.white,
                             backgroundColor: const Color(0xFF3362CC),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                15,
-                              ), // Set border radius here
+                              borderRadius: BorderRadius.circular(15), // Set border radius here
                             ),
                           ),
                           onPressed: () async {
@@ -692,31 +428,18 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                             int MEWs = calculateMEWs(
                               consciousness: conscious,
                               heartRate: (hr != '-') ? int.tryParse(hr) : null,
-                              temperature:
-                                  (temp != '-') ? double.tryParse(temp) : null,
-                              respiratoryRate:
-                                  (rr != '-') ? int.tryParse(rr) : null,
-                              systolicBp:
-                                  (sBp != '-') ? int.tryParse(sBp) : null,
+                              temperature: (temp != '-') ? double.tryParse(temp) : null,
+                              respiratoryRate: (rr != '-') ? int.tryParse(rr) : null,
+                              systolicBp: (sBp != '-') ? int.tryParse(sBp) : null,
                               spo2: (spO2 != '-') ? int.tryParse(spO2) : null,
-                              urine:
-                                  (urine != '-') ? int.tryParse(urine) : null,
+                              urine: (urine != '-') ? int.tryParse(urine) : null,
                             );
 
                             Navigator.pop(context);
 
-                            showGeneralResultDialog(
-                              context: context,
-                              MEWs: MEWs,
-                            );
+                            showGeneralResultDialog(context: context, MEWs: MEWs);
                           },
-                          child: Text(
-                            'calculate'.tr(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                          ),
+                          child: Text('calculate'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                         ),
                       ],
                     ),

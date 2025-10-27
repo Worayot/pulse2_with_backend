@@ -1,14 +1,10 @@
 // ignore_for_file: library_private_types_in_public_api
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
-import 'package:tuh_mews/utils/action_button.dart';
-import 'package:tuh_mews/utils/mews_forms_general.dart';
-import 'package:tuh_mews/utils/notification_list_page.dart';
 import 'package:tuh_mews/utils/patient_card_monitored.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

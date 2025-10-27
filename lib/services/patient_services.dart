@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/patient_user_link.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
-import 'server_url.dart';
 import '../models/patient.dart';
 
 class FirebasePatientService {
@@ -34,8 +33,6 @@ class FirebasePatientService {
           patientData['inspection_notes'] = inspectionNotes;
           monitoredPatients.add(patientData);
         }
-
-        // print("Successfully retrieved monitored patients with inspection notes and MEWS data.");
       } else {
         // print("No monitored patient data found.");
       }
@@ -111,103 +108,185 @@ class FirebasePatientService {
 class PatientService {
   //* Tested
   Future<Map<int, String>> addPatient(Patient patientData) async {
-    String? idToken = await SessionService().getIdToken();
+    final db = FirebaseFirestore.instance;
+    final auth = FirebaseAuth.instance;
 
-    if (idToken == null) {
-      // print('No token found');
-      return {401: 'No token found'};
+    // 1. Check for authenticated user (replaces token check)
+    if (auth.currentUser == null) {
+      return {401: "User is not authenticated."};
     }
-    final url = Uri.parse('${URL().getServerURL()}/home-fetch/add_patient/');
 
     try {
-      final response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"}, body: jsonEncode(patientData.toJson()));
-      return {response.statusCode: response.body};
+      Map<String, dynamic> patientMap = patientData.toJson();
+      patientMap['created_at'] = FieldValue.serverTimestamp();
+
+      final docRef = await db.collection("patients").add(patientMap);
+
+      return {
+        200: jsonEncode({"message": "Patient added successfully", "patient_id": docRef.id}),
+      };
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        return {403: "Permission denied."};
+      } else {
+        return {500: "Firebase error: ${e.message}"};
+      }
     } catch (e) {
-      return {500: 'Error adding patient: $e'};
+      return {500: "Error adding patient: $e"};
     }
   }
 
   //* Tested
   Future<Map<int, String>> deletePatient(String patientId) async {
-    String? idToken = await SessionService().getIdToken();
+    final db = FirebaseFirestore.instance;
+    final auth = FirebaseAuth.instance;
 
-    if (idToken == null) {
-      return {401: 'No token found'};
+    // 1. Check for authenticated user (replaces token check)
+    if (auth.currentUser == null) {
+      return {401: "User is not authenticated."};
     }
-    final url = Uri.parse('${URL().getServerURL()}/home-fetch/delete-patient/$patientId');
 
     try {
-      final response = await http.delete(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"});
+      final batch = db.batch();
 
-      return {response.statusCode: response.body};
+      final patientRef = db.collection("patients").doc(patientId);
+      final patientDoc = await patientRef.get();
+
+      if (!patientDoc.exists) {
+        return {404: "Patient not found"};
+      }
+
+      final inspectionNotesQuery = db.collection("inspection_notes").where("patient_id", isEqualTo: patientId);
+      final inspectionNotesSnapshot = await inspectionNotesQuery.get();
+
+      final List<String> mewsIdsToDelete = [];
+
+      for (final noteDoc in inspectionNotesSnapshot.docs) {
+        batch.delete(noteDoc.reference);
+
+        final noteData = noteDoc.data();
+        final String? mewsId = noteData["mews_id"] as String?;
+        if (mewsId != null && mewsId.isNotEmpty) {
+          mewsIdsToDelete.add(mewsId);
+        }
+      }
+
+      for (final mewsId in mewsIdsToDelete.toSet()) {
+        final mewRef = db.collection("mews").doc(mewsId);
+        batch.delete(mewRef);
+      }
+
+      final linksQuery = db.collection("patient_user_links").where("patient_id", isEqualTo: patientId);
+      final linksSnapshot = await linksQuery.get();
+
+      for (final linkDoc in linksSnapshot.docs) {
+        batch.delete(linkDoc.reference);
+      }
+
+      batch.delete(patientRef);
+      await batch.commit();
+
+      return {
+        200: jsonEncode({"message": "Patient and all related records deleted successfully"}),
+      };
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        return {403: "Permission denied."};
+      } else {
+        return {500: "Firebase error: ${e.message}"};
+      }
     } catch (e) {
-      return {500: 'Error deleting patient: $e'};
+      return {500: "Error deleting patient: $e"};
     }
   }
 
   //* Used
   Future<Map<int, String>> updatePatient(String patientId, Patient patientData) async {
-    String? idToken = await SessionService().getIdToken();
+    final db = FirebaseFirestore.instance;
+    final auth = FirebaseAuth.instance;
 
-    if (idToken == null) {
-      return {401: 'No token found'};
+    if (auth.currentUser == null) {
+      return {401: 'User is not authenticated.'};
     }
-    final url = Uri.parse('${URL().getServerURL()}/home-fetch/update_patient/$patientId');
+
+    final patientRef = db.collection("patients").doc(patientId);
 
     try {
-      final response = await http.put(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"}, body: jsonEncode(patientData.toJson()));
+      final patientMap = patientData.toJson();
+      await patientRef.update(patientMap);
 
-      return {response.statusCode: response.body};
+      return {
+        200: jsonEncode({"message": "Patient updated successfully", "patient_id": patientId}),
+      };
+    } on FirebaseException catch (e) {
+      if (e.code == 'not-found') {
+        return {404: "Patient not found"};
+      } else if (e.code == 'permission-denied') {
+        return {403: "Permission denied."};
+      } else {
+        return {500: "Firebase error: ${e.message}"};
+      }
     } catch (e) {
       return {500: 'Error updating patient: $e'};
     }
   }
 
-  //* Tested
-  Future<Map<String, dynamic>?> getMonitoredPatient(String userId) async {
+  Future<Map<String, dynamic>> getMonitoredPatient(String userId) async {
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      return null;
+      return {"status": 401, "message": "Unauthorized: No token found", "data": null};
     }
+
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/get-links-by-user/$userId');
 
     try {
       final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"});
 
       if (response.statusCode == 200) {
-        // Parse the response body if it's JSON
-        Map<String, dynamic> responseData = jsonDecode(response.body);
-        // print(responseData);
-        return responseData; // Return the parsed data
+        final Map<String, dynamic> decoded = jsonDecode(response.body);
+        return {"status": 200, "message": decoded["message"] ?? "Links retrieved successfully", "data": decoded["data"]};
       } else {
-        // print("Failed to get monitored patient: ${response.body}");
-        return null; // Return null on failure
+        String errorMessage;
+
+        try {
+          final Map<String, dynamic> err = jsonDecode(response.body);
+          errorMessage = err["detail"] ?? response.body;
+        } catch (_) {
+          errorMessage = response.body;
+        }
+
+        return {"status": response.statusCode, "message": errorMessage, "data": null};
       }
     } catch (e) {
-      // print("Error monitoring patient: $e");
-      return null; // Return null in case of error
+      return {"status": 500, "message": "Error fetching monitored patient: $e", "data": null};
     }
   }
 
   Future<Map<int, String>> takeIn({required PatientUserLink link}) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      return {401: 'No token found'};
+      return {401: 'Unauthorized: No token found'};
     }
+
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/take-in/');
 
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"},
-        body: jsonEncode(link.toJson()), // Only one jsonEncode needed
+        body: jsonEncode(link.toJson()), // convert your model to JSON
       );
 
-      return {response.statusCode: response.body};
+      try {
+        final Map<String, dynamic> decoded = jsonDecode(response.body);
+        final message = decoded["message"] ?? "Operation completed";
+        return {response.statusCode: message};
+      } catch (_) {
+        // fallback if response is not JSON
+        return {response.statusCode: response.body};
+      }
     } catch (e) {
       return {500: 'Error taking in patient: $e'};
     }
@@ -229,10 +308,9 @@ class PatientService {
         return true; // Deletion successful
       } else {
         // No matching document found
-        return false; // Or handle as you see fit: document not found, so no deletion happened.
+        return false;
       }
     } catch (e) {
-      // print("Error taking out patient: $e");
       return false; // Error occurred
     }
   }
