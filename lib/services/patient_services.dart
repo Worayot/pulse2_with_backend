@@ -35,9 +35,9 @@ class FirebasePatientService {
           monitoredPatients.add(patientData);
         }
 
-        print("Successfully retrieved monitored patients with inspection notes and MEWS data.");
+        // print("Successfully retrieved monitored patients with inspection notes and MEWS data.");
       } else {
-        print("No monitored patient data found.");
+        // print("No monitored patient data found.");
       }
 
       return monitoredPatients;
@@ -52,11 +52,11 @@ class FirebasePatientService {
       if (docSnapshot.exists) {
         return docSnapshot.data() as Map<String, dynamic>;
       } else {
-        print("No patient data found for patientId $patientId");
+        // print("No patient data found for patientId $patientId");
         return null; // No patient data found
       }
     } catch (e) {
-      print("Error fetching patient data for patientId $patientId: $e");
+      // print("Error fetching patient data for patientId $patientId: $e");
       return null; // Error fetching patient data
     }
   }
@@ -85,7 +85,7 @@ class FirebasePatientService {
         inspectionNotes.add(noteData);
       }
     } catch (e) {
-      print("Error fetching inspection notes for patient $patientId: $e");
+      // print("Error fetching inspection notes for patient $patientId: $e");
     }
 
     return inspectionNotes;
@@ -102,7 +102,7 @@ class FirebasePatientService {
         return null; // No MEWS data found
       }
     } catch (e) {
-      print("Error fetching MEWS data for mews_id $mewsId: $e");
+      // print("Error fetching MEWS data for mews_id $mewsId: $e");
       return null;
     }
   }
@@ -114,7 +114,7 @@ class PatientService {
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      print('No token found');
+      // print('No token found');
       return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/add_patient/');
@@ -132,7 +132,6 @@ class PatientService {
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      print('No token found');
       return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/delete-patient/$patientId');
@@ -148,12 +147,9 @@ class PatientService {
 
   //* Used
   Future<Map<int, String>> updatePatient(String patientId, Patient patientData) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      print('No token found');
       return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/update_patient/$patientId');
@@ -169,12 +165,9 @@ class PatientService {
 
   //* Tested
   Future<Map<String, dynamic>?> getMonitoredPatient(String userId) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      print('No token found');
       return null;
     }
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/get-links-by-user/$userId');
@@ -188,11 +181,11 @@ class PatientService {
         // print(responseData);
         return responseData; // Return the parsed data
       } else {
-        print("Failed to get monitored patient: ${response.body}");
+        // print("Failed to get monitored patient: ${response.body}");
         return null; // Return null on failure
       }
     } catch (e) {
-      print("Error monitoring patient: $e");
+      // print("Error monitoring patient: $e");
       return null; // Return null in case of error
     }
   }
@@ -203,7 +196,6 @@ class PatientService {
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      print('No token found');
       return {401: 'No token found'};
     }
     final url = Uri.parse('${URL().getServerURL()}/home-fetch/take-in/');
@@ -240,7 +232,7 @@ class PatientService {
         return false; // Or handle as you see fit: document not found, so no deletion happened.
       }
     } catch (e) {
-      print("Error taking out patient: $e");
+      // print("Error taking out patient: $e");
       return false; // Error occurred
     }
   }

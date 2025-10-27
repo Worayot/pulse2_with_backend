@@ -9,9 +9,6 @@ import 'package:tuh_mews/services/url.dart';
 class MEWsService {
   //* Used
   Future<Map<int, String>> addMEWs(String noteID, Parameters parameters) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
@@ -30,8 +27,6 @@ class MEWsService {
 
   //* Used
   Future<Map<int, String>> addNote({required String noteID, required Note note}) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
@@ -51,9 +46,6 @@ class MEWsService {
 
   //* Used
   Future<Map<int, String>> addNewInspection({required InspectionNote inspectionNote}) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {

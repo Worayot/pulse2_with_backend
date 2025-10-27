@@ -114,7 +114,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     try {
       String url = URL().getServerURL();
       Uri loginUrl = Uri.parse('$url/authenticate/login');
-      final cookieUrl = Uri.parse('$url/authenticate/create-session-cookie');
       final response = await http.post(
         loginUrl,
         headers: {'Content-Type': 'application/json'},
@@ -125,35 +124,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         final data = jsonDecode(response.body);
         final String customToken = data['custom_token'];
 
-        // Step 1: Sign in with the custom token
         UserCredential userCredential = await FirebaseAuth.instance.signInWithCustomToken(customToken);
-        final String? idToken = await userCredential.user?.getIdToken(); // Get Firebase ID Token
+        final String? idToken = await userCredential.user?.getIdToken();
 
         if (idToken != null) {
-          // print("Firebase ID Token: $idToken");
-          await Future.delayed(Duration(seconds: 1));
-
-          // Step 2: Send ID Token to FastAPI to create a session
+          final cookieUrl = Uri.parse('$url/authenticate/create-session-cookie');
           final sessionResponse = await http.post(cookieUrl, headers: {'Content-Type': 'application/json'}, body: jsonEncode({'id_token': idToken}));
 
           if (sessionResponse.statusCode == 200) {
             final sessionData = jsonDecode(sessionResponse.body);
             try {
               await secureStorage.write(key: 'session_cookie', value: sessionData['session_cookie'], expiry: Duration(days: 7));
-
-              // print("Session cookie stored successfully");
-
-              // await secureStorage.write(key: 'id_token', value: idToken);
-              // print("Id token stored successfully");
             } catch (e) {
-              // print("Error storing session cookie: $e");
+              rethrow;
             }
 
             if (mounted) {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => LoadingScreen(userId: _nurseIDController.text, password: _passwordController.text)),
-                (Route<dynamic> route) => false, // Removes all previous screens
+                (Route<dynamic> route) => false,
               );
             }
           } else {
@@ -189,7 +179,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    // final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return Stack(
       children: [
