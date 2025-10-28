@@ -114,6 +114,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     try {
       String url = URL().getServerURL();
       Uri loginUrl = Uri.parse('$url/authenticate/login');
+
       final response = await http.post(
         loginUrl,
         headers: {'Content-Type': 'application/json'},
