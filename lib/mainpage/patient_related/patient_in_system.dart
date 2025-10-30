@@ -41,10 +41,20 @@ class _PatientInSystemState extends State<PatientInSystem> {
     super.dispose();
   }
 
-  List<Map<String, dynamic>> _getFilteredPatients(List<Map<String, dynamic>> patients) {
+  List<Map<String, dynamic>> _getFilteredPatients(
+    List<Map<String, dynamic>> patients,
+  ) {
     if (_searchQuery.isEmpty) return patients;
 
-    return patients.where((patient) => patient["fullname"]?.toString().toLowerCase().contains(_searchQuery) ?? false).toList();
+    return patients
+        .where(
+          (patient) =>
+              patient["fullname"]?.toString().toLowerCase().contains(
+                _searchQuery,
+              ) ??
+              false,
+        )
+        .toList();
   }
 
   // Stream to listen to real-time updates from Firestore
@@ -84,118 +94,161 @@ class _PatientInSystemState extends State<PatientInSystem> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Gap(20),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Align(alignment: Alignment.topLeft, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        showInfoDialog(context, homeSymbols());
-                      });
-                    },
-                    child: const FaIcon(
-                      FontAwesomeIcons.circleInfo,
-                      size: 28, // Responsive icon size
-                      color: Color(0xff3362CC),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: "${"search".tr()}...",
-                          suffixIcon:
-                              _searchController.text.isNotEmpty
-                                  ? IconButton(
-                                    icon: const Icon(Icons.clear),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                    },
-                                  )
-                                  : null,
-                          fillColor: const Color(0xffCADBFF),
-                          filled: true,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                          prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
-                          prefixIconConstraints: const BoxConstraints(minWidth: 60),
+      body: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Gap(20),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "patientsInSystem".tr(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: getPageTitleSize(context),
                         ),
                       ),
                     ),
-                  ),
-                  const Gap(8),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const AddPatientForm();
-                        },
-                      );
-                    },
-                    icon: Icon(FontAwesomeIcons.userPlus, color: Colors.white, size: 26),
-                    label: Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Text("addPatient".tr(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          showInfoDialog(context, homeSymbols());
+                        });
+                      },
+                      child: const FaIcon(
+                        FontAwesomeIcons.circleInfo,
+                        size: 28, // Responsive icon size
+                        color: Color(0xff3362CC),
+                      ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff407BFF),
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
-                      // fixedSize: Size.fromHeight(60),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: "${"search".tr()}...",
+                            suffixIcon:
+                                _searchController.text.isNotEmpty
+                                    ? IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                      },
+                                    )
+                                    : null,
+                            fillColor: const Color(0xffCADBFF),
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: const Icon(
+                              FontAwesomeIcons.magnifyingGlass,
+                              color: Colors.black,
+                            ),
+                            prefixIconConstraints: const BoxConstraints(
+                              minWidth: 60,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    const Gap(8),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const AddPatientForm();
+                          },
+                        );
+                      },
+                      icon: Icon(
+                        FontAwesomeIcons.userPlus,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                      label: Padding(
+                        padding: const EdgeInsets.only(left: 4.0),
+                        child: Text(
+                          "addPatient".tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff407BFF),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        // fixedSize: Size.fromHeight(60),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Gap(8),
-            Expanded(
-              child: StreamBuilder<List<Map<String, dynamic>>>(
-                stream: getPatientsStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+              const Gap(8),
+              Expanded(
+                child: StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: getPatientsStream(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
 
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return NoPatientWidget();
-                  }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return NoPatientWidget();
+                    }
 
-                  final patients = snapshot.data!;
-                  final filteredPatients = _getFilteredPatients(patients);
+                    final patients = snapshot.data!;
+                    final filteredPatients = _getFilteredPatients(patients);
 
-                  if (filteredPatients.isEmpty) {
-                    return NoPatientWidget();
-                  }
+                    if (filteredPatients.isEmpty) {
+                      return NoPatientWidget();
+                    }
 
-                  List isExpanded = List.generate(filteredPatients.length, (index) => false);
+                    List isExpanded = List.generate(
+                      filteredPatients.length,
+                      (index) => false,
+                    );
 
-                  return HomeExpandableCards(filteredPatients: filteredPatients, context: context, isExpanded: isExpanded);
-                },
+                    return HomeExpandableCards(
+                      filteredPatients: filteredPatients,
+                      context: context,
+                      isExpanded: isExpanded,
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

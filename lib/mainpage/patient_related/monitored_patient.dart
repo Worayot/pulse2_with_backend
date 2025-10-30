@@ -42,41 +42,65 @@ class _PatientPageState extends State<PatientPage> {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Gap(28),
-            Text("patientInMonitoring".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)), textAlign: TextAlign.left),
-            const Gap(8),
-            Expanded(
-              child: StreamBuilder<List<Map<String, dynamic>>>(
-                stream: FirebasePatientService().fetchMonitoredPatients(myUserId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Column(children: [SizedBox(height: size.height * 0.15), const NoPatientWidget()]);
-                  } else {
-                    List<Map<String, dynamic>> patients = snapshot.data!;
-
-                    patients.sort((a, b) => a['patient_details']['fullname'].compareTo(b['patient_details']['fullname']));
-
-                    return ListView.builder(
-                      itemCount: patients.length,
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> patientData = patients[index];
-                        return MonitoredPatientCard(patientData: patientData, onPop: refreshData);
-                      },
-                    );
-                  }
-                },
+      body: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Gap(28),
+              Text(
+                "patientInMonitoring".tr(),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: getPageTitleSize(context),
+                ),
+                textAlign: TextAlign.left,
               ),
-            ),
-          ],
+              const Gap(8),
+              Expanded(
+                child: StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: FirebasePatientService().fetchMonitoredPatients(
+                    myUserId,
+                  ),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Column(
+                        children: [
+                          SizedBox(height: size.height * 0.15),
+                          const NoPatientWidget(),
+                        ],
+                      );
+                    } else {
+                      List<Map<String, dynamic>> patients = snapshot.data!;
+
+                      patients.sort(
+                        (a, b) => a['patient_details']['fullname'].compareTo(
+                          b['patient_details']['fullname'],
+                        ),
+                      );
+
+                      return ListView.builder(
+                        itemCount: patients.length,
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> patientData = patients[index];
+                          return MonitoredPatientCard(
+                            patientData: patientData,
+                            onPop: refreshData,
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

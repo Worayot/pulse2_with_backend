@@ -22,7 +22,12 @@ class HomeExpandableCards extends StatefulWidget {
   final BuildContext context;
   final List isExpanded;
 
-  const HomeExpandableCards({super.key, required this.filteredPatients, required this.context, required this.isExpanded});
+  const HomeExpandableCards({
+    super.key,
+    required this.filteredPatients,
+    required this.context,
+    required this.isExpanded,
+  });
 
   @override
   _HomeExpandableCardsState createState() => _HomeExpandableCardsState();
@@ -30,7 +35,7 @@ class HomeExpandableCards extends StatefulWidget {
 
 class _HomeExpandableCardsState extends State<HomeExpandableCards> {
   bool enableToggleButton = true;
-  late StreamSubscription<List<String>> _streamSubscription; // Updated type to match the data (List<String>)
+  StreamSubscription<List<String>>? _streamSubscription;
   late List<String> _linkedPatient; // Initialize it with an empty list
   String userID = '';
 
@@ -45,31 +50,27 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
     }
   }
 
-  void _startListeningToStream() async {
+  Future<void> _startListeningToStream() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference patientsCollection = firestore.collection('patient_user_links');
-
-    // Get current nurse ID
     final currentUserId = await SecureStorage().read(key: 'nurseId');
     if (currentUserId == null) return;
 
-    // Firestore query with where clause
+    CollectionReference patientsCollection = firestore.collection(
+      'patient_user_links',
+    );
+
     _streamSubscription = patientsCollection
         .where('user_id', isEqualTo: currentUserId)
         .snapshots()
         .map((querySnapshot) {
-          List<String> patientIds = [];
-          for (var document in querySnapshot.docs) {
-            final data = document.data() as Map<String, dynamic>?;
-
-            if (data == null) continue;
-
-            final patientId = data['patient_id'] as String?;
-            if (patientId != null) {
-              patientIds.add(patientId);
-            }
-          }
-          return patientIds;
+          return querySnapshot.docs
+              .map(
+                (doc) =>
+                    (doc.data() as Map<String, dynamic>?)?['patient_id']
+                        as String?,
+              )
+              .whereType<String>()
+              .toList();
         })
         .listen((linkedPatients) {
           if (mounted) {
@@ -80,9 +81,14 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
         });
   }
 
+  Future<void> _initialize() async {
+    await loadUID(); // Load the nurse ID from SharedPreferences first
+    await _startListeningToStream();
+  }
+
   @override
   void dispose() {
-    _streamSubscription.cancel();
+    _streamSubscription?.cancel();
     super.dispose();
   }
 
@@ -91,7 +97,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
     super.initState();
     loadUID();
     _linkedPatient = [];
-    _startListeningToStream();
+    _initialize();
   }
 
   @override
@@ -101,6 +107,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
     List filteredPatients = widget.filteredPatients;
 
     return ListView.builder(
+      padding: EdgeInsets.only(top: 8),
       itemCount: filteredPatients.length,
       itemBuilder: (context, index) {
         Map<String, dynamic> patient = filteredPatients[index];
@@ -116,7 +123,10 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
         String patientID = patient['patient_id'];
         String time = patient['inspectionTime'];
 
-        String nextTimeText = time == '-' ? "${"latestInspection".tr()} -" : "${"latestInspection".tr()} $time${"n".tr()}";
+        String nextTimeText =
+            time == '-'
+                ? "${"latestInspection".tr()} -"
+                : "${"latestInspection".tr()} $time${"n".tr()}";
 
         return Padding(
           padding: const EdgeInsets.only(bottom: 16.0, left: 8, right: 8),
@@ -140,8 +150,22 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                         padding: const EdgeInsets.only(top: 16),
                         height: isExpanded[index] ? 380 : 82,
                         width: double.infinity,
-                        decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
-                        child: isExpanded[index] ? PatientIndData(age: age, gender: gender.tr(), hn: hn, bedNum: bedNum, ward: ward, MEWs: MEWs, time: time) : const SizedBox(),
+                        decoration: BoxDecoration(
+                          color: const Color(0xff98B1E8),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child:
+                            isExpanded[index]
+                                ? PatientIndData(
+                                  age: age,
+                                  gender: gender.tr(),
+                                  hn: hn,
+                                  bedNum: bedNum,
+                                  ward: ward,
+                                  MEWs: MEWs,
+                                  time: time,
+                                )
+                                : const SizedBox(),
                       ),
                     ),
                   ),
@@ -150,16 +174,27 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
 
               // Collapsed Header
               Container(
-                decoration: BoxDecoration(color: const Color(0xffE0EAFF), borderRadius: BorderRadius.circular(16)),
+                decoration: BoxDecoration(
+                  color: const Color(0xffE0EAFF),
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Stack(
                   children: [
                     Positioned(
                       bottom: 0, // Adjust the vertical position
                       right: 0, // Adjust the horizontal position
-                      child: IgnorePointer(child: Image.asset("assets/images/therapy3.png", fit: BoxFit.contain)),
+                      child: IgnorePointer(
+                        child: Image.asset(
+                          "assets/images/therapy3.png",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -174,25 +209,50 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "$name $surname",
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
-                                          shadows: [Shadow(color: Colors.black.withOpacity(0.25), offset: const Offset(0.8, 0.8), blurRadius: 1)],
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black.withOpacity(
+                                                0.25,
+                                              ),
+                                              offset: const Offset(0.8, 0.8),
+                                              blurRadius: 1,
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       RichText(
                                         text: TextSpan(
                                           children: [
-                                            TextSpan(text: "${"bedNumber".tr()} ", style: const TextStyle(fontSize: 11, color: Colors.black)),
-                                            TextSpan(text: bedNum, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black)),
+                                            TextSpan(
+                                              text: "${"bedNumber".tr()} ",
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: bedNum,
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
-                                      Text(nextTimeText, style: const TextStyle(fontSize: 11)),
+                                      Text(
+                                        nextTimeText,
+                                        style: const TextStyle(fontSize: 11),
+                                      ),
                                       const SizedBox(height: 2),
                                     ],
                                   ),
@@ -204,21 +264,36 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     setState(() {
                                       enableToggleButton = false;
                                     });
-                                    PatientUserLink link = PatientUserLink(patientID: patientID, userID: userID);
+                                    PatientUserLink link = PatientUserLink(
+                                      patientID: patientID,
+                                      userID: userID,
+                                    );
 
-                                    Map<int, String> status = await PatientService().takeIn(link: link);
+                                    Map<int, String> status =
+                                        await PatientService().takeIn(
+                                          link: link,
+                                        );
                                     int statusCode = status.keys.first;
-                                    String message = '$statusCode ${status.values.first}';
+                                    String message =
+                                        '$statusCode ${status.values.first}';
 
                                     if (statusCode == 200) {
                                     } else if (statusCode == 401) {
                                       if (mounted) {
-                                        LogoutService(navigator: Navigator.of(context)).logout();
-                                        FlushbarService().showErrorMessage(context: context, message: message);
+                                        LogoutService(
+                                          navigator: Navigator.of(context),
+                                        ).logout();
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: message,
+                                        );
                                       }
                                     } else {
                                       if (mounted) {
-                                        FlushbarService().showErrorMessage(context: context, message: message);
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: message,
+                                        );
                                       }
                                     }
 
@@ -232,11 +307,18 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     setState(() {
                                       enableToggleButton = false;
                                     });
-                                    bool takeOutState = await PatientService().takeOut(userId: userID, patientId: patientID);
+                                    bool takeOutState = await PatientService()
+                                        .takeOut(
+                                          userId: userID,
+                                          patientId: patientID,
+                                        );
                                     if (mounted) {
                                       if (takeOutState) {
                                       } else {
-                                        FlushbarService().showErrorMessage(context: context, message: 'failedToRemovePatient'.tr());
+                                        FlushbarService().showErrorMessage(
+                                          context: context,
+                                          message: 'failedToRemovePatient'.tr(),
+                                        );
                                       }
                                     }
 
@@ -245,7 +327,8 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     });
                                     EasyLoading.dismiss();
                                   },
-                                  buttonState: !_linkedPatient.contains(patientID),
+                                  buttonState:
+                                      !_linkedPatient.contains(patientID),
                                 ),
                                 const SizedBox(width: 8),
                                 buildActionButton(
@@ -264,17 +347,40 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
-                                          return EditPatientForm(patientId: patientID, name: name, surname: surname, age: age, gender: gender, hn: hn, bedNum: bedNum, ward: ward);
+                                          return EditPatientForm(
+                                            patientId: patientID,
+                                            name: name,
+                                            surname: surname,
+                                            age: age,
+                                            gender: gender,
+                                            hn: hn,
+                                            bedNum: bedNum,
+                                            ward: ward,
+                                          );
                                         },
                                       );
                                     },
                                     style: OutlinedButton.styleFrom(
                                       backgroundColor: Colors.white,
-                                      side: const BorderSide(color: Colors.white),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                                      side: const BorderSide(
+                                        color: Colors.white,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 2,
+                                        vertical: 4,
+                                      ),
                                     ),
-                                    child: Text("edit".tr(), style: const TextStyle(color: Color(0xff3362CC), fontSize: 16, fontWeight: FontWeight.bold)),
+                                    child: Text(
+                                      "edit".tr(),
+                                      style: const TextStyle(
+                                        color: Color(0xff3362CC),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -302,7 +408,13 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                         });
                       },
                     ),
-                    IgnorePointer(child: Icon(isExpanded[index] ? Icons.expand_less : Icons.expand_more)),
+                    IgnorePointer(
+                      child: Icon(
+                        isExpanded[index]
+                            ? Icons.expand_less
+                            : Icons.expand_more,
+                      ),
+                    ),
                   ],
                 ),
               ),

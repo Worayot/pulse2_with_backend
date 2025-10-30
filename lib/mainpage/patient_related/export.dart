@@ -45,7 +45,9 @@ class _ExportPageState extends State<ExportPage> {
   @override
   void initState() {
     super.initState();
-    FirebaseFirestore.instance.collection('patients').snapshots().listen((snapshot) {
+    FirebaseFirestore.instance.collection('patients').snapshots().listen((
+      snapshot,
+    ) {
       final patients =
           snapshot.docs.map((doc) {
             var patientData = doc.data();
@@ -94,24 +96,59 @@ class _ExportPageState extends State<ExportPage> {
             final lastName = nameParts.length > 1 ? nameParts[1] : "";
 
             // Apply name and other filters
-            final matchesFullname = _fullnameFilter.isEmpty || patient.fullname.trim().toLowerCase().contains(_fullnameFilter.toLowerCase().trim());
-            final matchesName = _nameController.text.isEmpty || firstName.toLowerCase().trim().contains(_nameController.text.toLowerCase().trim());
-            final matchesSurname = _surnameController.text.isEmpty || lastName.toLowerCase().trim().contains(_surnameController.text.toLowerCase().trim());
-            final matchesWard = _wardController.text.isEmpty || patient.ward.toLowerCase().trim().contains(_wardController.text.toLowerCase().trim());
+            final matchesFullname =
+                _fullnameFilter.isEmpty ||
+                patient.fullname.trim().toLowerCase().contains(
+                  _fullnameFilter.toLowerCase().trim(),
+                );
+            final matchesName =
+                _nameController.text.isEmpty ||
+                firstName.toLowerCase().trim().contains(
+                  _nameController.text.toLowerCase().trim(),
+                );
+            final matchesSurname =
+                _surnameController.text.isEmpty ||
+                lastName.toLowerCase().trim().contains(
+                  _surnameController.text.toLowerCase().trim(),
+                );
+            final matchesWard =
+                _wardController.text.isEmpty ||
+                patient.ward.toLowerCase().trim().contains(
+                  _wardController.text.toLowerCase().trim(),
+                );
 
             // Gender filter logic
             final matchesGender =
                 (_maleToggle == _femaleToggle) ||
-                (_maleToggle && patient.gender.toLowerCase().trim() == "male") ||
-                (_femaleToggle && patient.gender.toLowerCase().trim() == "female");
+                (_maleToggle &&
+                    patient.gender.toLowerCase().trim() == "male") ||
+                (_femaleToggle &&
+                    patient.gender.toLowerCase().trim() == "female");
 
             // Other filters
-            final matchesHospitalNumber = _hnController.text.isEmpty || patient.hospitalNumber.toLowerCase().trim().contains(_hnController.text.toLowerCase().trim());
-            final matchesBedNumber = _bedNumController.text.isEmpty || patient.bedNumber.toLowerCase().trim().contains(_bedNumController.text.toLowerCase().trim());
-            final matchesAge = (int.tryParse(patient.age)! >= _minAge) && (int.tryParse(patient.age)! <= _maxAge);
+            final matchesHospitalNumber =
+                _hnController.text.isEmpty ||
+                patient.hospitalNumber.toLowerCase().trim().contains(
+                  _hnController.text.toLowerCase().trim(),
+                );
+            final matchesBedNumber =
+                _bedNumController.text.isEmpty ||
+                patient.bedNumber.toLowerCase().trim().contains(
+                  _bedNumController.text.toLowerCase().trim(),
+                );
+            final matchesAge =
+                (int.tryParse(patient.age)! >= _minAge) &&
+                (int.tryParse(patient.age)! <= _maxAge);
 
             // Combine all conditions
-            return matchesName && matchesSurname && matchesWard && matchesGender && matchesHospitalNumber && matchesBedNumber && matchesAge && matchesFullname;
+            return matchesName &&
+                matchesSurname &&
+                matchesWard &&
+                matchesGender &&
+                matchesHospitalNumber &&
+                matchesBedNumber &&
+                matchesAge &&
+                matchesFullname;
           }).toList();
     });
   }
@@ -144,9 +181,12 @@ class _ExportPageState extends State<ExportPage> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(), // Prevent unnecessary scrolling
+                physics:
+                    const ClampingScrollPhysics(), // Prevent unnecessary scrolling
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.8,
+                  ),
                   child: SizedBox(
                     width: 400,
                     child: Stack(
@@ -155,7 +195,11 @@ class _ExportPageState extends State<ExportPage> {
                           top: 5,
                           right: 5,
                           child: IconButton(
-                            icon: const Icon(Icons.close, color: Colors.black, size: 30),
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.black,
+                              size: 30,
+                            ),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -164,14 +208,34 @@ class _ExportPageState extends State<ExportPage> {
                         Positioned(
                           bottom: 0,
                           right: 0,
-                          child: ClipRect(child: SizedBox(height: 280, child: Opacity(opacity: 1, child: Image.asset('assets/images/filter.png', fit: BoxFit.contain)))),
+                          child: ClipRect(
+                            child: SizedBox(
+                              height: 280,
+                              child: Opacity(
+                                opacity: 1,
+                                child: Image.asset(
+                                  'assets/images/filter.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Align(alignment: Alignment.centerLeft, child: Text('filterPatients'.tr(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'filterPatients'.tr(),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: 16.0),
                               _buildFilterInputs(),
                               StatefulBuilder(
@@ -190,9 +254,19 @@ class _ExportPageState extends State<ExportPage> {
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xff407BFF),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          12.0,
+                                        ),
+                                      ),
                                     ),
-                                    child: Text('filterData'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                    child: Text(
+                                      'filterData'.tr(),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -218,10 +292,26 @@ class _ExportPageState extends State<ExportPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(child: infoTextField(title: "name".tr(), controller: _nameController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-")),
+            Expanded(
+              child: infoTextField(
+                title: "name".tr(),
+                controller: _nameController,
+                boxColor: const Color(0xffE0EAFF),
+                context: context,
+                fillSpace: true,
+                hintText: "-",
+              ),
+            ),
             const SizedBox(width: 10),
             Expanded(
-              child: infoTextField(title: "surname".tr(), controller: _surnameController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-"),
+              child: infoTextField(
+                title: "surname".tr(),
+                controller: _surnameController,
+                boxColor: const Color(0xffE0EAFF),
+                context: context,
+                fillSpace: true,
+                hintText: "-",
+              ),
             ),
           ],
         ),
@@ -230,7 +320,15 @@ class _ExportPageState extends State<ExportPage> {
           padding: const EdgeInsets.symmetric(horizontal: 6.0),
           child: Column(
             children: [
-              Row(children: [Text("gender".tr(), textAlign: TextAlign.left, style: const TextStyle(fontWeight: FontWeight.bold))]),
+              Row(
+                children: [
+                  Text(
+                    "gender".tr(),
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
               const SizedBox(height: 3),
               Row(
                 children: [
@@ -243,7 +341,8 @@ class _ExportPageState extends State<ExportPage> {
                       onToggle: (value) {
                         _maleToggle = value;
                       },
-                      preferenceKey: "male_toggle_state", // Unique key for male toggle
+                      preferenceKey:
+                          "male_toggle_state", // Unique key for male toggle
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -256,7 +355,8 @@ class _ExportPageState extends State<ExportPage> {
                       onToggle: (value) {
                         _femaleToggle = value;
                       },
-                      preferenceKey: "female_toggle_state", // Unique key for female toggle
+                      preferenceKey:
+                          "female_toggle_state", // Unique key for female toggle
                     ),
                   ),
                 ],
@@ -268,22 +368,51 @@ class _ExportPageState extends State<ExportPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(child: infoTextField(title: "hn".tr(), controller: _hnController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-")),
+            Expanded(
+              child: infoTextField(
+                title: "hn".tr(),
+                controller: _hnController,
+                boxColor: const Color(0xffE0EAFF),
+                context: context,
+                fillSpace: true,
+                hintText: "-",
+              ),
+            ),
             const SizedBox(width: 10),
             Expanded(
-              child: infoTextField(title: "bedNumber".tr(), controller: _bedNumController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-"),
+              child: infoTextField(
+                title: "bedNumber".tr(),
+                controller: _bedNumController,
+                boxColor: const Color(0xffE0EAFF),
+                context: context,
+                fillSpace: true,
+                hintText: "-",
+              ),
             ),
           ],
         ),
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6.0),
-          child: infoTextField(title: "ward".tr(), controller: _wardController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-"),
+          child: infoTextField(
+            title: "ward".tr(),
+            controller: _wardController,
+            boxColor: const Color(0xffE0EAFF),
+            context: context,
+            fillSpace: true,
+            hintText: "-",
+          ),
         ),
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8),
-          child: Align(alignment: Alignment.centerLeft, child: Text("age".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "age".tr(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
         ),
       ],
     );
@@ -297,8 +426,12 @@ class _ExportPageState extends State<ExportPage> {
             activeTrackColor: Color(0xff4672D6), // Color of the active track
             inactiveTrackColor: Colors.grey, // Color of the inactive track
             thumbColor: Color(0xff5677C3), // Color of the thumb circle
-            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 16), // Thumb size (radius)
-            overlayColor: Colors.transparent, // Color of the overlay when the thumb is pressed
+            thumbShape: RoundSliderThumbShape(
+              enabledThumbRadius: 16,
+            ), // Thumb size (radius)
+            overlayColor:
+                Colors
+                    .transparent, // Color of the overlay when the thumb is pressed
             trackHeight: 6, // Height of the track
             rangeTrackShape: RectangularRangeSliderTrackShape(),
             valueIndicatorColor: Color(0xff407BFF),
@@ -308,9 +441,14 @@ class _ExportPageState extends State<ExportPage> {
             min: 0,
             max: 120,
             divisions: 120,
-            labels: RangeLabels('${_minAge.toInt()} ${"yrs".tr()}', '${_maxAge.toInt()} ${"yrs".tr()}'),
+            labels: RangeLabels(
+              '${_minAge.toInt()} ${"yrs".tr()}',
+              '${_maxAge.toInt()} ${"yrs".tr()}',
+            ),
             activeColor: const Color(0xff4672D6),
-            inactiveColor: const Color(0xffE0EAFF), // Set the inactive color (track)
+            inactiveColor: const Color(
+              0xffE0EAFF,
+            ), // Set the inactive color (track)
             onChanged: (values) {
               setState(() {
                 _minAge = values.start;
@@ -342,20 +480,30 @@ class _ExportPageState extends State<ExportPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Column(
-        children: [
-          const Gap(28),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Align(alignment: Alignment.topLeft, child: Text("exportData".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
-          ),
-          const Gap(20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            const Gap(28),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  "exportData".tr(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: getPageTitleSize(context),
+                  ),
+                ),
+              ),
+            ),
+            const Gap(8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
                     child: TextField(
                       onChanged: (value) {
                         setState(() {
@@ -367,13 +515,22 @@ class _ExportPageState extends State<ExportPage> {
                       decoration: InputDecoration(
                         hintText: "${"search".tr()}...",
 
-                        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15)), borderSide: BorderSide.none),
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
+                          borderSide: BorderSide.none,
+                        ),
 
-                        prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                        prefixIcon: const Icon(
+                          FontAwesomeIcons.magnifyingGlass,
+                          color: Colors.black,
+                        ),
                         suffixIcon:
                             _fullnameFilter.isNotEmpty
                                 ? IconButton(
-                                  icon: const Icon(Icons.clear, color: Colors.black),
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    color: Colors.black,
+                                  ),
                                   onPressed: () {
                                     setState(() {
                                       _searchController.clear();
@@ -384,108 +541,172 @@ class _ExportPageState extends State<ExportPage> {
                                 )
                                 : null,
                         filled: true, // Enables the background color
-                        fillColor: const Color(0xffCADBFF), // Sets the background color
+                        fillColor: const Color(
+                          0xffCADBFF,
+                        ), // Sets the background color
                         labelStyle: const TextStyle(color: Colors.black),
                       ),
                       style: const TextStyle(color: Colors.black),
                     ),
                   ),
-                ),
-                const Gap(8),
-                SizedBox(
-                  // height: sbs.getHeight(),
-                  child: ElevatedButton(
-                    onPressed: () {
+                  const Gap(8),
+                  GestureDetector(
+                    onTap: () {
                       showFilterDialog(context);
                     },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-                      backgroundColor: const Color(0xff407BFF),
-                      // fixedSize: Size.fromHeight(sbs.getHeight()),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(FontAwesomeIcons.filter, color: Color(0xffCADBFF)),
-                        const SizedBox(width: 5),
-                        Text('filterData'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Gap(8),
-          Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: buildPatientCards())),
-          const Gap(8),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                InkWell(
-                  onTap: _resetFilters,
-                  child: Text(
-                    'resetFilters'.tr(),
-                    style: TextStyle(
-                      color: Colors.red, // Set text color to red
-                      decoration: TextDecoration.underline, // Add underline
-                      decorationColor: Colors.red, // Set underline color to red
-                      fontWeight: FontWeight.bold,
-                      // fontSize: size.width * 0.035,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                SizedBox(width: size.width * 0.035),
-                GestureDetector(
-                  onTap:
-                      enableButton
-                          ? () async {
-                            setState(() {
-                              enableButton = false;
-                            });
-                            try {
-                              bool result = await showWarningDialog(context); // Wait for user choice
-                              final navigator = Navigator.of(context);
-                              if (result && mounted) {
-                                // bool status = await _exportAll();
-                                Map<int, String> status = await _exportAll();
-                                ValidateService(status: status, navigator: navigator).validate();
-                              }
-                            } catch (e) {
-                              if (mounted) {
-                                FlushbarService().showErrorMessage(context: context, message: 'An unexpected error occurred: $e');
-                              }
-                            } finally {
-                              if (mounted) {
-                                setState(() {
-                                  enableButton = true;
-                                });
-                              }
-                            }
-                          }
-                          : () {},
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    height: 40,
-                    decoration: BoxDecoration(color: const Color(0xff407BFF), borderRadius: BorderRadius.circular(8)),
-                    child: Center(
-                      child: Text(
-                        '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      height: 55,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: const Color(0xff407BFF),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            FontAwesomeIcons.filter,
+                            color: Color(0xffCADBFF),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'filterData'.tr(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     showFilterDialog(context);
+                  //   },
+                  //   style: ElevatedButton.styleFrom(
+                  //     elevation: 0,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(15),
+                  //     ),
+                  //     padding: EdgeInsets.symmetric(
+                  //       vertical: 16,
+                  //       horizontal: 10,
+                  //     ),
+                  //     backgroundColor: const Color(0xff407BFF),
+                  //   ),
+                  //   child: Row(
+                  //     children: [
+                  //       const Icon(
+                  //         FontAwesomeIcons.filter,
+                  //         color: Color(0xffCADBFF),
+                  //       ),
+                  //       const SizedBox(width: 5),
+                  //       Text(
+                  //         'filterData'.tr(),
+                  //         style: const TextStyle(
+                  //           color: Colors.white,
+                  //           fontWeight: FontWeight.bold,
+                  //           fontSize: 14,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
-          ),
-        ],
+            const Gap(8),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: buildPatientCards(),
+              ),
+            ),
+            const Gap(8),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: _resetFilters,
+                    child: Text(
+                      'resetFilters'.tr(),
+                      style: TextStyle(
+                        color: Colors.red, // Set text color to red
+                        decoration: TextDecoration.underline, // Add underline
+                        decorationColor:
+                            Colors.red, // Set underline color to red
+                        fontWeight: FontWeight.bold,
+                        // fontSize: size.width * 0.035,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: size.width * 0.035),
+                  GestureDetector(
+                    onTap:
+                        enableButton
+                            ? () async {
+                              setState(() {
+                                enableButton = false;
+                              });
+                              try {
+                                bool result = await showWarningDialog(
+                                  context,
+                                ); // Wait for user choice
+                                final navigator = Navigator.of(context);
+                                if (result && mounted) {
+                                  // bool status = await _exportAll();
+                                  Map<int, String> status = await _exportAll();
+                                  ValidateService(
+                                    status: status,
+                                    navigator: navigator,
+                                  ).validate();
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  FlushbarService().showErrorMessage(
+                                    context: context,
+                                    message: 'An unexpected error occurred: $e',
+                                  );
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() {
+                                    enableButton = true;
+                                  });
+                                }
+                              }
+                            }
+                            : () {},
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xff407BFF),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -494,7 +715,8 @@ class _ExportPageState extends State<ExportPage> {
     EasyLoading.show();
     final exportServices = ExportServices();
 
-    List<String> patientIds = _filteredPatients.map((patient) => patient.patientId ?? '').toList();
+    List<String> patientIds =
+        _filteredPatients.map((patient) => patient.patientId ?? '').toList();
 
     Map<int, String> status = await exportServices.export(patientIds);
     EasyLoading.dismiss();

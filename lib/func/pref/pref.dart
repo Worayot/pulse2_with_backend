@@ -25,7 +25,7 @@ Future<void> saveStringPreference(
   BuildContext context,
 ) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString(key, value); // Save the string value
+  await prefs.setString(key, value);
 
   final userDataProvider = Provider.of<UserDataProvider>(
     context,
@@ -35,6 +35,8 @@ Future<void> saveStringPreference(
   // Ensure correct values are updated based on the key
   if (key == 'name') {
     userDataProvider.updateUserName(value);
+  } else if (key == 'password') {
+    userDataProvider.updatePassword(value);
   } else if (key == 'nurseID') {
     userDataProvider.updateUserNurseID(value);
   } else if (key == 'role') {
