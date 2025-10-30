@@ -46,12 +46,5 @@ class UserDataProvider extends ChangeNotifier {
 
     await storage.write(key: 'password', value: password);
     await loadUserData();
-
-    // Save a boolean preference and notify listeners
-    Future<void> savePreference(String key, bool value) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(key, value); // Save the boolean value
-      notifyListeners(); // Notify listeners that preference has changed
-    }
   }
 }

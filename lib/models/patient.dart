@@ -35,7 +35,14 @@ class Patient {
   }
 
   Map<String, dynamic> toJson() {
-    return {'age': age, 'bed_number': bedNumber, 'fullname': fullname, 'gender': gender, 'ward': ward, 'hospital_number': hospitalNumber};
+    return {
+      'age': age,
+      'bed_number': bedNumber,
+      'fullname': fullname,
+      'gender': gender,
+      'ward': ward,
+      'hospital_number': hospitalNumber,
+    };
   }
 
   @override

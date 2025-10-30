@@ -1,10 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/utils/report_widget.dart';
 
-void showPatientDetails(BuildContext context, var patient) {
+void showPatientDetails(BuildContext context, Patient patient) {
   final screenHeight = MediaQuery.of(context).size.height;
-  String fullname = patient["fullname"];
+  String fullname = patient.fullname;
   List nameParts = fullname.split(' ');
   String name = nameParts[0];
   String surname = nameParts[1];
@@ -82,7 +83,7 @@ void showPatientDetails(BuildContext context, var patient) {
                                 child: displayData(
                                   context,
                                   "age".tr(),
-                                  "${patient["age"]}",
+                                  patient.age,
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -90,7 +91,7 @@ void showPatientDetails(BuildContext context, var patient) {
                                 child: displayData(
                                   context,
                                   "gender".tr(),
-                                  '${patient["gender"]}'.tr(),
+                                  patient.gender.tr(),
                                 ),
                               ),
                             ],
@@ -98,19 +99,19 @@ void showPatientDetails(BuildContext context, var patient) {
                           displayData(
                             context,
                             "bedNumber".tr(),
-                            patient["bed_number"],
+                            patient.bedNumber,
                           ),
                           displayData(
                             context,
                             "hn".tr(),
-                            patient["hospital_number"],
+                            patient.hospitalNumber,
                           ),
-                          displayData(context, "ward".tr(), patient["ward"]),
+                          displayData(context, "ward".tr(), patient.ward),
                           SizedBox(
                             height: screenHeight * 0.6,
                             child: ReportWidget(
                               tableHeight: screenHeight * 0.5,
-                              patientID: patient['patient_id'],
+                              patientID: patient.patientId ?? '',
                             ),
                           ),
                         ],
