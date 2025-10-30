@@ -38,7 +38,6 @@ class _PatientIndDataState extends State<PatientIndData> {
     return Padding(
       padding: const EdgeInsets.only(right: 16, left: 16.0, top: 60),
       child: SingleChildScrollView(
-        // Wrapping with SingleChildScrollView to handle overflow
         child: Column(
           children: [
             Column(
@@ -149,7 +148,7 @@ class _PatientIndDataState extends State<PatientIndData> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8),
                 child: Text(
                   "${"latestMEWsScore".tr()} ",
                   style: const TextStyle(fontWeight: FontWeight.bold),

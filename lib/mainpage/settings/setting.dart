@@ -68,7 +68,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: const SafeArea(bottom: false, child: Header())),
+      appBar: AppBar(
+        title: const SafeArea(bottom: false, child: Header()),
+        toolbarHeight: size.height * 0.13,
+      ),
       body: Stack(
         children: [
           Padding(
