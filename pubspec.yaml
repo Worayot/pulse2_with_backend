@@ -1,8 +1,8 @@
 name: tuh_mews
 description: "TUH MEWS Project"
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.1+2
+version: 1.0.2+3
 
 environment:
   sdk: ^3.7.0
@@ -21,7 +21,7 @@ dependencies:
   firebase_auth: ^5.5.0
   flutter_secure_storage: ^9.2.4
   flutter_slidable: ^3.1.1
-  firebase_database: ^11.3.3 
+  firebase_database: ^11.3.3
   cloud_firestore: ^5.6.4
   shared_preferences: ^2.3.2
   intl: ^0.20.2
@@ -55,7 +55,7 @@ dev_dependencies:
   freezed: ^3.1.0
   flutter_test:
     sdk: flutter
-  integration_test: 
+  integration_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
@@ -72,7 +72,7 @@ flutter:
     - assets/icons/
     - assets/images/flags/
     - assets/images/emojis/
-    - assets/quotes/quotes.json 
+    - assets/quotes/quotes.json
     - assets/audio/alarm.mp3
   fonts:
     - family: SpaceGrotesk
