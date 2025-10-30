@@ -127,7 +127,7 @@ class _AdminPageState extends State<AdminPage> {
                         },
                       );
                     },
-                    icon: Icon(FontAwesomeIcons.personCirclePlus, size: 40, color: Colors.white),
+                    icon: Icon(FontAwesomeIcons.personCirclePlus, size: 26, color: Colors.white),
                     label: Padding(
                       padding: const EdgeInsets.only(left: 4.0, top: 20, bottom: 20),
                       child: Align(

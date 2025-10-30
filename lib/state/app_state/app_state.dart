@@ -9,7 +9,6 @@ class LocaleConverter implements JsonConverter<Locale, String> {
 
   @override
   Locale fromJson(String json) {
-    // Handle locale format like "en", "en_US"
     final parts = json.split('_');
     if (parts.length == 2) {
       return Locale(parts[0], parts[1]);

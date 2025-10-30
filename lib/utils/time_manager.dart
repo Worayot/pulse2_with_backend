@@ -150,8 +150,7 @@ void showTimeManager({
                                           });
                                           DateTime now = DateTime.now();
                                           DateTime recordTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute, now.second);
-
-                                          DateTime notificationTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute);
+                                          DateTime notificationTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute, now.second);
 
                                           if (notificationTime.isBefore(now)) {
                                             notificationTime = notificationTime.add(Duration(days: 1));
@@ -165,7 +164,7 @@ void showTimeManager({
 
                                           try {
                                             Map<int, String> status = await MEWsService().addNewInspection(inspectionNote: newInspection);
-                                            //! Change this later
+
                                             if (status.containsKey(200)) {
                                               String desc = "";
                                               String stringToHash = patientID + recordTime.toString();
@@ -174,7 +173,6 @@ void showTimeManager({
 
                                               var alarmSettings = AlarmSettings(
                                                 id: alarmId,
-
                                                 dateTime: notificationTime,
                                                 assetAudioPath: "assets/audio/alarm.mp3",
                                                 loopAudio: false,
@@ -196,7 +194,7 @@ void showTimeManager({
 
                                               // Set alarm 5 minutes before the initial alarm
                                               if (notificationTime.difference(now).inMinutes > 5) {
-                                                DateTime secondNotificationTime = recordTime.subtract(const Duration(minutes: 5));
+                                                DateTime secondNotificationTime = notificationTime.subtract(const Duration(minutes: 5));
                                                 String secondStringToHash = patientID + secondNotificationTime.toString();
 
                                                 int secondAlarmId = StringTransformer().generateID(secondStringToHash);
@@ -205,7 +203,7 @@ void showTimeManager({
                                                   id: secondAlarmId,
                                                   dateTime: notificationTime.subtract(const Duration(minutes: 5)),
                                                 );
-                                                await AlarmService().setAlarm(alarmSettingsBefore); // Use the service
+                                                await AlarmService().setAlarm(alarmSettingsBefore);
                                                 desc += ', ${secondNotificationTime.toString().split('.')[0]}';
                                               }
                                               if (context.mounted) {
@@ -263,8 +261,7 @@ void showTimeManager({
 // Function to initialize the timezone database
 Future<void> _loadTimezone() async {
   tzdata.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation('Asia/Bangkok')); // Set local timezone
-  print("Timezone initialized!");
+  tz.setLocalLocation(tz.getLocation('Asia/Bangkok'));
 }
 
 // Save active alarm ID to SharedPreferences
@@ -286,20 +283,6 @@ Future<void> stopAlarm(int alarmId) async {
   alarmIds.remove(alarmId.toString());
   await prefs.setStringList('activeAlarms', alarmIds);
 }
-
-// Stop all active alarms
-// Future<void> stopAllAlarms() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
-
-//   for (String id in alarmIds) {
-//     await Alarm.stop(int.parse(id));
-//     print('Alarm $id stopped');
-//   }
-
-//   // Clear stored alarms
-//   await prefs.remove('activeAlarms');
-// }
 
 //* Function that will be triggered when the alarm goes off
 // void onAlarmTriggered(int alarmId) async {

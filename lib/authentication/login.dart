@@ -232,7 +232,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
                                   focusedErrorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 2)),
                                 ),
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.numberWithOptions(decimal: false),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return "plsEnterNurseID".tr(); // Use .tr() if localized

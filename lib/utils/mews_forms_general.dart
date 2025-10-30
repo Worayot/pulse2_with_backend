@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tuh_mews/func/calculateMEWs.dart';
+import 'package:tuh_mews/func/calculate_mews.dart';
 import 'package:tuh_mews/results/result_screens_general.dart';
 
 class MEWsFormsGeneral extends StatefulWidget {
@@ -42,7 +42,12 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
 
   @override
   Widget build(BuildContext context) {
-    return _showMEWsForms(context);
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: _showMEWsForms(context),
+    );
   }
 
   Widget _showMEWsForms(BuildContext context) {
@@ -107,7 +112,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
-                          // RegExp(r'^\d*\.?\d*$'), //! Many decimal place
+                          // RegExp(r'^\d*\.?\d*$'), //- Many decimal place
                           RegExp(r'^\d{0,3}(\.\d{0,1})?$'), //* 1 decimal place
                         ), // Allows only numbers and one decimal point
                       ],
@@ -140,7 +145,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: heartRateController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: "-",
@@ -171,7 +176,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                     height: 40,
                     child: TextField(
                       controller: respiratoryRateController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         suffix: const Text("bpm", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -212,7 +217,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                                   }
                                 },
                                 controller: sysBloodPressureController,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.numberWithOptions(decimal: false),
                                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 decoration: InputDecoration(
                                   hintText: '-',
@@ -240,7 +245,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                               child: TextField(
                                 focusNode: diasBpFocusNode,
                                 controller: diaBloodPressureController,
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.numberWithOptions(decimal: false),
                                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 decoration: InputDecoration(
                                   hintText: '-',
@@ -273,7 +278,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                     height: 40,
                     child: TextField(
                       controller: spo2Controller,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
@@ -301,7 +306,7 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: urineController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
@@ -323,7 +328,6 @@ class _MEWsFormsGeneralState extends State<MEWsFormsGeneral> {
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: cvpController,
-                      // keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: '-',
 

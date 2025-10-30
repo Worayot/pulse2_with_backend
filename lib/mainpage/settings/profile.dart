@@ -101,7 +101,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
           // Update user data and send the new password to the backend
           userServices.saveUserData(
             newUserData: User(
-              fullname: _name,
+              fullname: _name.trim(),
               nurseId: _nurseID,
               password: _passwordController.text.trim(), // Use the controller value
               role: _role,
@@ -148,6 +148,16 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
               decoration: BoxDecoration(color: const Color(0xFFB2C2E5), borderRadius: BorderRadius.circular(12)),
               child: Stack(
                 children: [
+                  Positioned(
+                    bottom: -50,
+                    right: -30,
+                    child: IgnorePointer(
+                      child: Image.asset(
+                        "assets/images/ambulance.png",
+                        height: size.width * 0.7, // Set height
+                      ),
+                    ),
+                  ),
                   Column(
                     children: [
                       Padding(
@@ -344,16 +354,6 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                         ),
                       ),
                     ],
-                  ),
-                  Positioned(
-                    bottom: -50,
-                    right: -30,
-                    child: IgnorePointer(
-                      child: Image.asset(
-                        "assets/images/ambulance.png",
-                        height: size.width * 0.7, // Set height
-                      ),
-                    ),
                   ),
                 ],
               ),
