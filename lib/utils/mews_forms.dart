@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tuh_mews/func/calculateMEWs.dart';
+import 'package:tuh_mews/func/calculate_mews.dart';
 import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';

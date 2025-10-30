@@ -12,6 +12,7 @@ import 'package:tuh_mews/provider/user_data_provider.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tuh_mews/services/alarm_services.dart';
+import 'package:upgrader/upgrader.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,19 +64,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'TUH MEWs',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(selectedItemColor: Colors.blue, unselectedItemColor: Colors.grey),
+    final upgrader = Upgrader(
+      debugLogging: true,
+      countryCode: 'TH',
+      debugDisplayAlways: false,
+      durationUntilAlertAgain: const Duration(days: 1),
+      messages: null,
+      storeController: UpgraderStoreController(onAndroid: () => UpgraderPlayStore(), oniOS: () => UpgraderAppStore()),
+    );
+
+    return UpgradeAlert(
+      upgrader: upgrader,
+      barrierDismissible: false,
+      child: MaterialApp(
+        title: 'TUH MEWs',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(selectedItemColor: Colors.blue, unselectedItemColor: Colors.grey),
+        ),
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale,
+        // home: const NavigationPage(),
+        home: const NavigationPage(),
+        builder: EasyLoading.init(),
       ),
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      // home: const NavigationPage(),
-      home: const NavigationPage(),
-      builder: EasyLoading.init(),
     );
   }
 }

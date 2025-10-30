@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
 import '../models/user.dart';
+import 'package:bcrypt/bcrypt.dart';
 
 class UserServices {
   Future<Map<String, dynamic>?> loadAccount(String userId) async {
@@ -50,19 +50,18 @@ class UserServices {
   }
 
   // Tested
-  Future<Map<int, String>> saveUserData({required User newUserData, required String uid}) async {
+  Future<Map<int, String>> saveUserData({
+    required User newUserData,
+    required String uid, // This is your 'nurse_id'
+  }) async {
     try {
-      // Step 1: Ensure user is authenticated
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        return {401: 'No authenticated user found'};
-      }
-
       final userMap = newUserData.toJson();
 
       if (userMap['password'] != null && userMap['password'].toString().isNotEmpty) {
         final password = userMap['password'].toString();
-        final hashed = sha256.convert(utf8.encode(password)).toString();
+
+        final String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
+
         userMap['password'] = hashed;
       }
 

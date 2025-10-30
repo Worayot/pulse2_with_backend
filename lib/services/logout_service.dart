@@ -12,8 +12,11 @@ class LogoutService {
   LogoutService({required this.navigator});
 
   Future<Map<int, String>> logout() async {
-    final secureStoreage = SecureStorage();
-    secureStoreage.delete(key: 'session_cookie'); // Clear session cookie
+    final secureStorage = SecureStorage();
+    secureStorage.delete(key: 'session_cookie');
+    secureStorage.delete(key: 'nurseId');
+    secureStorage.delete(key: 'password');
+    secureStorage.delete(key: 'rememberMe');
     await AlarmService().stopAllAlarms();
 
     await navigator.pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const LoginPage()), (Route<dynamic> route) => false);
@@ -23,9 +26,7 @@ class LogoutService {
     if (idToken == null) {
       return {401: 'No token found'};
     }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/authenticate/logout', //* Logout route
-    );
+    final url = Uri.parse('${URL().getServerURL()}/authenticate/logout');
 
     try {
       final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"});
