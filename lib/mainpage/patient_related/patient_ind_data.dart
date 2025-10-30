@@ -8,10 +8,19 @@ class PatientIndData extends StatefulWidget {
   final String hn;
   final String bedNum;
   final String ward;
-  final String MEWs;
+  final String mews;
   final String time;
 
-  const PatientIndData({super.key, required this.age, required this.gender, required this.hn, required this.bedNum, required this.ward, required this.time, required this.MEWs});
+  const PatientIndData({
+    super.key,
+    required this.age,
+    required this.gender,
+    required this.hn,
+    required this.bedNum,
+    required this.ward,
+    required this.time,
+    required this.mews,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -37,21 +46,55 @@ class _PatientIndDataState extends State<PatientIndData> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(child: infoBox(title: "age".tr(), content: widget.age, boxColor: Colors.white, context: context)),
-                    Expanded(child: infoBox(title: "gender".tr(), content: widget.gender, boxColor: Colors.white, context: context)),
+                    Expanded(
+                      child: infoBox(
+                        title: "age".tr(),
+                        content: widget.age,
+                        boxColor: Colors.white,
+                        context: context,
+                      ),
+                    ),
+                    Expanded(
+                      child: infoBox(
+                        title: "gender".tr(),
+                        content: widget.gender,
+                        boxColor: Colors.white,
+                        context: context,
+                      ),
+                    ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(child: infoBox(title: "hn".tr(), content: widget.hn, boxColor: Colors.white, context: context)),
-                    Expanded(child: infoBox(title: "bedNumber".tr(), content: widget.bedNum, boxColor: Colors.white, context: context)),
+                    Expanded(
+                      child: infoBox(
+                        title: "hn".tr(),
+                        content: widget.hn,
+                        boxColor: Colors.white,
+                        context: context,
+                      ),
+                    ),
+                    Expanded(
+                      child: infoBox(
+                        title: "bedNumber".tr(),
+                        content: widget.bedNum,
+                        boxColor: Colors.white,
+                        context: context,
+                      ),
+                    ),
                   ],
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Padding(padding: const EdgeInsets.only(left: 8.0), child: Align(alignment: Alignment.centerLeft, child: Text("ward".tr(), textAlign: TextAlign.left))),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("ward".tr(), textAlign: TextAlign.left),
+                      ),
+                    ),
                     const SizedBox(height: 5),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -59,12 +102,20 @@ class _PatientIndDataState extends State<PatientIndData> {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: Colors.white, // Background color
-                          borderRadius: BorderRadius.circular(12), // Rounded corners
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          ), // Rounded corners
                         ),
-                        child: Padding(padding: const EdgeInsets.all(8), child: Text(widget.ward, style: const TextStyle(color: Colors.black))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(
+                            widget.ward,
+                            style: const TextStyle(color: Colors.black),
+                          ),
+                        ),
                       ),
                     ),
-                    description(widget.time, widget.MEWs),
+                    description(widget.time, widget.mews),
                   ],
                 ),
               ],
@@ -83,7 +134,13 @@ class _PatientIndDataState extends State<PatientIndData> {
           child: Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [Text("${"latestInspection".tr()} ", style: const TextStyle(fontWeight: FontWeight.bold)), Text("$time${"n".tr()}")],
+              children: [
+                Text(
+                  "${"latestInspection".tr()} ",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text("$time${"n".tr()}"),
+              ],
             ),
           ),
         ),
@@ -91,8 +148,20 @@ class _PatientIndDataState extends State<PatientIndData> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(padding: const EdgeInsets.only(top: 8.0), child: Text("${"latestMEWsScore".tr()} ", style: const TextStyle(fontWeight: FontWeight.bold))),
-              Text(MEWs, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "${"latestMEWsScore".tr()} ",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Text(
+                MEWs,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ),

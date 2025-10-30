@@ -2,10 +2,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
-import 'package:tuh_mews/utils/patient_card_home.dart';
+import 'package:tuh_mews/utils/patient_in_system/home_card_data.dart';
+import 'package:tuh_mews/utils/patient_in_system/patient_card_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tuh_mews/utils/symbols_dialog/home_symbols.dart';
 import 'package:tuh_mews/utils/symbols_dialog/info_dialog.dart';
@@ -57,7 +59,6 @@ class _PatientInSystemState extends State<PatientInSystem> {
         .toList();
   }
 
-  // Stream to listen to real-time updates from Firestore
   Stream<List<Map<String, dynamic>>> getPatientsStream() {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     CollectionReference patientsCollection = firestore.collection('patients');
@@ -125,7 +126,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
                       },
                       child: const FaIcon(
                         FontAwesomeIcons.circleInfo,
-                        size: 28, // Responsive icon size
+                        size: 28,
                         color: Color(0xff3362CC),
                       ),
                     ),
@@ -234,15 +235,48 @@ class _PatientInSystemState extends State<PatientInSystem> {
                       return NoPatientWidget();
                     }
 
-                    List isExpanded = List.generate(
-                      filteredPatients.length,
-                      (index) => false,
-                    );
+                    return ListView.separated(
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: filteredPatients.length,
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const Gap(8);
+                      },
+                      itemBuilder: (BuildContext context, int index) {
+                        final data = filteredPatients[index];
 
-                    return HomeExpandableCards(
-                      filteredPatients: filteredPatients,
-                      context: context,
-                      isExpanded: isExpanded,
+                        final timestamp = data['created_at'];
+                        DateTime? createdAt;
+                        if (timestamp != null && timestamp is Timestamp) {
+                          createdAt = timestamp.toDate().toLocal().toUtc();
+                        }
+
+                        final timeString = data['inspectionTime'] as String?;
+                        TimeOfDay? inspectionTime;
+                        if (timeString != null && timeString.contains(':')) {
+                          final parts = timeString.split(':');
+                          final hour = int.tryParse(parts[0]) ?? 0;
+                          final minute = int.tryParse(parts[1]) ?? 0;
+                          inspectionTime = TimeOfDay(
+                            hour: hour,
+                            minute: minute,
+                          );
+                        }
+
+                        return HomeExpandableCards(
+                          data: HomeCardData(
+                            fullname: data['fullname'] as String?,
+                            gender: data['gender'] as String?,
+                            hn: data['hospital_number']?.toString(),
+                            age: data['age']?.toString(),
+                            bedNum: data['bed_number']?.toString(),
+                            ward: data['ward']?.toString(),
+                            mews: data['MEWs']?.toString(),
+                            patientID: data['patient_id'] as String?,
+                            createdAt: createdAt,
+                            inspectionTime: inspectionTime,
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
