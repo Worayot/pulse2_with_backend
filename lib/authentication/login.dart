@@ -216,17 +216,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    // final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    return Stack(
-      children: [
-        Scaffold(
-          // resizeToAvoidBottomInset: false,
-          backgroundColor: Colors.white,
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: SingleChildScrollView(
+    return Scaffold(
+      // resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Stack(
+            children: [
+              Positioned(
+                top: size.height / 12,
+                left: -36,
+                child: SizedBox(
+                  width: size.width * 0.35,
+                  height: size.width * 0.35,
+
+                  child: Image.asset(
+                    'assets/images/img_login_top.png',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(24.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -441,39 +453,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ],
                 ),
               ),
-            ),
+            ],
           ),
         ),
-        Positioned(
-          top: size.height / 12,
-          left: -36,
-          child: SizedBox(
-            width: size.width * 0.35,
-            height: size.width * 0.35,
-
-            child: Image.asset(
-              'assets/images/img_login_top.png',
-              fit: BoxFit.contain, // Adjust the image's fit to your needs
-            ),
-          ),
-        ),
-
-        // Positioned(
-        //   bottom: -keyboardHeight, // Adjust bottom position so it overlaps with the card
-        //   left: 0,
-        //   right: 0,
-        //   child: SizedBox(
-        //     width: size.width / 4.5, // Full width of the screen
-        //     height: size.height / 4.5, // Adjust height as needed
-        //     child: IgnorePointer(
-        //       child: Image.asset(
-        //         'assets/images/img_login_bottom.png',
-        //         fit: BoxFit.contain, // Stretch the image to cover the container
-        //       ),
-        //     ),
-        //   ),
-        // ),
-      ],
+      ),
     );
   }
 }

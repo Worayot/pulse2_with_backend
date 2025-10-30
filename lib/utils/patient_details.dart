@@ -10,6 +10,8 @@ void showPatientDetails(BuildContext context, Patient patient) {
   String name = nameParts[0];
   String surname = nameParts[1];
 
+  print('Patient: $patient');
+
   showDialog(
     context: context,
     builder: (BuildContext context) {

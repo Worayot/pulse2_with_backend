@@ -97,11 +97,9 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
 
   @override
   Widget build(BuildContext context) {
-    print('_linkedPatient: ${_linkedPatient}');
-
     final data = widget.data;
     String fullname = data.fullname ?? '';
-    final nameParts = fullname.split('');
+    final nameParts = fullname.split(' ');
     String name = nameParts[0];
     String surname = nameParts[1];
     String age = data.age ?? '';
@@ -125,6 +123,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
       gender: gender,
       ward: ward,
       hospitalNumber: hn,
+      patientId: patientID,
     );
 
     String nextTimeText =
