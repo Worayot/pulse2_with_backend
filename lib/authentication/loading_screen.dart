@@ -35,12 +35,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Future<void> fetchUserAccount() async {
     UserServices userServices = UserServices();
     accountData = await userServices.loadAccount(widget.userId);
-
-    // if (accountData != null && accountData!.isNotEmpty) {
-    //   print("Successfully loaded account data.");
-    // } else {
-    //   print("Failed to load account data.");
-    // }
   }
 
   // Save encrypted password
@@ -61,42 +55,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
       await savePassword(widget.password);
 
       setState(() {
-        name = fullname; // Ensure the name is updated to the correct value
+        name = fullname;
       });
 
-      // Call the function to schedule notifications for this user
-      await fetchAndScheduleNotification(accountData!['nurse_id']); // Pass userId to fetch notifications
-
-      // Navigate to the main page
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigationPage()), (route) => false);
     } else {
-      print("Error loading user's data");
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
     }
   }
 
-  // Notification scheduling logic (You need to implement this function in your schedule_notification.dart)
-  Future<void> fetchAndScheduleNotification(String userId) async {
-    // Mock notification time fetch
-    // Replace this with your logic to fetch user-specific notification time from Firestore or any backend
-    var notificationTime = DateTime.now().add(Duration(seconds: 10)); // Just for testing
-
-    await _scheduleNotification(notificationTime);
-  }
-
-  Future<void> _scheduleNotification(DateTime notificationTime) async {
-    // This is where you would schedule your notification using a package like flutter_local_notifications
-    print('Scheduling notification for: $notificationTime');
-
-    // Assuming you are using flutter_local_notifications, the notification scheduling would go here.
-    // This is a simple mock for demonstration purposes.
-    // await Future.delayed(Duration(seconds: 2));
-    print('Notification scheduled for: $notificationTime');
-  }
-
   @override
   Widget build(BuildContext context) {
-    //! Change this to user's name
     return LoadingBar(context: context, name: name).build();
   }
 }

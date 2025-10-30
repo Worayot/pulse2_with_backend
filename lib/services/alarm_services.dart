@@ -1,6 +1,5 @@
 // alarm_service.dart
 import 'package:alarm/alarm.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -22,11 +21,7 @@ class AlarmService {
         deleteAlarmFromPrefs(triggeredAlarm.id); // Use your delete function
         // Add your logic to handle the ringing alarm (e.g., show a dialog, play sound)
       });
-      final fileExists = await rootBundle
-          .load('assets/audio/alarm.mp3')
-          .then((_) => true)
-          .catchError((_) => false);
-      // print("Audio file exists: $fileExists");
+      await rootBundle.load('assets/audio/alarm.mp3').then((_) => true).catchError((_) => false);
 
       _isInitialized = true;
       // print('Alarm Service Initialized');

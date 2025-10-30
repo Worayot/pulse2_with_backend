@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
@@ -31,15 +31,16 @@ class _AddPatientFormState extends State<AddPatientForm> {
 
   Future<void> _submitForm() async {
     if (_isSubmitting) {
-      // If already submitting, do nothing
       return;
     }
 
     setState(() {
-      _isSubmitting = true; // Set submitting flag to true
+      _isSubmitting = true;
     });
 
     if (_formKey.currentState!.validate()) {
+      EasyLoading.show();
+
       String fullname = '${nameController.text} ${surnameController.text}';
       Patient patient = Patient(
         fullname: fullname,
@@ -54,9 +55,12 @@ class _AddPatientFormState extends State<AddPatientForm> {
       int statusCode = status.keys.first;
       String message = '$statusCode ${status.values.first}';
 
+      EasyLoading.dismiss();
+
       if (mounted) {
+        // EasyLoading.dismiss();
         if (statusCode == 200) {
-          Navigator.pop(context); // Pop the form if successful
+          Navigator.pop(context);
         } else if (statusCode == 401) {
           LogoutService(navigator: Navigator.of(context)).logout();
           FlushbarService().showErrorMessage(context: context, message: message);
@@ -114,7 +118,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
       );
       return;
     } else {
-      _submitForm(); // Proceed with submission if no empty fields
+      _submitForm();
     }
   }
 
@@ -261,13 +265,10 @@ class _AddPatientFormState extends State<AddPatientForm> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
-                            onPressed: _isSubmitting ? null : submitData, // Disable if submitting
-                            label:
-                                _isSubmitting
-                                    ? CircularProgressIndicator(color: Colors.white)
-                                    : Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                            onPressed: _isSubmitting ? null : submitData,
+                            label: Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _isSubmitting ? const Color(0xffE0EAFF) : const Color(0xff407BFF),
+                              backgroundColor: const Color(0xff407BFF),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               padding: const EdgeInsets.symmetric(horizontal: 20),
                             ),

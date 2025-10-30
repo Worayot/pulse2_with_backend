@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/models/user.dart';
 import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/user_services.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 
@@ -46,10 +44,7 @@ class _AddUserFormState extends State<AddUserForm> {
     String surname = surnameController.text.trim();
     String nurseID = nurseIDController.text.trim();
 
-    if (name.isEmpty ||
-        surname.isEmpty ||
-        selectedRole.isEmpty ||
-        nurseID.isEmpty) {
+    if (name.isEmpty || surname.isEmpty || selectedRole.isEmpty || nurseID.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -79,14 +74,7 @@ class _AddUserFormState extends State<AddUserForm> {
       String password = nurseID.padLeft(6, '0');
 
       // Uncomment the following line when you want to add user data
-      Map<int, String> status = await UserServices().addUser(
-        User(
-          fullname: '$name $surname',
-          nurseId: nurseID,
-          password: password,
-          role: selectedRole,
-        ),
-      );
+      Map<int, String> status = await UserServices().addUser(User(fullname: '$name $surname', nurseId: nurseID, password: password, role: selectedRole));
 
       int statusCode = status.keys.first;
       String message = '$statusCode ${status.values.first}';
@@ -104,18 +92,12 @@ class _AddUserFormState extends State<AddUserForm> {
         }
       } else if (statusCode == 401) {
         if (mounted) {
-          FlushbarService().showErrorMessage(
-            context: context,
-            message: message,
-          );
+          FlushbarService().showErrorMessage(context: context, message: message);
           LogoutService(navigator: Navigator.of(context));
         }
       } else {
         if (mounted) {
-          FlushbarService().showErrorMessage(
-            context: context,
-            message: message,
-          );
+          FlushbarService().showErrorMessage(context: context, message: message);
         }
       }
     }
@@ -123,195 +105,124 @@ class _AddUserFormState extends State<AddUserForm> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.sizeOf(context);
-    TextWidgetSize tws = TextWidgetSize(context: context);
-
     return Dialog(
       child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: SizedBox(
-          height: size.height * 0.46,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 10, top: 10),
-                child: Row(
-                  children: [
-                    Text(
-                      "addUserData".tr(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
+        decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(15)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 10, top: 10),
+              child: Row(
+                children: [
+                  Text("addUserData".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black, size: 30),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            child: infoTextField(
-                              fontSize: 14,
-                              title: "name".tr(),
-                              controller: nameController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                              hintText: "fillInName".tr(),
-                            ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          child: infoTextField(
+                            fontSize: 14,
+                            title: "name".tr(),
+                            controller: nameController,
+                            boxColor: const Color(0xffE0EAFF),
+                            minWidth: 140,
+                            hintText: "fillInName".tr(),
                           ),
-                        ),
-                        Expanded(
-                          child: SizedBox(
-                            child: infoTextField(
-                              title: "surname".tr(),
-                              fontSize: 14,
-                              controller: surnameController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                              hintText: "fillInSurname".tr(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            'role'.tr(),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 40,
-                        child: DropdownButtonFormField<String>(
-                          value: selectedRole.isNotEmpty ? selectedRole : null,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: const Color(0xffE0EAFF),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 12,
-                            ),
-                            labelText:
-                                selectedRole.isEmpty ? 'selectRole'.tr() : "",
-                            labelStyle: TextStyle(fontSize: 14),
-                          ),
-                          items: [
-                            DropdownMenuItem(
-                              value: "nurse",
-                              child: Text(
-                                "nurse".tr(),
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            DropdownMenuItem(
-                              value: "admin",
-                              child: Text(
-                                "admin".tr(),
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ],
-                          onChanged: (String? value) {
-                            setState(() {
-                              selectedRole =
-                                  value ?? ''; // Set the selected role
-                            });
-                          },
                         ),
                       ),
-                    ),
-                    SizedBox(
+                      Expanded(
+                        child: SizedBox(
+                          child: infoTextField(
+                            title: "surname".tr(),
+                            fontSize: 14,
+                            controller: surnameController,
+                            boxColor: const Color(0xffE0EAFF),
+                            minWidth: 140,
+                            hintText: "fillInSurname".tr(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(padding: const EdgeInsets.only(left: 8.0), child: Row(children: [Text('role'.tr(), style: const TextStyle(fontWeight: FontWeight.bold))])),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: SizedBox(
                       width: double.infinity,
-                      child: infoTextField(
-                        title: "nurseID".tr(),
-                        fontSize: 14,
-                        controller: nurseIDController,
-                        boxColor: const Color(0xffE0EAFF),
-                        minWidth: 140,
-                        hintText: "fillInNurseID".tr(),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton.icon(
-                        onPressed: submitData,
-                        label:
-                            !_isSubmitting
-                                ? Text(
-                                  'save'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                )
-                                : CircularProgressIndicator(
-                                  color: Colors.white,
-                                ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff407BFF),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              12,
-                            ), // Set border radius
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                      height: 40,
+                      child: DropdownButtonFormField<String>(
+                        initialValue: selectedRole.isNotEmpty ? selectedRole : null,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xffE0EAFF),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          labelText: selectedRole.isEmpty ? 'selectRole'.tr() : "",
+                          labelStyle: TextStyle(fontSize: 14),
                         ),
+                        items: [
+                          DropdownMenuItem(value: "nurse", child: Text("nurse".tr(), style: TextStyle(color: Colors.black, fontSize: 14))),
+                          DropdownMenuItem(value: "admin", child: Text("admin".tr(), style: TextStyle(color: Colors.black, fontSize: 14))),
+                        ],
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedRole = value ?? ''; // Set the selected role
+                          });
+                        },
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: infoTextField(
+                      title: "nurseID".tr(),
+                      fontSize: 14,
+                      controller: nurseIDController,
+                      boxColor: const Color(0xffE0EAFF),
+                      minWidth: 140,
+                      hintText: "fillInNurseID".tr(),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton.icon(
+                      onPressed: submitData,
+                      label:
+                          !_isSubmitting
+                              ? Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white))
+                              : CircularProgressIndicator(color: Colors.white),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff407BFF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12), // Set border radius
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

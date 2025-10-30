@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
-import 'package:tuh_mews/mainpage/settings/aboutapp_ori.dart';
+import 'package:tuh_mews/mainpage/settings/aboutapp.dart';
 import 'package:tuh_mews/mainpage/settings/admin.dart';
 import 'package:tuh_mews/mainpage/settings/language.dart';
 import 'package:tuh_mews/mainpage/settings/profile.dart';
@@ -85,12 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 _buildSettingsTile(
                   title: 'aboutApp'.tr(),
                   leadingIcon: FontAwesomeIcons.circleInfo,
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        // MaterialPageRoute(builder: (context) => AboutAppPage()),
-                        MaterialPageRoute(builder: (context) => AboutAppPage()), //* TUH MEWS 2.0
-                      ),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AboutAppPage())),
                 ),
                 _buildSettingsTile(
                   title: 'language'.tr(),
@@ -100,18 +95,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {});
                   },
                 ),
-                //* TUH MEWS 2.0
-                // _buildSettingsTile(
-                //   title: 'bugReport'.tr(),
-                //   leadingIcon: FontAwesomeIcons.solidPaperPlane,
-                //   onTap:
-                //       () => Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //           builder: (context) => BugReportPage(),
-                //         ),
-                //       ),
-                // ),
                 if (isAdmin)
                   _buildSettingsTile(
                     title: 'adminFeature'.tr(),
@@ -127,15 +110,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   onTap: () async {
                     bool shouldProceed = await showWarningDialog(context);
                     if (shouldProceed) {
-                      // await AlarmService().stopAllAlarms();
-                      // await Navigator.pushAndRemoveUntil(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const LoginPage(),
-                      //   ),
-                      //   (Route<dynamic> route) =>
-                      //       false, // Removes all previous screens
-                      // );
                       if (mounted) {
                         LogoutService(navigator: Navigator.of(context)).logout();
                       }
@@ -176,18 +150,27 @@ class _SettingsPageState extends State<SettingsPage> {
                                 child: Text.rich(
                                   TextSpan(
                                     children: [
-                                      TextSpan(text: '"', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: size.height * 0.002)),
-                                      TextSpan(text: selectedQuote['quote']![0], style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, height: size.height * 0.002)),
+                                      TextSpan(
+                                        text: '"',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: size.height * 0.002, overflow: TextOverflow.ellipsis),
+                                      ),
+                                      TextSpan(
+                                        text: selectedQuote['quote']![0],
+                                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, height: size.height * 0.002, overflow: TextOverflow.ellipsis),
+                                      ),
                                       TextSpan(
                                         text: '${selectedQuote['quote']!.substring(1)}"',
-                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: size.height * 0.002),
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: size.height * 0.002, overflow: TextOverflow.ellipsis),
                                       ),
                                     ],
                                   ),
                                 ),
                               ),
                               SizedBox(height: size.height * 0.01),
-                              SizedBox(width: size.width * 0.45, child: Text(selectedQuote['author']!, style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13))),
+                              SizedBox(
+                                width: size.width * 0.45,
+                                child: Text(selectedQuote['author']!, style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13, overflow: TextOverflow.ellipsis)),
+                              ),
                             ],
                           ),
                         ],

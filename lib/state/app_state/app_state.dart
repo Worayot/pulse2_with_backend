@@ -1,7 +1,5 @@
 import 'dart:ui';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_state.freezed.dart';
 part 'app_state.g.dart';
@@ -11,7 +9,6 @@ class LocaleConverter implements JsonConverter<Locale, String> {
 
   @override
   Locale fromJson(String json) {
-    // Handle locale format like "en", "en_US"
     final parts = json.split('_');
     if (parts.length == 2) {
       return Locale(parts[0], parts[1]);

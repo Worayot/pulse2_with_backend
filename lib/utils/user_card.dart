@@ -9,11 +9,7 @@ import '../models/user.dart';
 class UserCard extends StatelessWidget {
   final User user;
   final bool renderRemoveButton;
-  const UserCard({
-    super.key,
-    required this.user,
-    required this.renderRemoveButton,
-  });
+  const UserCard({super.key, required this.user, required this.renderRemoveButton});
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -32,50 +28,20 @@ class UserCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            user.fullname,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
+                          Text(user.fullname, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           Text.rich(
                             TextSpan(
                               children: <TextSpan>[
-                                TextSpan(
-                                  text: "${"role".tr()} ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: "${user.role.tr()} ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
+                                TextSpan(text: "${"role".tr()} ", style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 11)),
+                                TextSpan(text: "${user.role.tr()} ", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
                               ],
                             ),
                           ),
                           Text.rich(
                             TextSpan(
                               children: <TextSpan>[
-                                TextSpan(
-                                  text: "${"nurseID".tr()} ",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: user.nurseId,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 11,
-                                  ),
-                                ),
+                                TextSpan(text: "${"nurseID".tr()} ", style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 11)),
+                                TextSpan(text: user.nurseId, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
                               ],
                             ),
                           ),
@@ -118,9 +84,7 @@ class UserCard extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: const Color(0xff3362CC),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       padding: EdgeInsets.zero,
                       // fixedSize: const Size(10, 30),
                       elevation: 0,
@@ -134,17 +98,10 @@ class UserCard extends StatelessWidget {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 0,
-                        horizontal: 0,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                       child: Text(
                         'edit'.tr(), // Replace with your text
-                        style: const TextStyle(
-                          color: Color(0xff3362CC),
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(color: Color(0xff3362CC), fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -153,8 +110,8 @@ class UserCard extends StatelessWidget {
 
                 buildActionButton(
                   FontAwesomeIcons.userMinus,
+                  fontSize: 16,
                   () {
-                    print('Attempt to delete UID: ${user.nurseId}');
                     showDeleteUserDialog(context, user.nurseId);
                   },
                   Colors.white,

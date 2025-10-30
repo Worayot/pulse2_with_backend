@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tuh_mews/func/calculateMEWs.dart';
+import 'package:tuh_mews/func/calculate_mews.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';
@@ -32,13 +32,10 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
   // Declare TextEditingController for each input field
   final TextEditingController heartRateController = TextEditingController();
   final TextEditingController temperatureController = TextEditingController();
-  final TextEditingController sysBloodPressureController =
-      TextEditingController();
-  final TextEditingController diaBloodPressureController =
-      TextEditingController();
+  final TextEditingController sysBloodPressureController = TextEditingController();
+  final TextEditingController diaBloodPressureController = TextEditingController();
   final TextEditingController spo2Controller = TextEditingController();
-  final TextEditingController respiratoryRateController =
-      TextEditingController();
+  final TextEditingController respiratoryRateController = TextEditingController();
   final TextEditingController urineController = TextEditingController();
   final TextEditingController cvpController = TextEditingController();
   final FocusNode sysBpFocusNode = FocusNode();
@@ -62,15 +59,18 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
 
   @override
   Widget build(BuildContext context) {
-    return _showMEWsForms(context);
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: _showMEWsForms(context),
+    );
   }
 
   Widget _showMEWsForms(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 20),
       child: Stack(
         children: [
           Card(
@@ -80,36 +80,18 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
             ),
             color: const Color(0xFFD7E0F5),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 8),
-                  Center(
-                    child: Text(
-                      textAlign: TextAlign.center,
-                      "calculateMEWs".tr(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ),
+                  Center(child: Text(textAlign: TextAlign.center, "calculateMEWs".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
                   const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5, bottom: 5),
-                    child: Text(
-                      "consciousness".tr(),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
+                  Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("consciousness".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                   SizedBox(
                     height: 40,
                     child: DropdownButtonFormField<String>(
-                      value: consciousnessValue,
+                      initialValue: consciousnessValue,
                       onChanged: (String? newValue) {
                         setState(() {
                           consciousnessValue = newValue!;
@@ -118,77 +100,33 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 8,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                       items: [
-                        const DropdownMenuItem(
-                          value: "-",
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 8),
-                            child: Text("-"),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: "Conscious",
-                          child: Text("conscious".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "Alert",
-                          child: Text("alert".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "verbalStimuli",
-                          child: Text("verbalStimuli".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "Pain",
-                          child: Text("pain".tr()),
-                        ),
-                        DropdownMenuItem(
-                          value: "Unresponsive",
-                          child: Text("unresponsive".tr()),
-                        ),
+                        const DropdownMenuItem(value: "-", child: Padding(padding: EdgeInsets.only(left: 8), child: Text("-"))),
+                        DropdownMenuItem(value: "Conscious", child: Text("conscious".tr())),
+                        DropdownMenuItem(value: "Alert", child: Text("alert".tr())),
+                        DropdownMenuItem(value: "verbalStimuli", child: Text("verbalStimuli".tr())),
+                        DropdownMenuItem(value: "Pain", child: Text("pain".tr())),
+                        DropdownMenuItem(value: "Unresponsive", child: Text("unresponsive".tr())),
                       ],
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "temperature".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("temperature".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(°C)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(°C)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: temperatureController,
-                      keyboardType: TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
                           // RegExp(r'^\d*\.?\d*$'), //! Many decimal place
@@ -197,31 +135,16 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                       ],
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text(
-                          '°C',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text('°C', style: TextStyle(fontWeight: FontWeight.bold)),
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
@@ -229,15 +152,9 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     padding: const EdgeInsets.only(top: 5, bottom: 5),
                     child: Row(
                       children: [
-                        Text(
-                          "heartRate".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        Text("heartRate".tr(), style: const TextStyle(fontWeight: FontWeight.bold)),
                         const Spacer(),
-                        const Text(
-                          "(bpm)",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        const Text("(bpm)", style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -245,14 +162,11 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: heartRateController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: "-",
-                        suffix: const Text(
-                          "bpm",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("bpm", style: TextStyle(fontWeight: FontWeight.bold)),
 
                         filled: true,
                         fillColor: Colors.white,
@@ -261,88 +175,47 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                           horizontal: 16, // Adjusts height/padding
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
                           borderSide: BorderSide.none,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "respiratoryRate".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("respiratoryRate".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(bpm)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(bpm)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
                     height: 40,
                     child: TextField(
                       controller: respiratoryRateController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
-                        suffix: const Text(
-                          "bpm",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("bpm", style: TextStyle(fontWeight: FontWeight.bold)),
                         hintText: '-',
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Text(
-                          "bloodPressure".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5), child: Text("bloodPressure".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(mmHg)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(mmHg)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   Row(
@@ -351,55 +224,28 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                "Systolic",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                            const Padding(padding: EdgeInsets.only(bottom: 5), child: Text("Systolic", style: TextStyle(fontWeight: FontWeight.bold))),
                             SizedBox(
                               height: 40,
                               child: TextField(
                                 focusNode: sysBpFocusNode,
                                 onChanged: (value) {
                                   if (value.length == 3) {
-                                    FocusScope.of(
-                                      context,
-                                    ).requestFocus(diasBpFocusNode);
+                                    FocusScope.of(context).requestFocus(diasBpFocusNode);
                                   }
                                 },
                                 controller: sysBloodPressureController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
+                                keyboardType: TextInputType.numberWithOptions(decimal: false),
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 decoration: InputDecoration(
                                   hintText: '-',
-                                  suffix: const Text(
-                                    "mmHg",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  suffix: const Text("mmHg", style: TextStyle(fontWeight: FontWeight.bold)),
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                                 ),
                               ),
                             ),
@@ -411,48 +257,23 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 5),
-                              child: Text(
-                                "Diastolic",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                            const Padding(padding: EdgeInsets.only(bottom: 5), child: Text("Diastolic", style: TextStyle(fontWeight: FontWeight.bold))),
                             SizedBox(
                               height: 40,
                               child: TextField(
                                 focusNode: diasBpFocusNode,
                                 controller: diaBloodPressureController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                ],
+                                keyboardType: TextInputType.numberWithOptions(decimal: false),
+                                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                 decoration: InputDecoration(
                                   hintText: '-',
-                                  suffix: const Text(
-                                    "mmHg",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  suffix: const Text("mmHg", style: TextStyle(fontWeight: FontWeight.bold)),
                                   filled: true,
                                   fillColor: Colors.white,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide.none,
-                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                                 ),
                               ),
                             ),
@@ -465,146 +286,77 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "spO2 (${"whileGivingOxygen".tr()})",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        child: Text("spO2 (${"whileGivingOxygen".tr()})", style: const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                       const Spacer(),
-                      const Text(
-                        "(%)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(%)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
                     height: 40,
                     child: TextField(
                       controller: spo2Controller,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text(
-                          "%",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("%", style: TextStyle(fontWeight: FontWeight.bold)),
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
                   Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "urine".tr(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("urine".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
                       const Spacer(),
-                      const Text(
-                        "(mL/hr)",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                      const Text("(mL/hr)", style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   SizedBox(
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: urineController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       decoration: InputDecoration(
                         hintText: '-',
-                        suffix: const Text(
-                          "mL/hr",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        suffix: const Text("mL/hr", style: TextStyle(fontWeight: FontWeight.bold)),
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, bottom: 5),
-                        child: Text(
-                          "CVP",
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
+                  Row(children: [Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("CVP", style: const TextStyle(fontWeight: FontWeight.bold)))]),
                   SizedBox(
                     height: 40, // Adjust height here
                     child: TextField(
                       controller: cvpController,
-                      // keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: '-',
-
                         filled: true,
                         fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ), // Adjusts height/padding
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(
-                            15,
-                          ), // Rounded corners
-                          borderSide:
-                              BorderSide.none, // Removes visible border line
+                          borderRadius: BorderRadius.circular(15), // Rounded corners
+                          borderSide: BorderSide.none, // Removes visible border line
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide.none,
-                        ),
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       ),
                     ),
                   ),
@@ -625,17 +377,13 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(
-                                          dialogContext,
-                                        ).pop(false); // User pressed cancel
+                                        Navigator.of(dialogContext).pop(false); // User pressed cancel
                                       },
                                       child: Text("cancel".tr()),
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(
-                                          dialogContext,
-                                        ).pop(true); // User confirmed
+                                        Navigator.of(dialogContext).pop(true); // User confirmed
                                       },
                                       child: Text("confirm".tr()),
                                     ),
@@ -654,8 +402,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                   respiratoryRateController.text = "";
                                   urineController.text = "";
                                   cvpController.text = "";
-                                  consciousnessValue =
-                                      "-"; // Reset dropdown safely
+                                  consciousnessValue = "-"; // Reset dropdown safely
                                 });
                               }
                             });
@@ -665,9 +412,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.red, // Text color
-                              decoration:
-                                  TextDecoration
-                                      .underline, // Underline to indicate it's clickable
+                              decoration: TextDecoration.underline, // Underline to indicate it's clickable
                               decorationColor: Colors.red,
                             ),
                           ),
@@ -678,9 +423,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                             foregroundColor: Colors.white,
                             backgroundColor: const Color(0xFF3362CC),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                15,
-                              ), // Set border radius here
+                              borderRadius: BorderRadius.circular(15), // Set border radius here
                             ),
                           ),
                           onPressed:
@@ -692,33 +435,18 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                     DateTime now = DateTime.now();
 
                                     // Add new Note in Database collection
-                                    InspectionNote newInspection =
-                                        InspectionNote(
-                                          patientID: widget.patientID,
-                                          auditorID: widget.auditorID,
-                                          time: now,
-                                        );
+                                    InspectionNote newInspection = InspectionNote(patientID: widget.patientID, auditorID: widget.auditorID, time: now);
 
                                     String inspectionNotesID = '';
 
                                     try {
                                       // Get NoteID from response
-                                      Map<int, String> status =
-                                          await MEWsService().addNewInspection(
-                                            inspectionNote: newInspection,
-                                          );
-                                      ValidateService(
-                                        navigator: Navigator.of(context),
-                                        status: status,
-                                        showSuccessFlushbar: false,
-                                      ).validate();
+                                      Map<int, String> status = await MEWsService().addNewInspection(inspectionNote: newInspection);
+                                      ValidateService(navigator: Navigator.of(context), status: status, showSuccessFlushbar: false).validate();
                                       String response = status.values.first;
 
-                                      Map<String, dynamic> decoded = jsonDecode(
-                                        response,
-                                      );
-                                      inspectionNotesID =
-                                          decoded['inspection_notes_id'];
+                                      Map<String, dynamic> decoded = jsonDecode(response);
+                                      inspectionNotesID = decoded['inspection_notes_id'];
                                       // print(inspectionNotesId);
                                     } catch (e) {
                                       setState(() {
@@ -729,15 +457,11 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                     }
 
                                     String hr = heartRateController.text.trim();
-                                    String temp =
-                                        temperatureController.text.trim();
-                                    String sBp =
-                                        sysBloodPressureController.text.trim();
-                                    String dBp =
-                                        diaBloodPressureController.text.trim();
+                                    String temp = temperatureController.text.trim();
+                                    String sBp = sysBloodPressureController.text.trim();
+                                    String dBp = diaBloodPressureController.text.trim();
                                     String spO2 = spo2Controller.text.trim();
-                                    String rr =
-                                        respiratoryRateController.text.trim();
+                                    String rr = respiratoryRateController.text.trim();
                                     String urine = urineController.text.trim();
                                     String conscious = consciousnessValue;
                                     String cvp = cvpController.text.trim();
@@ -753,26 +477,12 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
 
                                     int MEWs = calculateMEWs(
                                       consciousness: conscious,
-                                      heartRate:
-                                          (hr != '-') ? int.tryParse(hr) : null,
-                                      temperature:
-                                          (temp != '-')
-                                              ? double.tryParse(temp)
-                                              : null,
-                                      respiratoryRate:
-                                          (rr != '-') ? int.tryParse(rr) : null,
-                                      systolicBp:
-                                          (sBp != '-')
-                                              ? int.tryParse(sBp)
-                                              : null,
-                                      spo2:
-                                          (spO2 != '-')
-                                              ? int.tryParse(spO2)
-                                              : null,
-                                      urine:
-                                          (urine != '-')
-                                              ? int.tryParse(urine)
-                                              : null,
+                                      heartRate: (hr != '-') ? int.tryParse(hr) : null,
+                                      temperature: (temp != '-') ? double.tryParse(temp) : null,
+                                      respiratoryRate: (rr != '-') ? int.tryParse(rr) : null,
+                                      systolicBp: (sBp != '-') ? int.tryParse(sBp) : null,
+                                      spo2: (spO2 != '-') ? int.tryParse(spO2) : null,
+                                      urine: (urine != '-') ? int.tryParse(urine) : null,
                                     );
 
                                     Parameters parameters = Parameters(
@@ -790,8 +500,7 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                       assessTime: DateTime.now(),
                                     );
 
-                                    Map<int, String> state = await MEWsService()
-                                        .addMEWs(inspectionNotesID, parameters);
+                                    Map<int, String> state = await MEWsService().addMEWs(inspectionNotesID, parameters);
                                     final navigator = Navigator.of(context);
                                     if (state.containsKey(200)) {
                                       if (mounted) {
@@ -816,16 +525,8 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                   : () {},
                           child:
                               enableButton
-                                  ? Text(
-                                    'calculate'.tr(),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  )
-                                  : CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
+                                  ? Text('calculate'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20))
+                                  : CircularProgressIndicator(color: Colors.white),
                         ),
                       ],
                     ),
