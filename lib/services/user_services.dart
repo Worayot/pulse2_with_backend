@@ -50,10 +50,7 @@ class UserServices {
   }
 
   // Tested
-  Future<Map<int, String>> saveUserData({
-    required User newUserData,
-    required String uid, // This is your 'nurse_id'
-  }) async {
+  Future<Map<int, String>> saveUserData({required User newUserData, required String uid}) async {
     try {
       final userMap = newUserData.toJson();
 
@@ -78,6 +75,36 @@ class UserServices {
       return {200: 'User updated successfully'};
     } catch (e) {
       return {500: 'Error saving user data: $e'};
+    }
+  }
+
+  Future<Map<int, String>> updateUserData({required User newUserData, required String uid}) async {
+    try {
+      final userMap = newUserData.toJson();
+
+      // Check if user actually provided a new password
+      final password = userMap['password']?.toString();
+
+      if (password != null && password.trim().isNotEmpty) {
+        final hashed = BCrypt.hashpw(password, BCrypt.gensalt());
+        userMap['password'] = hashed;
+      } else {
+        userMap.remove('password');
+      }
+
+      final usersRef = FirebaseFirestore.instance.collection('users');
+      final query = await usersRef.where('nurse_id', isEqualTo: uid).limit(1).get();
+
+      if (query.docs.isEmpty) {
+        return {404: 'User not found'};
+      }
+
+      final userDoc = query.docs.first.reference;
+      await userDoc.update(userMap);
+
+      return {200: 'User updated successfully'};
+    } catch (e) {
+      return {500: 'Error updating user data: $e'};
     }
   }
 

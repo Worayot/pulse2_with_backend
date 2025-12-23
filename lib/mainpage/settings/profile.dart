@@ -7,6 +7,7 @@ import 'package:tuh_mews/services/user_services.dart';
 import 'package:tuh_mews/utils/custom_header.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tuh_mews/utils/password_validation_widget.dart';
 
 class ProfileSettingsPage extends StatefulWidget {
   const ProfileSettingsPage({super.key});
@@ -20,6 +21,8 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
   String _nurseID = "";
   String _role = "";
   String _password = "";
+
+  String _newPassword = "";
 
   // Track if a field is being edited
   bool _isEditingName = false;
@@ -45,11 +48,12 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
       _name = prefs.getString('fullname') ?? "N/A";
       _role = prefs.getString('role') ?? "N/A";
       _nurseID = prefs.getString('nurseID') ?? "N/A";
-      _password = storedPassword ?? ""; // Handle null case
+      _password = storedPassword ?? "";
 
       // Initialize controllers with saved data
       _nameController.text = _name;
       _passwordController.text = _password;
+      _newPassword = _password;
     });
   }
 
@@ -62,46 +66,19 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
 
         if (!_isEditingName) {
           _saveName('name', _nameController.text);
-          userServices.saveUserData(
-            newUserData: User(
-              fullname: _nameController.text,
-              nurseId: _nurseID,
-              password: _password,
-              role: _role,
-            ),
-            uid: _nurseID,
-          );
+          userServices.saveUserData(newUserData: User(fullname: _nameController.text, nurseId: _nurseID, password: _password, role: _role), uid: _nurseID);
         }
       } else if (field == 'password') {
         _isEditingPassword = !_isEditingPassword;
 
         if (!_isEditingPassword) {
-          if (_passwordController.text.trim().length < 6) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'passwordWarning'.tr(),
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 2),
-              ),
-            );
+          if (PasswordValidator.isValid(_passwordController.text.trim()) == false) {
             return;
           }
 
           _savePassword('password', _passwordController.text.trim());
 
-          userServices.saveUserData(
-            newUserData: User(
-              fullname: _name.trim(),
-              nurseId: _nurseID,
-              password:
-                  _passwordController.text.trim(), // Use the controller value
-              role: _role,
-            ),
-            uid: _nurseID,
-          );
+          userServices.saveUserData(newUserData: User(fullname: _name.trim(), nurseId: _nurseID, password: _passwordController.text.trim(), role: _role), uid: _nurseID);
         }
       }
     });
@@ -130,394 +107,215 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Header(),
-        toolbarHeight: size.height * 0.13,
-      ),
+      appBar: AppBar(automaticallyImplyLeading: false, title: const Header(), toolbarHeight: size.height * 0.13),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            Container(
-              height: size.height * 0.7,
-              decoration: BoxDecoration(
-                color: const Color(0xFFB2C2E5),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    bottom: -50,
-                    right: -30,
-                    child: IgnorePointer(
-                      child: Image.asset(
-                        "assets/images/ambulance.png",
-                        height: size.width * 0.7, // Set height
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0, left: 16),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Row(
-                            children: [
-                              const Icon(
-                                FontAwesomeIcons.backward,
-                                color: Colors.black,
-                                size: 25,
-                              ),
-                              const SizedBox(width: 10),
-                              Text(
-                                'back'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Center(
-                        child: Text(
-                          "userAccount".tr(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 35,
-                        ), // White box outer padding
-                        child: Container(
-                          height: size.height * 0.5,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 12.0,
-                            horizontal: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.75),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 5,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(color: const Color(0xFFB2C2E5), borderRadius: BorderRadius.circular(12)),
+                child: Stack(
+                  children: [
+                    Positioned(bottom: -50, right: -30, child: IgnorePointer(child: Image.asset("assets/images/ambulance.png", height: size.width * 0.7))),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0, left: 16),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Row(
                               children: [
-                                InkWell(
-                                  onTap: () => _toggleEditMode('name'),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 8.0,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'name-surname'.tr(),
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              SizedBox(
-                                                height: 20,
-                                                child:
-                                                    _isEditingName
-                                                        ? TextField(
-                                                          controller:
-                                                              _nameController,
-                                                          decoration: const InputDecoration(
-                                                            border:
-                                                                UnderlineInputBorder(),
-                                                            contentPadding:
-                                                                EdgeInsets.only(
-                                                                  bottom: 13,
-                                                                ),
-                                                          ),
-                                                        )
-                                                        : Text(
-                                                          _name,
-                                                          style: const TextStyle(
-                                                            fontSize: 16,
-                                                            color:
-                                                                Colors.black54,
-                                                          ),
-                                                        ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child:
-                                              _isEditingName
-                                                  ? Transform.translate(
-                                                    offset: const Offset(
-                                                      8.0,
-                                                      0.0,
-                                                    ), // Move 8 pixels to the right
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        UserServices().saveUserData(
-                                                          newUserData: User(
-                                                            fullname: _name,
-                                                            nurseId: _nurseID,
-                                                            password:
-                                                                _passwordController
-                                                                    .text
-                                                                    .trim(), // Use the controller value
-                                                            role: _role,
-                                                          ),
-                                                          uid: _nurseID,
-                                                        );
-                                                        _saveName(
-                                                          'name',
-                                                          _nameController.text,
-                                                        );
-                                                      },
-                                                      icon: const Icon(
-                                                        FontAwesomeIcons
-                                                            .chevronRight,
-                                                      ),
-                                                      color: Colors.black,
-                                                    ),
-                                                  )
-                                                  : const Icon(
-                                                    Icons.edit,
-                                                    color: Colors.black,
-                                                  ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 3), // Adjusted spacing
-
-                                InkWell(
-                                  onTap: () => _toggleEditMode('password'),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 8.0,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'password'.tr(),
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              SizedBox(
-                                                height: 20,
-                                                child:
-                                                    _isEditingPassword
-                                                        ? TextField(
-                                                          controller:
-                                                              _passwordController,
-                                                          decoration: const InputDecoration(
-                                                            border:
-                                                                UnderlineInputBorder(),
-                                                            contentPadding:
-                                                                EdgeInsets.only(
-                                                                  bottom: 13,
-                                                                ),
-                                                          ),
-                                                        )
-                                                        : Text(
-                                                          '*' *
-                                                              _password.length,
-                                                          style: const TextStyle(
-                                                            fontSize: 20,
-                                                            color:
-                                                                Colors.black54,
-                                                          ),
-                                                        ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        // Align icons
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child:
-                                              _isEditingPassword
-                                                  ? Transform.translate(
-                                                    offset: const Offset(
-                                                      8.0,
-                                                      0.0,
-                                                    ), // Move 8 pixels to the right
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        if (_passwordController
-                                                                .text
-                                                                .trim()
-                                                                .length <
-                                                            6) {
-                                                          ScaffoldMessenger.of(
-                                                            context,
-                                                          ).showSnackBar(
-                                                            SnackBar(
-                                                              content: Text(
-                                                                'passwordWarning'
-                                                                    .tr(),
-                                                                style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              backgroundColor:
-                                                                  Colors.red,
-                                                              duration:
-                                                                  Duration(
-                                                                    seconds: 2,
-                                                                  ),
-                                                            ),
-                                                          );
-                                                          return;
-                                                        }
-                                                        _savePassword(
-                                                          'password',
-                                                          _passwordController
-                                                              .text,
-                                                        );
-                                                        UserServices().saveUserData(
-                                                          newUserData: User(
-                                                            fullname: _name,
-                                                            nurseId: _nurseID,
-                                                            password:
-                                                                _passwordController
-                                                                    .text
-                                                                    .trim(), // Use the controller value
-                                                            role: _role,
-                                                          ),
-                                                          uid: _nurseID,
-                                                        );
-                                                      },
-
-                                                      icon: const Icon(
-                                                        FontAwesomeIcons
-                                                            .chevronRight,
-                                                      ),
-                                                      color: Colors.black,
-                                                    ),
-                                                  )
-                                                  : const Icon(
-                                                    Icons.edit,
-                                                    color: Colors.black,
-                                                  ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 3), // Adjusted spacing
-
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'role'.tr(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            _role.tr(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 9), // Adjusted spacing
-                                // Nurse ID
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'nurseID'.tr(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 4,
-                                          ), // Balanced spacing
-                                          Text(
-                                            _nurseID,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                const Icon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
+                                const SizedBox(width: 10),
+                                Text('back'.tr(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
                               ],
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(height: 8),
+                        Center(child: Text("userAccount".tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+                        const SizedBox(height: 16),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          child: Container(
+                            height: size.height * 0.5,
+                            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.75),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, offset: const Offset(0, 3))],
+                            ),
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    InkWell(
+                                      onTap: () => _toggleEditMode('name'),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('name-surname'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                                                  const SizedBox(height: 4),
+                                                  SizedBox(
+                                                    height: 20,
+                                                    child:
+                                                        _isEditingName
+                                                            ? TextField(
+                                                              controller: _nameController,
+                                                              decoration: const InputDecoration(border: UnderlineInputBorder(), contentPadding: EdgeInsets.only(bottom: 13)),
+                                                            )
+                                                            : Text(_name, style: const TextStyle(fontSize: 16, color: Colors.black54)),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Align(
+                                              alignment: Alignment.centerRight,
+                                              child:
+                                                  _isEditingName
+                                                      ? Transform.translate(
+                                                        offset: const Offset(8.0, 0.0), // Move 8 pixels to the right
+                                                        child: IconButton(
+                                                          onPressed: () {
+                                                            UserServices().saveUserData(
+                                                              newUserData: User(
+                                                                fullname: _name,
+                                                                nurseId: _nurseID,
+                                                                password: _passwordController.text.trim(), // Use the controller value
+                                                                role: _role,
+                                                              ),
+                                                              uid: _nurseID,
+                                                            );
+                                                            _saveName('name', _nameController.text);
+                                                          },
+                                                          icon: const Icon(FontAwesomeIcons.chevronRight),
+                                                          color: Colors.black,
+                                                        ),
+                                                      )
+                                                      : const Icon(Icons.edit, color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3), // Adjusted spacing
+
+                                    GestureDetector(
+                                      onTap: () => _toggleEditMode('password'),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('password'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                                                  const SizedBox(height: 4),
+                                                  SizedBox(
+                                                    height: 20,
+                                                    child:
+                                                        _isEditingPassword
+                                                            ? TextField(
+                                                              controller: _passwordController,
+                                                              onChanged: (value) {
+                                                                setState(() {
+                                                                  _newPassword = value;
+                                                                });
+                                                              },
+                                                              decoration: const InputDecoration(border: UnderlineInputBorder(), contentPadding: EdgeInsets.only(bottom: 13)),
+                                                            )
+                                                            : Text('*' * _password.length, style: const TextStyle(fontSize: 20, color: Colors.black54)),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            // Align icons
+                                            Align(
+                                              alignment: Alignment.centerRight,
+                                              child:
+                                                  _isEditingPassword
+                                                      ? Transform.translate(
+                                                        offset: const Offset(8.0, 0.0),
+                                                        child: IconButton(
+                                                          onPressed: () {
+                                                            if (PasswordValidator.isValid(_passwordController.text.trim()) == false) {
+                                                              return;
+                                                            }
+
+                                                            _savePassword('password', _passwordController.text);
+                                                            UserServices().saveUserData(
+                                                              newUserData: User(fullname: _name, nurseId: _nurseID, password: _passwordController.text.trim(), role: _role),
+                                                              uid: _nurseID,
+                                                            );
+                                                          },
+
+                                                          icon: const Icon(FontAwesomeIcons.chevronRight),
+                                                          color: Colors.black,
+                                                        ),
+                                                      )
+                                                      : const Icon(Icons.edit, color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    if (_isEditingPassword) PasswordValidationWidget(password: _newPassword),
+                                    const SizedBox(height: 3), // Adjusted spacing
+
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text('role'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                                              const SizedBox(height: 4),
+                                              Text(_role.tr(), style: const TextStyle(fontSize: 16, color: Colors.black54)),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 9), // Adjusted spacing
+                                    // Nurse ID
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text('nurseID'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                                              const SizedBox(height: 4), // Balanced spacing
+                                              Text(_nurseID, style: const TextStyle(fontSize: 16, color: Colors.black54)),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

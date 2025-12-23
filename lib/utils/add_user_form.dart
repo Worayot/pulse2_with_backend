@@ -5,6 +5,7 @@ import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/user_services.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
+import 'package:tuh_mews/utils/password_validation_widget.dart';
 
 class AddUserForm extends StatefulWidget {
   const AddUserForm({super.key});
@@ -17,15 +18,38 @@ class _AddUserFormState extends State<AddUserForm> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
   final TextEditingController nurseIDController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   String selectedRole = '';
+  String password = '';
   bool _isSubmitting = false;
+  bool _isEditingPassword = false;
+
+  final FocusNode focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        setState(() {
+          _isEditingPassword = true;
+        });
+      } else {
+        setState(() {
+          _isEditingPassword = false;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
     nameController.dispose();
     surnameController.dispose();
     nurseIDController.dispose();
+    passwordController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -43,8 +67,9 @@ class _AddUserFormState extends State<AddUserForm> {
     String name = nameController.text.trim();
     String surname = surnameController.text.trim();
     String nurseID = nurseIDController.text.trim();
+    String newPassword = passwordController.text.trim();
 
-    if (name.isEmpty || surname.isEmpty || selectedRole.isEmpty || nurseID.isEmpty) {
+    if (name.isEmpty || surname.isEmpty || selectedRole.isEmpty || nurseID.isEmpty || newPassword.isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -69,9 +94,12 @@ class _AddUserFormState extends State<AddUserForm> {
       });
       return;
     } else {
-      // Only pop once if the form submission is successful
-
-      String password = nurseID.padLeft(6, '0');
+      if (PasswordValidator.isValid(newPassword) == false) {
+        setState(() {
+          _isSubmitting = false;
+        });
+        return;
+      }
 
       // Uncomment the following line when you want to add user data
       Map<int, String> status = await UserServices().addUser(User(fullname: '$name $surname', nurseId: nurseID, password: password, role: selectedRole));
@@ -135,7 +163,7 @@ class _AddUserFormState extends State<AddUserForm> {
                     children: [
                       Expanded(
                         child: SizedBox(
-                          child: infoTextField(
+                          child: InfoTextField(
                             fontSize: 14,
                             title: "name".tr(),
                             controller: nameController,
@@ -147,7 +175,7 @@ class _AddUserFormState extends State<AddUserForm> {
                       ),
                       Expanded(
                         child: SizedBox(
-                          child: infoTextField(
+                          child: InfoTextField(
                             title: "surname".tr(),
                             fontSize: 14,
                             controller: surnameController,
@@ -175,8 +203,8 @@ class _AddUserFormState extends State<AddUserForm> {
                           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                           contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          labelText: selectedRole.isEmpty ? 'selectRole'.tr() : "",
-                          labelStyle: TextStyle(fontSize: 14),
+                          hintText: selectedRole.isEmpty ? 'selectRole'.tr() : "",
+                          hintStyle: TextStyle(fontSize: 14),
                         ),
                         items: [
                           DropdownMenuItem(value: "nurse", child: Text("nurse".tr(), style: TextStyle(color: Colors.black, fontSize: 14))),
@@ -184,7 +212,7 @@ class _AddUserFormState extends State<AddUserForm> {
                         ],
                         onChanged: (String? value) {
                           setState(() {
-                            selectedRole = value ?? ''; // Set the selected role
+                            selectedRole = value ?? '';
                           });
                         },
                       ),
@@ -192,13 +220,42 @@ class _AddUserFormState extends State<AddUserForm> {
                   ),
                   SizedBox(
                     width: double.infinity,
-                    child: infoTextField(
+                    child: InfoTextField(
                       title: "nurseID".tr(),
                       fontSize: 14,
                       controller: nurseIDController,
                       boxColor: const Color(0xffE0EAFF),
                       minWidth: 140,
                       hintText: "fillInNurseID".tr(),
+                      padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
+                    ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: InfoTextField(
+                      title: "password".tr(),
+                      fontSize: 14,
+                      controller: passwordController,
+                      focusNode: focusNode,
+                      boxColor: const Color(0xffE0EAFF),
+                      minWidth: 140,
+                      hintText: "fillInPassword".tr(),
+                      obscure: true,
+                      showToggle: true,
+                      onChanged: (val) {
+                        setState(() {
+                          password = val;
+                        });
+                      },
+                    ),
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOut,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 200),
+                      opacity: (_isEditingPassword && password.trim().isNotEmpty) ? 1 : 0,
+                      child: (_isEditingPassword && password.trim().isNotEmpty) ? PasswordValidationWidget(password: password) : const SizedBox.shrink(),
                     ),
                   ),
                   const SizedBox(height: 10),

@@ -99,6 +99,7 @@
   "n": "",
   "name": "Name",
   "name-surname": "Name-Surname",
+  "newPassword": "New Password (Leave blank to keep existing)",
   "nextInspectionTime": "Next Inspection Time",
   "noPatient": "There's no one here.",
   "note": "Note",

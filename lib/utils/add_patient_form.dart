@@ -161,7 +161,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                           children: [
                             Expanded(
                               child: SizedBox(
-                                child: infoTextField(
+                                child: InfoTextField(
                                   title: "name".tr(),
                                   fontSize: tws.getInfoBoxTextSize(),
                                   controller: nameController,
@@ -172,7 +172,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                             ),
                             Expanded(
                               child: SizedBox(
-                                child: infoTextField(
+                                child: InfoTextField(
                                   title: "surname".tr(),
                                   fontSize: tws.getInfoBoxTextSize(),
                                   controller: surnameController,
@@ -186,7 +186,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                         Row(
                           children: [
                             Expanded(
-                              child: infoTextField(
+                              child: InfoTextField(
                                 title: "age".tr(),
                                 fontSize: tws.getInfoBoxTextSize(),
                                 controller: ageController,
@@ -229,7 +229,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                           children: [
                             Expanded(
                               child: SizedBox(
-                                child: infoTextField(
+                                child: InfoTextField(
                                   title: "hnNo".tr(),
                                   fontSize: tws.getInfoBoxTextSize(),
                                   controller: hnController,
@@ -240,7 +240,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                             ),
                             Expanded(
                               child: SizedBox(
-                                child: infoTextField(
+                                child: InfoTextField(
                                   title: "bedNumber".tr(),
                                   fontSize: tws.getInfoBoxTextSize(),
                                   controller: bedNumController,
@@ -253,7 +253,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                         ),
                         SizedBox(
                           width: double.infinity,
-                          child: infoTextField(
+                          child: InfoTextField(
                             title: "ward".tr(),
                             fontSize: tws.getInfoBoxTextSize(),
                             controller: wardController,

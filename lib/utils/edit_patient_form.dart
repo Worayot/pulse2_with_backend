@@ -102,14 +102,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
       return;
     }
 
-    if (name.isEmpty ||
-        surname.isEmpty ||
-        age.isEmpty ||
-        ward.isEmpty ||
-        hn.isEmpty ||
-        bedNum.isEmpty ||
-        _selectedGender == null ||
-        _selectedGender == "-") {
+    if (name.isEmpty || surname.isEmpty || age.isEmpty || ward.isEmpty || hn.isEmpty || bedNum.isEmpty || _selectedGender == null || _selectedGender == "-") {
       setState(() {
         enableSaveButton = true;
       });
@@ -118,9 +111,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
         builder: (BuildContext context) {
           return SafeArea(
             child: Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
               child: AlertDialog(
                 title: Text("Warning".tr()),
                 content: Text("plsFillInAllTheFields".tr()),
@@ -152,10 +143,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
       );
 
       // Call the updatePatient function and await its result
-      Map<int, String> updateStatus = await patientService.updatePatient(
-        widget.patientId,
-        patient,
-      );
+      Map<int, String> updateStatus = await patientService.updatePatient(widget.patientId, patient);
       EasyLoading.dismiss();
 
       int updateStatusCode = updateStatus.keys.first;
@@ -164,29 +152,18 @@ class _EditPatientFormState extends State<EditPatientForm> {
       if (updateStatusCode == 200) {
         if (mounted) {
           Navigator.pop(context);
-          FlushbarService().showSuccessMessage(
-            context: context,
-            title: 'success'.tr(),
-            message: "successfullyUpdatedPatientData".tr(),
-            duration: 2,
-          );
+          FlushbarService().showSuccessMessage(context: context, title: 'success'.tr(), message: "successfullyUpdatedPatientData".tr(), duration: 2);
         } else if (updateStatusCode == 401) {
           if (mounted) {
             LogoutService(navigator: Navigator.of(context)).logout();
-            FlushbarService().showErrorMessage(
-              context: context,
-              message: '$updateStatusCode ${updateStatus.values.first}',
-            );
+            FlushbarService().showErrorMessage(context: context, message: '$updateStatusCode ${updateStatus.values.first}');
           }
         } else {
           setState(() {
             enableSaveButton = true;
           });
           if (mounted) {
-            FlushbarService().showErrorMessage(
-              context: context,
-              message: "failedToUpdatePatientData".tr(),
-            );
+            FlushbarService().showErrorMessage(context: context, message: "failedToUpdatePatientData".tr());
           }
         }
       } else {
@@ -194,10 +171,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
           enableSaveButton = true;
         });
         if (mounted) {
-          FlushbarService().showErrorMessage(
-            context: context,
-            message: "failedToUpdatePatientData".tr(),
-          );
+          FlushbarService().showErrorMessage(context: context, message: "failedToUpdatePatientData".tr());
         }
       }
     }
@@ -209,10 +183,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
     return Dialog(
       child: Container(
         height: 475,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(15),
-        ),
+        decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(15)),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -220,20 +191,10 @@ class _EditPatientFormState extends State<EditPatientForm> {
                 padding: const EdgeInsets.only(left: 20, right: 10, top: 10),
                 child: Row(
                   children: [
-                    Text(
-                      "editPatientData".tr(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
+                    Text("editPatientData".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(
-                        Icons.close,
-                        color: Colors.black,
-                        size: 30,
-                      ),
+                      icon: const Icon(Icons.close, color: Colors.black, size: 30),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -250,7 +211,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                       children: [
                         Expanded(
                           child: SizedBox(
-                            child: infoTextField(
+                            child: InfoTextField(
                               title: "name".tr(),
                               fontSize: tws.getInfoBoxTextSize(),
                               controller: nameController,
@@ -261,7 +222,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         ),
                         Expanded(
                           child: SizedBox(
-                            child: infoTextField(
+                            child: InfoTextField(
                               title: "surname".tr(),
                               fontSize: tws.getInfoBoxTextSize(),
                               controller: surnameController,
@@ -276,7 +237,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: infoTextField(
+                          child: InfoTextField(
                             title: "age".tr(),
                             fontSize: tws.getInfoBoxTextSize(),
                             controller: ageController,
@@ -288,9 +249,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                                 return null;
                               }
                               final number = int.tryParse(value);
-                              if (number == null ||
-                                  number < 1 ||
-                                  number > 120) {
+                              if (number == null || number < 1 || number > 120) {
                                 return '1-120';
                               }
                               return null;
@@ -318,7 +277,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                       children: [
                         Expanded(
                           child: SizedBox(
-                            child: infoTextField(
+                            child: InfoTextField(
                               title: "hnNo".tr(),
                               fontSize: tws.getInfoBoxTextSize(),
                               controller: hnController,
@@ -329,7 +288,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         ),
                         Expanded(
                           child: SizedBox(
-                            child: infoTextField(
+                            child: InfoTextField(
                               title: "bedNumber".tr(),
                               fontSize: tws.getInfoBoxTextSize(),
                               controller: bedNumController,
@@ -340,13 +299,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         ),
                       ],
                     ),
-                    infoTextField(
-                      title: "ward".tr(),
-                      fontSize: tws.getInfoBoxTextSize(),
-                      controller: wardController,
-                      boxColor: const Color(0xffE0EAFF),
-                      minWidth: 140,
-                    ),
+                    InfoTextField(title: "ward".tr(), fontSize: tws.getInfoBoxTextSize(), controller: wardController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
                     const Gap(10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -357,49 +310,28 @@ class _EditPatientFormState extends State<EditPatientForm> {
                             if (result) {
                               EasyLoading.show();
                               PatientService patientService = PatientService();
-                              Map<int, String> deleteStatus =
-                                  await patientService.deletePatient(
-                                    widget.patientId,
-                                  );
+                              Map<int, String> deleteStatus = await patientService.deletePatient(widget.patientId);
                               EasyLoading.dismiss();
 
                               int deleteStatusCode = deleteStatus.keys.first;
-                              String deleteStatusMessage =
-                                  '$deleteStatusCode ${deleteStatus.values.first}';
+                              String deleteStatusMessage = '$deleteStatusCode ${deleteStatus.values.first}';
 
                               if ((deleteStatusCode == 200) && mounted) {
                                 Navigator.pop(context);
-                                FlushbarService().showSuccessMessage(
-                                  context: context,
-                                  message:
-                                      "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}",
-                                );
+                                FlushbarService().showSuccessMessage(context: context, message: "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}");
                               } else if (deleteStatusCode == 401) {
-                                LogoutService(
-                                  navigator: Navigator.of(context),
-                                ).logout();
-                                FlushbarService().showErrorMessage(
-                                  context: context,
-                                  message: deleteStatusMessage,
-                                );
+                                LogoutService(navigator: Navigator.of(context)).logout();
+                                FlushbarService().showErrorMessage(context: context, message: deleteStatusMessage);
                               } else {
                                 if (mounted) {
-                                  FlushbarService().showErrorMessage(
-                                    context: context,
-                                    message: "failedToDeletePatientData".tr(),
-                                  );
+                                  FlushbarService().showErrorMessage(context: context, message: "failedToDeletePatientData".tr());
                                 }
                               }
                             } else {}
                           },
                           child: Text(
                             'deletePatient'.tr(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.red,
-                            ),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, decoration: TextDecoration.underline, decorationColor: Colors.red),
                           ),
                         ),
 
@@ -407,24 +339,13 @@ class _EditPatientFormState extends State<EditPatientForm> {
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
                             onPressed: enableSaveButton ? submitData : () {},
-                            label: Text(
-                              'save'.tr(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                            label: Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xff407BFF),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  12,
-                                ), // Set border radius
+                                borderRadius: BorderRadius.circular(12), // Set border radius
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
                             ),
                           ),
                         ),
