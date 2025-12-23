@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:tuh_mews/models/monitored_patient/card_model.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
@@ -11,48 +12,48 @@ class FirebasePatientService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Stream monitored patients linked to the given user ID
-  Stream<List<Map<String, dynamic>>> fetchMonitoredPatients(String userId) {
-    return _firestore
-        .collection('patient_user_links')
-        .where('user_id', isEqualTo: userId)
-        .snapshots()
-        .asyncMap((querySnapshot) async {
-          List<Map<String, dynamic>> monitoredPatients = [];
+  Stream<List<PatientModel>> fetchMonitoredPatients(String userId) {
+    return _firestore.collection('patient_user_links').where('user_id', isEqualTo: userId).snapshots().asyncMap((querySnapshot) async {
+      if (querySnapshot.docs.isEmpty) return [];
 
-          if (querySnapshot.docs.isNotEmpty) {
-            for (var doc in querySnapshot.docs) {
-              Map<String, dynamic> patientData = doc.data();
-              String patientId = patientData['patient_id'];
+      // 1. Create a list of Futures (tasks) to run in parallel
+      List<Future<PatientModel?>> tasks =
+          querySnapshot.docs.map((doc) async {
+            Map<String, dynamic> linkData = doc.data();
+            String patientId = linkData['patient_id'];
 
-              // Fetch patient details from the 'patients' collection
-              Map<String, dynamic>? patientDetails = await fetchPatientData(
-                patientId,
-              );
+            // 2. Fire both sub-requests simultaneously for THIS patient
+            var detailsFuture = fetchPatientData(patientId);
+            var notesFuture = fetchInspectionNotes(patientId);
 
-              // Fetch inspection notes for this patient
-              List<Map<String, dynamic>> inspectionNotes =
-                  await fetchInspectionNotes(patientId);
+            // 3. Wait for both to finish
+            var results = await Future.wait([detailsFuture, notesFuture]);
 
-              // Add patient details and inspection notes to the monitored patient data
-              if (patientDetails != null) {
-                patientData['patient_details'] = patientDetails;
-              }
-              patientData['inspection_notes'] = inspectionNotes;
-              monitoredPatients.add(patientData);
-            }
-          } else {
-            // print("No monitored patient data found.");
-          }
+            var patientDetails = results[0] as Map<String, dynamic>?;
+            var inspectionNotes = results[1] as List<Map<String, dynamic>>;
 
-          return monitoredPatients;
-        });
+            // If patient details are missing, we might want to skip this patient
+            if (patientDetails == null) return null;
+
+            // Merge data
+            Map<String, dynamic> fullData = {...linkData, 'patient_details': patientDetails, 'inspection_notes': inspectionNotes};
+
+            // Convert to Model here (background work)
+            return PatientModel.fromMap(fullData);
+          }).toList();
+
+      // 4. Wait for ALL patients to finish loading in parallel
+      List<PatientModel?> results = await Future.wait(tasks);
+
+      // Filter out any nulls (failed loads) and return
+      return results.whereType<PatientModel>().toList();
+    });
   }
 
   /// Fetch patient data from the 'patients' collection
   Future<Map<String, dynamic>?> fetchPatientData(String patientId) async {
     try {
-      final DocumentSnapshot docSnapshot =
-          await _firestore.collection('patients').doc(patientId).get();
+      final DocumentSnapshot docSnapshot = await _firestore.collection('patients').doc(patientId).get();
 
       if (docSnapshot.exists) {
         return docSnapshot.data() as Map<String, dynamic>;
@@ -67,17 +68,11 @@ class FirebasePatientService {
   }
 
   /// Fetch inspection notes for a specific patient
-  Future<List<Map<String, dynamic>>> fetchInspectionNotes(
-    String patientId,
-  ) async {
+  Future<List<Map<String, dynamic>>> fetchInspectionNotes(String patientId) async {
     List<Map<String, dynamic>> inspectionNotes = [];
 
     try {
-      final QuerySnapshot querySnapshot =
-          await _firestore
-              .collection('inspection_notes')
-              .where('patient_id', isEqualTo: patientId)
-              .get();
+      final QuerySnapshot querySnapshot = await _firestore.collection('inspection_notes').where('patient_id', isEqualTo: patientId).get();
 
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> noteData = doc.data() as Map<String, dynamic>;
@@ -105,8 +100,7 @@ class FirebasePatientService {
   /// Fetch MEWS data using mews_id
   Future<Map<String, dynamic>?> fetchMewsData(String mewsId) async {
     try {
-      final DocumentSnapshot docSnapshot =
-          await _firestore.collection('mews').doc(mewsId).get();
+      final DocumentSnapshot docSnapshot = await _firestore.collection('mews').doc(mewsId).get();
 
       if (docSnapshot.exists) {
         return docSnapshot.data() as Map<String, dynamic>;
@@ -138,10 +132,7 @@ class PatientService {
       final docRef = await db.collection("patients").add(patientMap);
 
       return {
-        200: jsonEncode({
-          "message": "Patient added successfully",
-          "patient_id": docRef.id,
-        }),
+        200: jsonEncode({"message": "Patient added successfully", "patient_id": docRef.id}),
       };
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
@@ -174,9 +165,7 @@ class PatientService {
         return {404: "Patient not found"};
       }
 
-      final inspectionNotesQuery = db
-          .collection("inspection_notes")
-          .where("patient_id", isEqualTo: patientId);
+      final inspectionNotesQuery = db.collection("inspection_notes").where("patient_id", isEqualTo: patientId);
       final inspectionNotesSnapshot = await inspectionNotesQuery.get();
 
       final List<String> mewsIdsToDelete = [];
@@ -196,9 +185,7 @@ class PatientService {
         batch.delete(mewRef);
       }
 
-      final linksQuery = db
-          .collection("patient_user_links")
-          .where("patient_id", isEqualTo: patientId);
+      final linksQuery = db.collection("patient_user_links").where("patient_id", isEqualTo: patientId);
       final linksSnapshot = await linksQuery.get();
 
       for (final linkDoc in linksSnapshot.docs) {
@@ -209,9 +196,7 @@ class PatientService {
       await batch.commit();
 
       return {
-        200: jsonEncode({
-          "message": "Patient and all related records deleted successfully",
-        }),
+        200: jsonEncode({"message": "Patient and all related records deleted successfully"}),
       };
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
@@ -225,10 +210,7 @@ class PatientService {
   }
 
   //* Used
-  Future<Map<int, String>> updatePatient(
-    String patientId,
-    Patient patientData,
-  ) async {
+  Future<Map<int, String>> updatePatient(String patientId, Patient patientData) async {
     final db = FirebaseFirestore.instance;
     final auth = FirebaseAuth.instance;
 
@@ -243,10 +225,7 @@ class PatientService {
       await patientRef.update(patientMap);
 
       return {
-        200: jsonEncode({
-          "message": "Patient updated successfully",
-          "patient_id": patientId,
-        }),
+        200: jsonEncode({"message": "Patient updated successfully", "patient_id": patientId}),
       };
     } on FirebaseException catch (e) {
       if (e.code == 'not-found') {
@@ -265,33 +244,17 @@ class PatientService {
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      return {
-        "status": 401,
-        "message": "Unauthorized: No token found",
-        "data": null,
-      };
+      return {"status": 401, "message": "Unauthorized: No token found", "data": null};
     }
 
-    final url = Uri.parse(
-      '${URL().getServerURL()}/home-fetch/get-links-by-user/$userId',
-    );
+    final url = Uri.parse('${URL().getServerURL()}/home-fetch/get-links-by-user/$userId');
 
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-      );
+      final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"});
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> decoded = jsonDecode(response.body);
-        return {
-          "status": 200,
-          "message": decoded["message"] ?? "Links retrieved successfully",
-          "data": decoded["data"],
-        };
+        return {"status": 200, "message": decoded["message"] ?? "Links retrieved successfully", "data": decoded["data"]};
       } else {
         String errorMessage;
 
@@ -302,18 +265,10 @@ class PatientService {
           errorMessage = response.body;
         }
 
-        return {
-          "status": response.statusCode,
-          "message": errorMessage,
-          "data": null,
-        };
+        return {"status": response.statusCode, "message": errorMessage, "data": null};
       }
     } catch (e) {
-      return {
-        "status": 500,
-        "message": "Error fetching monitored patient: $e",
-        "data": null,
-      };
+      return {"status": 500, "message": "Error fetching monitored patient: $e", "data": null};
     }
   }
 
@@ -329,10 +284,7 @@ class PatientService {
     try {
       final response = await http.post(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
+        headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"},
         body: jsonEncode(link.toJson()), // convert your model to JSON
       );
 
@@ -349,23 +301,14 @@ class PatientService {
     }
   }
 
-  Future<bool> takeOut({
-    required String userId,
-    required String patientId,
-  }) async {
+  Future<bool> takeOut({required String userId, required String patientId}) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     try {
-      CollectionReference linkCollection = firestore.collection(
-        'patient_user_links',
-      );
+      CollectionReference linkCollection = firestore.collection('patient_user_links');
 
       // Query for the document with matching userId and patientId
-      QuerySnapshot querySnapshot =
-          await linkCollection
-              .where('user_id', isEqualTo: userId)
-              .where('patient_id', isEqualTo: patientId)
-              .get();
+      QuerySnapshot querySnapshot = await linkCollection.where('user_id', isEqualTo: userId).where('patient_id', isEqualTo: patientId).get();
 
       // Check if any documents were found
       if (querySnapshot.docs.isNotEmpty) {
@@ -382,26 +325,17 @@ class PatientService {
   }
 
   //* Tested
-  Future<Map<String, dynamic>?> getPatientReport({
-    required String patientId,
-    required DateTime date,
-  }) async {
+  Future<Map<String, dynamic>?> getPatientReport({required String patientId, required DateTime date}) async {
     Map<String, dynamic> response = {};
     try {
-      final DocumentSnapshot patientDocSnapshot =
-          await FirebaseFirestore.instance
-              .collection('patients')
-              .doc(patientId)
-              .get();
+      final DocumentSnapshot patientDocSnapshot = await FirebaseFirestore.instance.collection('patients').doc(patientId).get();
       response['patient_id'] = patientId;
       response['patient_info'] = patientDocSnapshot.data();
 
       if (response['patient_info'] != null) {
-        Map<String, dynamic> patientInfo =
-            response['patient_info'] as Map<String, dynamic>;
+        Map<String, dynamic> patientInfo = response['patient_info'] as Map<String, dynamic>;
         if (patientInfo['created_at'] is Timestamp) {
-          patientInfo['created_at'] =
-              (patientInfo['created_at'] as Timestamp).toDate();
+          patientInfo['created_at'] = (patientInfo['created_at'] as Timestamp).toDate();
         }
       }
 
@@ -411,24 +345,14 @@ class PatientService {
           await FirebaseFirestore.instance
               .collection('mews')
               .where('patient_id', isEqualTo: patientId)
-              .where(
-                'assessed_time',
-                isGreaterThanOrEqualTo: Timestamp.fromDate(queryDateStart),
-              )
-              .where(
-                'assessed_time',
-                isLessThan: Timestamp.fromDate(queryDateEnd),
-              )
+              .where('assessed_time', isGreaterThanOrEqualTo: Timestamp.fromDate(queryDateStart))
+              .where('assessed_time', isLessThan: Timestamp.fromDate(queryDateEnd))
               .get();
 
       List<Map<String, dynamic>> fullReports = [];
       for (var doc in mewsSnapshot.docs) {
         Map<String, dynamic> mewsData = doc.data() as Map<String, dynamic>;
-        final QuerySnapshot noteSnapshot =
-            await FirebaseFirestore.instance
-                .collection('inspection_notes')
-                .where('mews_id', isEqualTo: doc.id)
-                .get();
+        final QuerySnapshot noteSnapshot = await FirebaseFirestore.instance.collection('inspection_notes').where('mews_id', isEqualTo: doc.id).get();
 
         if (noteSnapshot.docs.isNotEmpty) {
           mewsData['report_id'] = noteSnapshot.docs.first.id;
@@ -451,8 +375,7 @@ class PatientService {
 
       for (var report in fullReports) {
         if (report['assessed_time'] is Timestamp) {
-          report['assessed_time'] =
-              (report['assessed_time'] as Timestamp).toDate();
+          report['assessed_time'] = (report['assessed_time'] as Timestamp).toDate();
         }
       }
 

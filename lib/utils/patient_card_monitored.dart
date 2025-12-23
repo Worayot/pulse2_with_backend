@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/func/get_color.dart';
+import 'package:tuh_mews/models/monitored_patient/card_model.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 import 'package:tuh_mews/utils/circle_with_num.dart';
 import 'package:tuh_mews/utils/assess_table_row.dart';
@@ -13,13 +13,10 @@ import 'package:tuh_mews/utils/time_manager.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class MonitoredPatientCard extends StatefulWidget {
-  final Map<String, dynamic> patientData;
+  final PatientModel patient;
   final VoidCallback onPop;
-  const MonitoredPatientCard({
-    super.key,
-    required this.patientData,
-    required this.onPop,
-  });
+
+  const MonitoredPatientCard({super.key, required this.patient, required this.onPop});
 
   @override
   State<MonitoredPatientCard> createState() => _MonitoredPatientCardState();
@@ -29,14 +26,12 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
   String _latestTimeText = "";
   String _countdownText = "";
   Timer? _timer;
-  List<Map<String, dynamic>> _processedData = [];
-  DateTime? _nearestFutureTime;
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+  // You can create a small UI model for this list if you want,
+  // but keeping Map<String, dynamic> for the specific UI row state is okay for now.
+  List<Map<String, dynamic>> _processedUIRows = [];
+  DateTime? _nearestFutureTime;
+  bool isExpanded = false;
 
   @override
   void initState() {
@@ -45,117 +40,108 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     _startNearestTimeCountdown();
   }
 
-  void _processInspectionData() {
-    var patientData = widget.patientData;
-    List<Map<String, dynamic>> dataRows = patientData['inspection_notes'];
-    dataRows.sort(
-      (a, b) => (a['time'] as Timestamp).compareTo(b['time'] as Timestamp),
-    );
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
-    _processedData =
-        dataRows.map((map) {
-          Timestamp timestamp = map['time'];
-          DateTime dateTimeUtc = timestamp.toDate().toUtc();
-          final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+  void _processInspectionData() {
+    // 1. Get notes from the Model
+    List<InspectionNoteModel> notes = widget.patient.inspectionNotes;
+
+    // 2. Sort using Model DateTime
+    notes.sort((a, b) => a.time.compareTo(b.time));
+
+    // 3. Process into UI-ready data
+    final bangkokTimezone = tz.getLocation('Asia/Bangkok');
+
+    _processedUIRows =
+        notes.map((noteModel) {
+          // Convert Model DateTime (UTC/Local) to Specific Timezone
+          DateTime dateTimeUtc = noteModel.time.toUtc();
           var localDateTime = tz.TZDateTime.from(dateTimeUtc, bangkokTimezone);
-          // String formattedTimeShort = DateFormat('HH.mm').format(localDateTime);
+
           String formattedTime = DateFormat('HH.mm').format(localDateTime);
-          // String timeDelta = timeDeltaFromNow(dateTime: localDateTime);
-          String timeFull = DateFormat(
-            'yyyy-MM-dd HH:mm:ss',
-          ).format(localDateTime);
+          String timeFull = DateFormat('yyyy-MM-dd HH:mm:ss').format(localDateTime);
 
           return {
-            // "formatted_time_short":
-            //     '$formattedTimeShort${'n'.tr()} ($timeDelta)',
             "formatted_time": '$formattedTime${'n'.tr()}',
-            "mews": map['mews']['mews'] ?? '-',
-            "is_assessed": map['mews']['is_assessed'],
-            "mews_id": map['mews_id'],
-            "note_id": map['note_id'],
-            "note": map['text'] ?? '',
-            "auditor": map['audit_by'],
+            "mews": noteModel.mewsScore,
+            "is_assessed": noteModel.isAssessed,
+            "mews_id": noteModel.mewsId,
+            "note_id": noteModel.noteId,
+            "note": noteModel.noteText,
+            "auditor": noteModel.auditor,
             "time": timeFull,
             "local_date_time": localDateTime,
           };
         }).toList();
 
+    // 4. Calculate Nearest Future Time
     DateTime nowUtc = DateTime.now().toUtc();
-    final bangkokTimezone = tz.getLocation('Asia/Bangkok');
     final nowLocal = tz.TZDateTime.from(nowUtc, bangkokTimezone);
 
-    List<DateTime> futureTimes =
-        _processedData
-            .map((item) => item['local_date_time'] as DateTime)
-            .where((t) => t.isAfter(nowLocal))
-            .toList();
+    List<DateTime> futureTimes = _processedUIRows.map((item) => item['local_date_time'] as DateTime).where((t) => t.isAfter(nowLocal)).toList();
+
     futureTimes.sort((a, b) => a.compareTo(b));
 
     _nearestFutureTime = futureTimes.isNotEmpty ? futureTimes.first : null;
-    _latestTimeText =
-        _nearestFutureTime != null
-            ? DateFormat('HH.mm.ss').format(_nearestFutureTime!) + 'n'.tr()
-            : "-";
+    _latestTimeText = _nearestFutureTime != null ? DateFormat('HH.mm.ss').format(_nearestFutureTime!) + 'n'.tr() : "-";
   }
 
   void _startNearestTimeCountdown() {
     _timer?.cancel();
-
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_nearestFutureTime != null) {
-        final nowUtc = DateTime.now().toUtc();
         final bangkokTimezone = tz.getLocation('Asia/Bangkok');
-        final nowLocal = tz.TZDateTime.from(nowUtc, bangkokTimezone);
-        final nearestFutureTimeLocal = tz.TZDateTime.from(
-          _nearestFutureTime!,
-          bangkokTimezone,
-        );
+        final nowLocal = tz.TZDateTime.from(DateTime.now().toUtc(), bangkokTimezone);
+        final nearestFutureTimeLocal = tz.TZDateTime.from(_nearestFutureTime!, bangkokTimezone);
 
         if (nearestFutureTimeLocal.isAfter(nowLocal)) {
           final difference = nearestFutureTimeLocal.difference(nowLocal);
+          // ... formatting logic same as before ...
           final days = difference.inDays;
           final hours = difference.inHours % 24;
           final minutes = difference.inMinutes % 60;
           final seconds = difference.inSeconds % 60;
-          setState(() {
-            _countdownText =
-                " (${days > 0 ? '$days days ' : ''}${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')})";
-          });
+
+          if (mounted) {
+            setState(() {
+              _countdownText = " (${days > 0 ? '$days days ' : ''}${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')})";
+            });
+          }
         } else {
+          if (mounted) {
+            setState(() {
+              _countdownText = " ";
+            });
+            _processInspectionData(); // Refresh data
+            _startNearestTimeCountdown(); // Restart timer
+          }
+        }
+      } else {
+        if (mounted)
           setState(() {
             _countdownText = " ";
           });
-          _processInspectionData();
-          _startNearestTimeCountdown();
-        }
-      } else {
-        setState(() {
-          _countdownText = " ";
-        });
       }
     });
   }
 
-  bool isExpanded = false;
-
   @override
   Widget build(BuildContext context) {
-    var patientData = widget.patientData;
-    String patientID = patientData['patient_id'];
-    String myUserID = patientData['user_id'];
-    Map<String, dynamic> patientDetails = patientData['patient_details'];
-    String fullname = patientDetails['fullname'];
+    // Access data directly from the Model
+    String patientID = widget.patient.patientId;
+    String myUserID = widget.patient.userId;
+    String fullname = widget.patient.fullname;
 
     Size size = MediaQuery.of(context).size;
-    int dataLength = _processedData.length;
+    int dataLength = _processedUIRows.length;
 
-    List<String> scores =
-        _processedData.map((item) => item["mews"].toString()).toList();
-
-    int latestIndex = scores.lastIndexWhere(
-      (score) => int.tryParse(score) != null,
-    );
-
+    // Logic to find latest score
+    List<String> scores = _processedUIRows.map((item) => item["mews"].toString()).toList();
+    int latestIndex = scores.lastIndexWhere((score) => int.tryParse(score) != null);
     String latestMews = latestIndex != -1 ? scores[latestIndex] : "-";
 
     return Padding(
@@ -169,44 +155,27 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      isExpanded = !isExpanded;
-                    });
-                  },
+                  onTap: () => setState(() => isExpanded = !isExpanded),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeInOut,
                     padding: const EdgeInsets.only(top: 16),
-                    height:
-                        isExpanded
-                            ? (size.height * 0.033 + 8) * dataLength + 101
-                            : 101,
+                    height: isExpanded ? (size.height * 0.033 + 8) * dataLength + 101 : 101,
                     width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xff98B1E8),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
                     child: SingleChildScrollView(
                       physics: const NeverScrollableScrollPhysics(),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 75),
-                          if (isExpanded) ...[
+                          if (isExpanded)
                             Column(
                               children: List.generate(dataLength, (i) {
-                                return AssessTableRowWidget(
-                                  combinedData: _processedData[i],
-                                  myUserID: myUserID,
-                                  patientID: patientID,
-                                  onPop: widget.onPop,
-                                );
+                                return AssessTableRowWidget(combinedData: _processedUIRows[i], myUserID: myUserID, patientID: patientID, onPop: widget.onPop);
                               }),
                             ),
-                            const SizedBox(height: 10),
-                          ],
+                          const SizedBox(height: 10),
                         ],
                       ),
                     ),
@@ -218,83 +187,41 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
           // Collapsed Header
           Container(
-            margin: const EdgeInsets.symmetric(vertical: 0),
-            decoration: BoxDecoration(
-              color: const Color(0xffE0EAFF),
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: BoxDecoration(color: const Color(0xffE0EAFF), borderRadius: BorderRadius.circular(16)),
             padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 InkWell(
-                  onTap: () {
-                    setState(() {
-                      isExpanded = !isExpanded;
-                    });
-                  },
+                  onTap: () => setState(() => isExpanded = !isExpanded),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4.0, right: 12),
-                        child: CircleWithNumber(
-                          number: latestMews,
-                          color: getColor(latestMews),
-                        ),
-                      ),
+                      Padding(padding: const EdgeInsets.only(left: 4.0, right: 12), child: CircleWithNumber(number: latestMews, color: getColor(latestMews))),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              fullname,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black.withOpacity(0.25),
-                                    offset: const Offset(0.4, 0.4),
-                                    blurRadius: 0.5,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              "nextInspectionTime".tr(),
-                              style: TextStyle(fontSize: 16),
-                            ),
+                            Text(fullname, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text("nextInspectionTime".tr(), style: TextStyle(fontSize: 16)),
                             const SizedBox(height: 2),
                             Text.rich(
                               TextSpan(
                                 style: const TextStyle(fontSize: 16),
-                                children: [
-                                  TextSpan(text: _latestTimeText),
-                                  TextSpan(
-                                    text: _countdownText,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
+                                children: [TextSpan(text: _latestTimeText), TextSpan(text: _countdownText, style: TextStyle(fontSize: 14, color: Colors.grey[600]))],
                               ),
                             ),
                           ],
                         ),
                       ),
+                      // ... Action Buttons (same as before) ...
                       buildActionButton(
                         FontAwesomeIcons.magnifyingGlassPlus,
                         () {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return InstantMEWsForm(
-                                patientID: patientID,
-                                auditorID: myUserID,
-                                onPop: widget.onPop,
-                              );
+                              return InstantMEWsForm(patientID: patientID, auditorID: myUserID, onPop: widget.onPop);
                             },
                           );
                         },
@@ -329,17 +256,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
             right: 0,
             top: 85,
             child: IgnorePointer(
-              child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('assess'.tr()),
-                    isExpanded
-                        ? Icon(Icons.expand_less)
-                        : Icon(Icons.expand_more),
-                  ],
-                ),
-              ),
+              child: Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('assess'.tr()), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)])),
             ),
           ),
         ],
