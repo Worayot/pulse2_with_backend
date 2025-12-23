@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'dart:convert';
@@ -16,10 +15,19 @@ class ExportServices {
       return {401: "Unauthorized: Invalid or missing token."};
     }
 
-    final url = Uri.parse('${URL().getServerURL()}/expt-fetch/get_report_excel');
+    final url = Uri.parse(
+      '${URL().getServerURL()}/expt-fetch/get_report_excel',
+    );
 
     try {
-      final response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"}, body: jsonEncode({"patient_ids": patientIds}));
+      final response = await http.post(
+        url,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $idToken",
+        },
+        body: jsonEncode({"patient_ids": patientIds}),
+      );
 
       if (response.statusCode == 200) {
         return await _saveAndOpenFile(response.bodyBytes);
@@ -36,12 +44,9 @@ class ExportServices {
       Directory? directory;
 
       if (Platform.isAndroid) {
-        bool permissionGranted = await _requestStoragePermissions();
-        if (!permissionGranted) {
-          return {403: "Forbidden: Storage permission denied."};
-        }
-
-        final directories = await getExternalStorageDirectories(type: StorageDirectory.downloads);
+        final directories = await getExternalStorageDirectories(
+          type: StorageDirectory.downloads,
+        );
         directory = directories?.first;
         if (directory == null) {
           return {500: "Internal Server Error: Could not get directory."};
@@ -67,24 +72,5 @@ class ExportServices {
     } catch (e) {
       return {500: "Internal Server Error: $e"};
     }
-  }
-
-  Future<bool> _requestStoragePermissions() async {
-    if (Platform.isAndroid) {
-      // For Android 11+ request MANAGE_EXTERNAL_STORAGE permission
-      if (await Permission.manageExternalStorage.isGranted) {
-        return true;
-      }
-      final status = await Permission.manageExternalStorage.request();
-      if (status.isGranted) {
-        return true;
-      } else {
-        // Open app settings for manual enablement
-        await openAppSettings();
-        return false;
-      }
-    }
-    // iOS does not need special permission for documents directory
-    return true;
   }
 }
