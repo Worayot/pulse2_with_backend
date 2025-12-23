@@ -9,6 +9,7 @@ void showNursing(BuildContext context, String MEWs) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Card(
+          color: const Color(0xffE0EAFF),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 6,
           child: Padding(
@@ -64,16 +65,25 @@ Widget buildNursingDetails(BuildContext context, String MEWs) {
   }
 
   return Expanded(
-    child: Column(
-      children: [
-        FittedBox(fit: BoxFit.scaleDown, child: Row(children: [Text("MEWs : $MEWs", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold))])),
-        const Gap(4),
-        Expanded(
-          child: SingleChildScrollView(
-            child: SizedBox(child: Align(alignment: Alignment.topLeft, child: Text(nursing, style: TextStyle(fontSize: 20), textAlign: TextAlign.left, softWrap: true))),
+    child: Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        children: [
+          FittedBox(fit: BoxFit.scaleDown, child: Row(children: [Text("MEWs : $MEWs", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold))])),
+          const Gap(4),
+          Expanded(
+            child: Scrollbar(
+              child: SingleChildScrollView(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(padding: const EdgeInsets.only(right: 12), child: Text(nursing, style: TextStyle(fontSize: 18), textAlign: TextAlign.left, softWrap: true)),
+                ),
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
