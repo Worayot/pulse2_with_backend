@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
 import 'package:tuh_mews/universal_setting/sizes.dart';
@@ -43,20 +42,10 @@ class _PatientInSystemState extends State<PatientInSystem> {
     super.dispose();
   }
 
-  List<Map<String, dynamic>> _getFilteredPatients(
-    List<Map<String, dynamic>> patients,
-  ) {
+  List<Map<String, dynamic>> _getFilteredPatients(List<Map<String, dynamic>> patients) {
     if (_searchQuery.isEmpty) return patients;
 
-    return patients
-        .where(
-          (patient) =>
-              patient["fullname"]?.toString().toLowerCase().contains(
-                _searchQuery,
-              ) ??
-              false,
-        )
-        .toList();
+    return patients.where((patient) => patient["fullname"]?.toString().toLowerCase().contains(_searchQuery) ?? false).toList();
   }
 
   Stream<List<Map<String, dynamic>>> getPatientsStream() {
@@ -108,27 +97,14 @@ class _PatientInSystemState extends State<PatientInSystem> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        "patientsInSystem".tr(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: getPageTitleSize(context),
-                        ),
-                      ),
-                    ),
+                    Align(alignment: Alignment.topLeft, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
                     GestureDetector(
                       onTap: () {
                         setState(() {
                           showInfoDialog(context, homeSymbols());
                         });
                       },
-                      child: const FaIcon(
-                        FontAwesomeIcons.circleInfo,
-                        size: 28,
-                        color: Color(0xff3362CC),
-                      ),
+                      child: const FaIcon(FontAwesomeIcons.circleInfo, size: 28, color: Color(0xff3362CC)),
                     ),
                   ],
                 ),
@@ -154,17 +130,9 @@ class _PatientInSystemState extends State<PatientInSystem> {
                                     : null,
                             fillColor: const Color(0xffCADBFF),
                             filled: true,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            prefixIcon: const Icon(
-                              FontAwesomeIcons.magnifyingGlass,
-                              color: Colors.black,
-                            ),
-                            prefixIconConstraints: const BoxConstraints(
-                              minWidth: 60,
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                            prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 60),
                           ),
                         ),
                       ),
@@ -179,31 +147,15 @@ class _PatientInSystemState extends State<PatientInSystem> {
                           },
                         );
                       },
-                      icon: Icon(
-                        FontAwesomeIcons.userPlus,
-                        color: Colors.white,
-                        size: 26,
-                      ),
+                      icon: Icon(FontAwesomeIcons.userPlus, color: Colors.white, size: 26),
                       label: Padding(
                         padding: const EdgeInsets.only(left: 4.0),
-                        child: Text(
-                          "addPatient".tr(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: Text("addPatient".tr(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff407BFF),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 0,
                         // fixedSize: Size.fromHeight(60),
                       ),
@@ -256,10 +208,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
                           final parts = timeString.split(':');
                           final hour = int.tryParse(parts[0]) ?? 0;
                           final minute = int.tryParse(parts[1]) ?? 0;
-                          inspectionTime = TimeOfDay(
-                            hour: hour,
-                            minute: minute,
-                          );
+                          inspectionTime = TimeOfDay(hour: hour, minute: minute);
                         }
 
                         return HomeExpandableCards(

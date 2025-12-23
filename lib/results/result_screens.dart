@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:tuh_mews/utils/note_adder.dart'; // Assuming this is correct
 
 void showResultDialog({required int MEWs, required String noteID, required VoidCallback onPop, required NavigatorState navigator}) {
@@ -15,105 +16,90 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
     builder: (context) {
       return Card(
         margin: const EdgeInsets.all(16),
-        color: Colors.transparent,
+        color: bgColor,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Stack(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                color: bgColor,
-                // --- FIX: REMOVED the outer SingleChildScrollView ---
-                // The main widget is a Column, which allows
-                // Expanded to work correctly.
-                child: Column(
-                  children: [
-                    // --- 1. THE FIXED (NON-SCROLLING) PART ---
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Center(child: Text("finishedCalculating".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text("\t\t${"totalScore".tr()}: $MEWs", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
+            Positioned(bottom: 0, right: 0, child: IgnorePointer(child: Opacity(opacity: 0.5, child: Image.asset(emoji)))),
 
-                    // --- 2. THE SCROLLABLE PART ---
-                    // Expanded tells this section to fill all remaining space.
-                    Expanded(
-                      // This SingleChildScrollView now scrolls *only*
-                      // in the space given by Expanded.
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(12.0)),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(title, style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 20),
-                                    Text("${"nursing".tr()}:", style: const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold, height: 0.5)),
-                                    const SizedBox(height: 10),
-                                    Text(nursing, style: const TextStyle(fontSize: 16, color: Colors.black)),
-                                  ],
-                                ),
-                              ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Center(child: Text("finishedCalculating".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text("\t\t${"totalScore".tr()}: $MEWs", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.7), borderRadius: BorderRadius.circular(12.0)),
+
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          const Gap(16),
+
+                          Text("${"nursing".tr()} :", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Gap(12),
+
+                          Expanded(
+                            child: Scrollbar(
+                              thumbVisibility: true,
+                              child: SingleChildScrollView(child: Padding(padding: const EdgeInsets.only(right: 12.0), child: Text(nursing, style: const TextStyle(fontSize: 16)))),
                             ),
-                            // Padding so content can scroll above the button
-                            const SizedBox(height: 80),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Gap(16),
+                  Align(
+                    alignment: AlignmentGeometry.bottomRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return NoteAdder(noteID: noteID, onPop: onPop);
+                          },
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(color: const Color(0xFF565656), borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(FontAwesomeIcons.solidPenToSquare, color: Colors.white, size: 16),
+                            const Gap(8),
+                            Text('addNote'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                           ],
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(bottom: 0, right: 0, child: IgnorePointer(child: Opacity(opacity: 0.5, child: Image.asset(emoji)))),
-            Positioned(
-              right: 15,
-              bottom: 15,
-              child: GestureDetector(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return NoteAdder(noteID: noteID, onPop: onPop);
-                    },
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(color: const Color(0xFF565656), borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: Row(
-                    // Changed to Row from your original code
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(FontAwesomeIcons.solidPenToSquare, color: Colors.white, size: 16), // Added size
-                      const SizedBox(width: 8), // Added spacing
-                      Text('addNote'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                    ],
                   ),
-                ),
+                ],
               ),
             ),
 
@@ -134,7 +120,6 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
   );
 }
 
-// getComponent function (no changes)
 List<dynamic> getComponent(int MEWs) {
   // Process MEWs
   String nursing = "";
