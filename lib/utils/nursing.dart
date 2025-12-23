@@ -1,32 +1,43 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 
 void showNursing(BuildContext context, String MEWs) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
-
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(screenWidth * 0.04)),
-            title: Row(
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 6,
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text("nursing".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: screenWidth * 0.05)),
-                const Spacer(),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.black, size: screenWidth * 0.06),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                // Title Row
+                Row(
+                  children: [
+                    const Gap(8),
+                    Text("nursing".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    const Spacer(),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(Icons.close, color: Colors.black, size: 18),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
                 ),
+
+                const Gap(4),
+
+                // Content
+                buildNursingDetails(context, MEWs),
               ],
             ),
-            contentPadding: EdgeInsets.only(left: screenWidth * 0.08, right: screenWidth * 0.08, bottom: screenHeight * 0.02),
-            content: Column(mainAxisSize: MainAxisSize.min, children: [buildNursingDetails(context, MEWs)]),
           ),
         ),
       );
@@ -35,9 +46,6 @@ void showNursing(BuildContext context, String MEWs) {
 }
 
 Widget buildNursingDetails(BuildContext context, String MEWs) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
-
   // Process MEWs
   String nursing = "";
   int? MEWs0 = int.tryParse(MEWs);
@@ -55,18 +63,16 @@ Widget buildNursingDetails(BuildContext context, String MEWs) {
     nursing = "nursingHigh".tr();
   }
 
-  return SizedBox(
-    width: screenWidth * 0.7,
+  return Expanded(
     child: Column(
       children: [
-        SizedBox(height: screenHeight * 0.03),
-        Row(
-          children: [
-            Text("${"latestMEWs".tr()} : ", style: TextStyle(fontSize: screenWidth * 0.06, fontWeight: FontWeight.bold)),
-            Padding(padding: EdgeInsets.only(bottom: screenHeight * 0.01), child: Text(MEWs, style: TextStyle(fontSize: screenWidth * 0.1, fontWeight: FontWeight.bold))),
-          ],
+        FittedBox(fit: BoxFit.scaleDown, child: Row(children: [Text("MEWs : $MEWs", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold))])),
+        const Gap(4),
+        Expanded(
+          child: SingleChildScrollView(
+            child: SizedBox(child: Align(alignment: Alignment.topLeft, child: Text(nursing, style: TextStyle(fontSize: 20), textAlign: TextAlign.left, softWrap: true))),
+          ),
         ),
-        Align(alignment: Alignment.topLeft, child: Text(nursing, style: TextStyle(fontSize: screenWidth * 0.045), textAlign: TextAlign.left, softWrap: true)),
       ],
     ),
   );

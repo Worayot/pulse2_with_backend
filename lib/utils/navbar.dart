@@ -109,7 +109,7 @@ class _ItemWidget extends StatelessWidget {
                   child: DefaultTextStyle.merge(
                     style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis, // Handles overflow with ellipsis
+                    overflow: TextOverflow.ellipsis,
                     textAlign: item.textAlign,
                     child: item.title,
                   ),

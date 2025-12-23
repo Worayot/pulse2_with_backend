@@ -86,7 +86,6 @@ class MyApp extends StatelessWidget {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-        // home: const NavigationPage(),
         home: const NavigationPage(),
         builder: EasyLoading.init(),
       ),

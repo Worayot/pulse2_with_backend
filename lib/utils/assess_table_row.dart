@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:tuh_mews/func/get_color.dart';
 import 'package:tuh_mews/utils/mews_forms.dart';
 import 'package:tuh_mews/utils/note_editor.dart';
+import 'package:tuh_mews/utils/nursing.dart';
+import 'package:tuh_mews/utils/show_datetime.dart';
 
 class AssessTableRowWidget extends StatelessWidget {
   final Map<String, dynamic> combinedData;
@@ -30,17 +32,10 @@ class AssessTableRowWidget extends StatelessWidget {
     final double screenHeight = size.height;
 
     DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-    // DateFormat formatter = DateFormat('yyyy-MM-dd HH.mm');
-
-    // print("assTableRow $fullTime");
-
-    // Step 1: Parse string to DateTime
     DateTime parsedTime = formatter.parse(fullTime);
+    String noMs = formatter.format(parsedTime);
 
-    // Step 2: Subtract 5 minutes
     DateTime fiveMinutesBefore = parsedTime.subtract(const Duration(minutes: 5));
-
-    // Step 3: Format back to string
     String newTime = formatter.format(fiveMinutesBefore);
 
     final bool isButtonEnabled = !isAssessed;
@@ -51,28 +46,33 @@ class AssessTableRowWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            width: screenWidth * 0.16,
-            height: screenHeight * 0.033,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4), // Rounded corners (optional)
-            ),
-            child: Center(
-              child: Text(
-                '$time${"n".tr()}',
-                style: TextStyle(
-                  color: Colors.black,
-                  // fontSize: screenWidth * 0.035,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.25), // Shadow color with opacity
-                      offset: const Offset(0.4, 0.4), // Horizontal and vertical offset
-                      blurRadius: 0.5, // Blur radius
+          GestureDetector(
+            onTap: () {
+              showDateTimeDialog(context, noMs);
+            },
+            child: Container(
+              width: screenWidth * 0.16,
+              height: screenHeight * 0.033,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    time,
+                    style: TextStyle(
+                      color: Colors.black,
+                      // fontSize: screenWidth * 0.035,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.25), // Shadow color with opacity
+                          offset: const Offset(0.4, 0.4), // Horizontal and vertical offset
+                          blurRadius: 0.5, // Blur radius
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -88,7 +88,7 @@ class AssessTableRowWidget extends StatelessWidget {
                 shadowColor: Colors.transparent, // Removes shadow
                 side: BorderSide(
                   color: isButtonEnabled ? Color(0xff3362CC) : Colors.black.withOpacity(0.5), // Border color
-                  width: 1, // Border width
+                  width: 1,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4), // Rounded corners
@@ -100,11 +100,6 @@ class AssessTableRowWidget extends StatelessWidget {
                       ? () {
                         String stringToHash = '$patientID$fullTime.000';
                         String secondStringToHash = '$patientID$newTime.000';
-
-                        // print("$stringToHash stringToHash assTableRow");
-                        // print(
-                        //   "$secondStringToHash secondStringToHash secondStringToHash",
-                        // );
 
                         showDialog(
                           context: context,
@@ -126,49 +121,42 @@ class AssessTableRowWidget extends StatelessWidget {
             ),
           ),
 
-          Container(
-            // padding: padding,
-            width: screenWidth * 0.2,
-            height: screenHeight * 0.033,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4), // Rounded corners (optional)
-            ),
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'MEWS : ',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withOpacity(0.25), // Shadow color with opacity
-                          offset: const Offset(0.8, 0.8), // Horizontal and vertical offset
-                          blurRadius: 1, // Blur radius
+          GestureDetector(
+            onTap: () {
+              final String score = MEWs.toString();
+              if (score.isNotEmpty && score != "-") showNursing(context, score);
+            },
+            child: Container(
+              width: screenWidth * 0.2,
+              height: screenHeight * 0.033,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'MEWS : ',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          shadows: [Shadow(color: Colors.black.withOpacity(0.25), offset: Offset(0.8, 0.8), blurRadius: 1)],
                         ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    '$MEWs',
-                    style: TextStyle(
-                      color: getColor(MEWs),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withOpacity(0.2), // Shadow color with opacity
-                          offset: const Offset(0.8, 0.8), // Horizontal and vertical offset
-                          blurRadius: 1, // Blur radius
+                      ),
+                      Text(
+                        '$MEWs',
+                        style: TextStyle(
+                          color: getColor(MEWs),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          shadows: [Shadow(color: Colors.black.withOpacity(0.2), offset: Offset(0.8, 0.8), blurRadius: 1)],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

@@ -10,7 +10,6 @@ import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
 import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
-import 'package:tuh_mews/state/secure_storage/secure_storage.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 import 'package:tuh_mews/utils/edit_patient_form.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
@@ -50,22 +49,13 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
     final currentUserId = prefs.getString('nurseID');
     if (currentUserId == null) return;
 
-    CollectionReference patientsCollection = firestore.collection(
-      'patient_user_links',
-    );
+    CollectionReference patientsCollection = firestore.collection('patient_user_links');
 
     _streamSubscription = patientsCollection
         .where('user_id', isEqualTo: currentUserId)
         .snapshots()
         .map((querySnapshot) {
-          return querySnapshot.docs
-              .map(
-                (doc) =>
-                    (doc.data() as Map<String, dynamic>?)?['patient_id']
-                        as String?,
-              )
-              .whereType<String>()
-              .toList();
+          return querySnapshot.docs.map((doc) => (doc.data() as Map<String, dynamic>?)?['patient_id'] as String?).whereType<String>().toList();
         })
         .listen((linkedPatients) {
           if (mounted) {
@@ -111,25 +101,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
     String patientID = data.patientID ?? '';
 
     TimeOfDay? inspectionTime = data.inspectionTime;
-    String formattedTime =
-        inspectionTime != null
-            ? '${inspectionTime.hour.toString().padLeft(2, '0')}:${inspectionTime.minute.toString().padLeft(2, '0')}'
-            : '-';
+    String formattedTime = inspectionTime != null ? '${inspectionTime.hour.toString().padLeft(2, '0')}:${inspectionTime.minute.toString().padLeft(2, '0')}' : '-';
 
-    final Patient patient = Patient(
-      age: age,
-      bedNumber: bedNum,
-      fullname: fullname,
-      gender: gender,
-      ward: ward,
-      hospitalNumber: hn,
-      patientId: patientID,
-    );
+    final Patient patient = Patient(age: age, bedNumber: bedNum, fullname: fullname, gender: gender, ward: ward, hospitalNumber: hn, patientId: patientID);
 
-    String nextTimeText =
-        formattedTime == '-'
-            ? "${"latestInspection".tr()} -"
-            : "${"latestInspection".tr()} $formattedTime${"n".tr()}";
+    String nextTimeText = formattedTime == '-' ? "${"latestInspection".tr()} -" : "${"latestInspection".tr()} $formattedTime${"n".tr()}";
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -152,22 +128,8 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                     padding: const EdgeInsets.only(top: 16),
                     height: isExpanded ? 380 : 82,
                     width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xff98B1E8),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child:
-                        isExpanded
-                            ? PatientIndData(
-                              age: age,
-                              gender: gender.tr(),
-                              hn: hn,
-                              bedNum: bedNum,
-                              ward: ward,
-                              mews: mews,
-                              time: formattedTime,
-                            )
-                            : const SizedBox(),
+                    decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
+                    child: isExpanded ? PatientIndData(age: age, gender: gender.tr(), hn: hn, bedNum: bedNum, ward: ward, mews: mews, time: formattedTime) : const SizedBox(),
                   ),
                 ),
               ),
@@ -176,27 +138,16 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
 
           // Collapsed Header
           Container(
-            decoration: BoxDecoration(
-              color: const Color(0xffE0EAFF),
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: BoxDecoration(color: const Color(0xffE0EAFF), borderRadius: BorderRadius.circular(16)),
             child: Stack(
               children: [
                 Positioned(
                   bottom: 0, // Adjust the vertical position
                   right: 0, // Adjust the horizontal position
-                  child: IgnorePointer(
-                    child: Image.asset(
-                      "assets/images/therapy3.png",
-                      fit: BoxFit.contain,
-                    ),
-                  ),
+                  child: IgnorePointer(child: Image.asset("assets/images/therapy3.png", fit: BoxFit.contain)),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -218,40 +169,18 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black.withOpacity(0.25),
-                                          offset: const Offset(0.8, 0.8),
-                                          blurRadius: 1,
-                                        ),
-                                      ],
+                                      shadows: [Shadow(color: Colors.black.withOpacity(0.25), offset: const Offset(0.8, 0.8), blurRadius: 1)],
                                     ),
                                   ),
                                   RichText(
                                     text: TextSpan(
                                       children: [
-                                        TextSpan(
-                                          text: "${"bedNumber".tr()} ",
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: bedNum,
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
-                                        ),
+                                        TextSpan(text: "${"bedNumber".tr()} ", style: const TextStyle(fontSize: 11, color: Colors.black)),
+                                        TextSpan(text: bedNum, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black)),
                                       ],
                                     ),
                                   ),
-                                  Text(
-                                    nextTimeText,
-                                    style: const TextStyle(fontSize: 11),
-                                  ),
+                                  Text(nextTimeText, style: const TextStyle(fontSize: 11)),
                                   const SizedBox(height: 2),
                                 ],
                               ),
@@ -263,34 +192,21 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                 setState(() {
                                   enableToggleButton = false;
                                 });
-                                PatientUserLink link = PatientUserLink(
-                                  patientID: patientID,
-                                  userID: userID,
-                                );
+                                PatientUserLink link = PatientUserLink(patientID: patientID, userID: userID);
 
-                                Map<int, String> status = await PatientService()
-                                    .takeIn(link: link);
+                                Map<int, String> status = await PatientService().takeIn(link: link);
                                 int statusCode = status.keys.first;
-                                String message =
-                                    '$statusCode ${status.values.first}';
+                                String message = '$statusCode ${status.values.first}';
 
                                 if (statusCode == 200) {
                                 } else if (statusCode == 401) {
                                   if (mounted) {
-                                    LogoutService(
-                                      navigator: Navigator.of(context),
-                                    ).logout();
-                                    FlushbarService().showErrorMessage(
-                                      context: context,
-                                      message: message,
-                                    );
+                                    LogoutService(navigator: Navigator.of(context)).logout();
+                                    FlushbarService().showErrorMessage(context: context, message: message);
                                   }
                                 } else {
                                   if (mounted) {
-                                    FlushbarService().showErrorMessage(
-                                      context: context,
-                                      message: message,
-                                    );
+                                    FlushbarService().showErrorMessage(context: context, message: message);
                                   }
                                 }
 
@@ -304,18 +220,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                 setState(() {
                                   enableToggleButton = false;
                                 });
-                                bool takeOutState = await PatientService()
-                                    .takeOut(
-                                      userId: userID,
-                                      patientId: patientID,
-                                    );
+                                bool takeOutState = await PatientService().takeOut(userId: userID, patientId: patientID);
                                 if (mounted) {
                                   if (takeOutState) {
                                   } else {
-                                    FlushbarService().showErrorMessage(
-                                      context: context,
-                                      message: 'failedToRemovePatient'.tr(),
-                                    );
+                                    FlushbarService().showErrorMessage(context: context, message: 'failedToRemovePatient'.tr());
                                   }
                                 }
 
@@ -343,38 +252,17 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      return EditPatientForm(
-                                        patientId: patientID,
-                                        name: name,
-                                        surname: surname,
-                                        age: age,
-                                        gender: gender,
-                                        hn: hn,
-                                        bedNum: bedNum,
-                                        ward: ward,
-                                      );
+                                      return EditPatientForm(patientId: patientID, name: name, surname: surname, age: age, gender: gender, hn: hn, bedNum: bedNum, ward: ward);
                                     },
                                   );
                                 },
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   side: const BorderSide(color: Colors.white),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 2,
-                                    vertical: 4,
-                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
                                 ),
-                                child: Text(
-                                  "edit".tr(),
-                                  style: const TextStyle(
-                                    color: Color(0xff3362CC),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                child: Text("edit".tr(), style: const TextStyle(color: Color(0xff3362CC), fontSize: 16, fontWeight: FontWeight.bold)),
                               ),
                             ),
                           ],
@@ -402,11 +290,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                     });
                   },
                 ),
-                IgnorePointer(
-                  child: Icon(
-                    isExpanded ? Icons.expand_less : Icons.expand_more,
-                  ),
-                ),
+                IgnorePointer(child: Icon(isExpanded ? Icons.expand_less : Icons.expand_more)),
               ],
             ),
           ),

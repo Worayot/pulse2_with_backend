@@ -31,34 +31,49 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
+	<!-- PERMISSIONS -->
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Your app requires location access for notifications.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your app requires location access for notifications.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to the photo library to save files.</string>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- REMOVE PROCESSING, KEEP ONLY NEEDED MODES -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 		<string>remote-notification</string>
-		<string>processing</string>
 	</array>
+
+	<!-- REMOVE BGTaskSchedulerPermittedIdentifiers (YOU DO NOT USE BG TASKS) -->
+
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
+	<!-- IPHONE ORIENTATIONS -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+
+	<!-- IPAD ORIENTATIONS -->
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+
+	<key>UIRequiresFullScreen</key>
+	<true/>
+
 	<key>UIUserNotificationUsageDescription</key>
 	<string>We use notifications to remind you about upcoming events and tasks.</string>
 </dict>
