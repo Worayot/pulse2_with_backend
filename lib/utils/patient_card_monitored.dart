@@ -27,9 +27,10 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
   String _countdownText = "";
   Timer? _timer;
 
-  // You can create a small UI model for this list if you want,
-  // but keeping Map<String, dynamic> for the specific UI row state is okay for now.
-  List<Map<String, dynamic>> _processedUIRows = [];
+  // Data Containers
+  List<Map<String, dynamic>> _allProcessedRows = [];
+  Map<String, List<Map<String, dynamic>>> _groupedRows = {};
+
   DateTime? _nearestFutureTime;
   bool isExpanded = false;
 
@@ -38,6 +39,16 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     super.initState();
     _processInspectionData();
     _startNearestTimeCountdown();
+  }
+
+  @override
+  void didUpdateWidget(covariant MonitoredPatientCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Refresh data if the patient model changes
+    if (oldWidget.patient != widget.patient) {
+      _processInspectionData();
+      _startNearestTimeCountdown();
+    }
   }
 
   @override
@@ -50,13 +61,13 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     // 1. Get notes from the Model
     List<InspectionNoteModel> notes = widget.patient.inspectionNotes;
 
-    // 2. Sort using Model DateTime
+    // 2. Sort using Model DateTime (Ascending or Descending as needed)
     notes.sort((a, b) => a.time.compareTo(b.time));
 
     // 3. Process into UI-ready data
     final bangkokTimezone = tz.getLocation('Asia/Bangkok');
 
-    _processedUIRows =
+    _allProcessedRows =
         notes.map((noteModel) {
           // Convert Model DateTime (UTC/Local) to Specific Timezone
           DateTime dateTimeUtc = noteModel.time.toUtc();
@@ -64,6 +75,9 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
           String formattedTime = DateFormat('HH.mm').format(localDateTime);
           String timeFull = DateFormat('yyyy-MM-dd HH:mm:ss').format(localDateTime);
+
+          // Create key for grouping (Year-Month-Day)
+          String dateKey = DateFormat('yyyy-MM-dd').format(localDateTime);
 
           return {
             "formatted_time": '$formattedTime${'n'.tr()}',
@@ -75,14 +89,25 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
             "auditor": noteModel.auditor,
             "time": timeFull,
             "local_date_time": localDateTime,
+            "date_key": dateKey,
           };
         }).toList();
 
-    // 4. Calculate Nearest Future Time
+    // 4. Group by Date
+    _groupedRows = {};
+    for (var row in _allProcessedRows) {
+      String key = row['date_key'];
+      if (!_groupedRows.containsKey(key)) {
+        _groupedRows[key] = [];
+      }
+      _groupedRows[key]!.add(row);
+    }
+
+    // 5. Calculate Nearest Future Time
     DateTime nowUtc = DateTime.now().toUtc();
     final nowLocal = tz.TZDateTime.from(nowUtc, bangkokTimezone);
 
-    List<DateTime> futureTimes = _processedUIRows.map((item) => item['local_date_time'] as DateTime).where((t) => t.isAfter(nowLocal)).toList();
+    List<DateTime> futureTimes = _allProcessedRows.map((item) => item['local_date_time'] as DateTime).where((t) => t.isAfter(nowLocal)).toList();
 
     futureTimes.sort((a, b) => a.compareTo(b));
 
@@ -100,7 +125,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
         if (nearestFutureTimeLocal.isAfter(nowLocal)) {
           final difference = nearestFutureTimeLocal.difference(nowLocal);
-          // ... formatting logic same as before ...
           final days = difference.inDays;
           final hours = difference.inHours % 24;
           final minutes = difference.inMinutes % 60;
@@ -121,12 +145,31 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
           }
         }
       } else {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _countdownText = " ";
           });
+        }
       }
     });
+  }
+
+  double _calculateExpandedHeight(Size size) {
+    if (!isExpanded) return 101;
+
+    // Base padding/header
+    double height = 75.0 + 10.0;
+
+    // Add height for rows
+    // Standard row height (screenHeight * 0.033) + padding (~12)
+    double rowHeight = (size.height * 0.033) + 12;
+    height += _allProcessedRows.length * rowHeight;
+
+    // Add height for section headers (approx 35px per group)
+    height += _groupedRows.length * 35;
+
+    // Add extra buffer just in case
+    return height + 20;
   }
 
   @override
@@ -137,10 +180,9 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     String fullname = widget.patient.fullname;
 
     Size size = MediaQuery.of(context).size;
-    int dataLength = _processedUIRows.length;
 
     // Logic to find latest score
-    List<String> scores = _processedUIRows.map((item) => item["mews"].toString()).toList();
+    List<String> scores = _allProcessedRows.map((item) => item["mews"].toString()).toList();
     int latestIndex = scores.lastIndexWhere((score) => int.tryParse(score) != null);
     String latestMews = latestIndex != -1 ? scores[latestIndex] : "-";
 
@@ -148,7 +190,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Stack(
         children: [
-          // Expanded Content
+          // Expanded Content Layer (Background)
           Positioned(
             child: Padding(
               padding: const EdgeInsets.only(top: 10),
@@ -160,7 +202,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeInOut,
                     padding: const EdgeInsets.only(top: 16),
-                    height: isExpanded ? (size.height * 0.033 + 8) * dataLength + 101 : 101,
+                    height: _calculateExpandedHeight(size),
                     width: double.infinity,
                     decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
                     child: SingleChildScrollView(
@@ -168,13 +210,43 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 75),
+                          const SizedBox(height: 75), // Space for the header
                           if (isExpanded)
-                            Column(
-                              children: List.generate(dataLength, (i) {
-                                return AssessTableRowWidget(combinedData: _processedUIRows[i], myUserID: myUserID, patientID: patientID, onPop: widget.onPop);
-                              }),
-                            ),
+                            ..._groupedRows.entries.map((entry) {
+                              String dateHeader = entry.key;
+                              List<Map<String, dynamic>> rows = entry.value;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // --- DATE SECTION HEADER ---
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          dateHeader,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            shadows: [Shadow(color: Colors.black.withOpacity(0.2), offset: const Offset(0.5, 0.5), blurRadius: 1)],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(child: Divider(color: Colors.white, thickness: 1, height: 1)),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // --- ROWS FOR THIS DATE ---
+                                  ...rows.map((row) {
+                                    return AssessTableRowWidget(combinedData: row, myUserID: myUserID, patientID: patientID, onPop: widget.onPop);
+                                  }),
+                                  const SizedBox(height: 8), // Gap between groups
+                                ],
+                              );
+                            }),
                           const SizedBox(height: 10),
                         ],
                       ),
@@ -185,7 +257,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
             ),
           ),
 
-          // Collapsed Header
+          // Header Layer (Always Visible)
           Container(
             decoration: BoxDecoration(color: const Color(0xffE0EAFF), borderRadius: BorderRadius.circular(16)),
             padding: const EdgeInsets.all(8),
@@ -214,7 +286,8 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                           ],
                         ),
                       ),
-                      // ... Action Buttons (same as before) ...
+
+                      // Action Buttons
                       buildActionButton(
                         FontAwesomeIcons.magnifyingGlassPlus,
                         () {
@@ -251,6 +324,8 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
               ],
             ),
           ),
+
+          // Expand Arrow Indicator
           Positioned(
             left: 0,
             right: 0,
