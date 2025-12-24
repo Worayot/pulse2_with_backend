@@ -160,25 +160,11 @@ class _AddPatientFormState extends State<AddPatientForm> {
                         Row(
                           children: [
                             Expanded(
-                              child: SizedBox(
-                                child: InfoTextField(
-                                  title: "name".tr(),
-                                  fontSize: tws.getInfoBoxTextSize(),
-                                  controller: nameController,
-                                  boxColor: const Color(0xffE0EAFF),
-                                  minWidth: 140,
-                                ),
-                              ),
+                              child: SizedBox(child: InfoTextField(title: "name".tr(), fontSize: 16, controller: nameController, boxColor: const Color(0xffE0EAFF), minWidth: 140)),
                             ),
                             Expanded(
                               child: SizedBox(
-                                child: InfoTextField(
-                                  title: "surname".tr(),
-                                  fontSize: tws.getInfoBoxTextSize(),
-                                  controller: surnameController,
-                                  boxColor: const Color(0xffE0EAFF),
-                                  minWidth: 140,
-                                ),
+                                child: InfoTextField(title: "surname".tr(), fontSize: 16, controller: surnameController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
                               ),
                             ),
                           ],
@@ -188,7 +174,7 @@ class _AddPatientFormState extends State<AddPatientForm> {
                             Expanded(
                               child: InfoTextField(
                                 title: "age".tr(),
-                                fontSize: tws.getInfoBoxTextSize(),
+                                fontSize: 16,
                                 controller: ageController,
                                 boxColor: const Color(0xffE0EAFF),
                                 minWidth: 140,
@@ -228,38 +214,18 @@ class _AddPatientFormState extends State<AddPatientForm> {
                         Row(
                           children: [
                             Expanded(
-                              child: SizedBox(
-                                child: InfoTextField(
-                                  title: "hnNo".tr(),
-                                  fontSize: tws.getInfoBoxTextSize(),
-                                  controller: hnController,
-                                  boxColor: const Color(0xffE0EAFF),
-                                  minWidth: 140,
-                                ),
-                              ),
+                              child: SizedBox(child: InfoTextField(title: "hnNo".tr(), fontSize: 16, controller: hnController, boxColor: const Color(0xffE0EAFF), minWidth: 140)),
                             ),
                             Expanded(
                               child: SizedBox(
-                                child: InfoTextField(
-                                  title: "bedNumber".tr(),
-                                  fontSize: tws.getInfoBoxTextSize(),
-                                  controller: bedNumController,
-                                  boxColor: const Color(0xffE0EAFF),
-                                  minWidth: 140,
-                                ),
+                                child: InfoTextField(title: "bedNumber".tr(), fontSize: 16, controller: bedNumController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
                               ),
                             ),
                           ],
                         ),
                         SizedBox(
                           width: double.infinity,
-                          child: InfoTextField(
-                            title: "ward".tr(),
-                            fontSize: tws.getInfoBoxTextSize(),
-                            controller: wardController,
-                            boxColor: const Color(0xffE0EAFF),
-                            minWidth: 140,
-                          ),
+                          child: InfoTextField(title: "ward".tr(), fontSize: 16, controller: wardController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
                         ),
                         const SizedBox(height: 10),
                         Align(

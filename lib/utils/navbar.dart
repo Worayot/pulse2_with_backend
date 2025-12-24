@@ -98,23 +98,35 @@ class _ItemWidget extends StatelessWidget {
         curve: curve,
         decoration: BoxDecoration(color: isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor, borderRadius: BorderRadius.circular(itemCornerRadius)),
         child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              IconTheme(data: IconThemeData(size: iconSize, color: isSelected ? item.activeColor.withOpacity(1) : item.inactiveColor ?? item.activeColor), child: item.icon),
-              if (isSelected) SizedBox(width: size.width * 0.025), // Space between icon and text
-              if (isSelected)
-                Flexible(
-                  child: DefaultTextStyle.merge(
-                    style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: item.textAlign,
-                    child: item.title,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: IconTheme(
+                    data: IconThemeData(size: iconSize, color: isSelected ? item.activeColor.withOpacity(1) : item.inactiveColor ?? item.activeColor),
+                    child: item.icon,
                   ),
                 ),
-            ],
+                if (isSelected) SizedBox(width: size.width * 0.025), // Space between icon and text
+                if (isSelected)
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: DefaultTextStyle.merge(
+                        style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: item.textAlign,
+                        child: item.title,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

@@ -51,8 +51,8 @@ class _NavigationPageState extends State<NavigationPage> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    double iconSize = screenWidth * 0.045;
-    double fontSize = 14;
+    double iconSize = 24;
+    double fontSize = 20;
 
     return Scaffold(
       body: _pages[_selectedIndex],

@@ -77,6 +77,7 @@ class MyApp extends StatelessWidget {
       upgrader: upgrader,
       barrierDismissible: false,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'TUH MEWs',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),

@@ -157,7 +157,11 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                       ),
                     ],
                   ),
-                  Positioned(right: -5, bottom: 0, child: IgnorePointer(child: Image.asset("assets/images/med_care.png", height: size.width * 0.85, width: size.width * 0.85))),
+                  Positioned(
+                    right: -5,
+                    bottom: 0,
+                    child: IgnorePointer(child: FittedBox(fit: BoxFit.scaleDown, child: Image.asset("assets/images/med_care.png", height: 400, width: 400))),
+                  ),
                 ],
               ),
             ),

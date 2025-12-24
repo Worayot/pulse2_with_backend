@@ -210,25 +210,11 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     Row(
                       children: [
                         Expanded(
-                          child: SizedBox(
-                            child: InfoTextField(
-                              title: "name".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: nameController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                            ),
-                          ),
+                          child: SizedBox(child: InfoTextField(title: "name".tr(), fontSize: 16, controller: nameController, boxColor: const Color(0xffE0EAFF), minWidth: 140)),
                         ),
                         Expanded(
                           child: SizedBox(
-                            child: InfoTextField(
-                              title: "surname".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: surnameController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                            ),
+                            child: InfoTextField(title: "surname".tr(), fontSize: 16, controller: surnameController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
                           ),
                         ),
                       ],
@@ -239,7 +225,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
                         Expanded(
                           child: InfoTextField(
                             title: "age".tr(),
-                            fontSize: tws.getInfoBoxTextSize(),
+                            fontSize: 16,
                             controller: ageController,
                             boxColor: const Color(0xffE0EAFF),
                             minWidth: 140,
@@ -276,30 +262,16 @@ class _EditPatientFormState extends State<EditPatientForm> {
                     Row(
                       children: [
                         Expanded(
-                          child: SizedBox(
-                            child: InfoTextField(
-                              title: "hnNo".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: hnController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                            ),
-                          ),
+                          child: SizedBox(child: InfoTextField(title: "hnNo".tr(), fontSize: 16, controller: hnController, boxColor: const Color(0xffE0EAFF), minWidth: 140)),
                         ),
                         Expanded(
                           child: SizedBox(
-                            child: InfoTextField(
-                              title: "bedNumber".tr(),
-                              fontSize: tws.getInfoBoxTextSize(),
-                              controller: bedNumController,
-                              boxColor: const Color(0xffE0EAFF),
-                              minWidth: 140,
-                            ),
+                            child: InfoTextField(title: "bedNumber".tr(), fontSize: 16, controller: bedNumController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
                           ),
                         ),
                       ],
                     ),
-                    InfoTextField(title: "ward".tr(), fontSize: tws.getInfoBoxTextSize(), controller: wardController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
+                    InfoTextField(title: "ward".tr(), fontSize: 16, controller: wardController, boxColor: const Color(0xffE0EAFF), minWidth: 140),
                     const Gap(10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
