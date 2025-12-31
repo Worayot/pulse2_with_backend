@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/gender_dropdown.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
@@ -124,8 +123,6 @@ class _AddPatientFormState extends State<AddPatientForm> {
 
   @override
   Widget build(BuildContext context) {
-    TextWidgetSize tws = TextWidgetSize(context: context);
-
     return Dialog(
       child: Container(
         decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(15)),

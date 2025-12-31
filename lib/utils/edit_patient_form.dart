@@ -5,7 +5,6 @@ import 'package:gap/gap.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/patient_services.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/gender_dropdown.dart';
@@ -179,7 +178,6 @@ class _EditPatientFormState extends State<EditPatientForm> {
 
   @override
   Widget build(BuildContext context) {
-    TextWidgetSize tws = TextWidgetSize(context: context);
     return Dialog(
       child: Container(
         height: 475,

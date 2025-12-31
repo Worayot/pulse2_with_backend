@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:tuh_mews/models/monitored_patient/card_model.dart';
 import 'package:tuh_mews/services/patient_services.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
 import 'package:tuh_mews/utils/patient_card_monitored.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,7 +49,7 @@ class _PatientPageState extends State<PatientPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Gap(28),
-              Text("patientInMonitoring".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)), textAlign: TextAlign.left),
+              FittedBox(fit: BoxFit.scaleDown, child: Text("patientInMonitoring".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18), textAlign: TextAlign.left)),
               const Gap(8),
               Expanded(
                 // Update Type: Now listens for List<PatientModel>

@@ -9,7 +9,6 @@ import 'package:gap/gap.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
 import 'package:tuh_mews/services/validate_service.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field_filter.dart';
@@ -171,7 +170,10 @@ class _ExportPageState extends State<ExportPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Align(alignment: Alignment.centerLeft, child: Text('filterPatients'.tr(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: FittedBox(fit: BoxFit.scaleDown, child: Text('filterPatients'.tr(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                              ),
                               const SizedBox(height: 16.0),
                               _buildFilterInputs(),
                               StatefulBuilder(
@@ -349,7 +351,7 @@ class _ExportPageState extends State<ExportPage> {
             const Gap(28),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(alignment: Alignment.topLeft, child: Text("exportData".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
+              child: Align(alignment: Alignment.topLeft, child: Text("exportData".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
             ),
             const Gap(8),
             Padding(

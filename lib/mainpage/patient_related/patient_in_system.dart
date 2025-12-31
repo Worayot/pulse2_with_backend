@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
-import 'package:tuh_mews/universal_setting/sizes.dart';
 import 'package:tuh_mews/utils/patient_in_system/home_card_data.dart';
 import 'package:tuh_mews/utils/patient_in_system/patient_card_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -97,7 +96,10 @@ class _PatientInSystemState extends State<PatientInSystem> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Align(alignment: Alignment.topLeft, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: getPageTitleSize(context)))),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: FittedBox(fit: BoxFit.scaleDown, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+                    ),
                     GestureDetector(
                       onTap: () {
                         setState(() {
