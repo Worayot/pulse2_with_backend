@@ -188,11 +188,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         child: SingleChildScrollView(
           child: Stack(
             children: [
-              Positioned(
-                top: size.height / 12,
-                left: 0,
-                child: FittedBox(fit: BoxFit.scaleDown, child: Expanded(child: Image.asset('assets/images/img_login_top.png', fit: BoxFit.contain))),
-              ),
+              Positioned(top: size.height / 12, left: 0, child: SizedBox(width: size.width / 3, child: Image.asset('assets/images/img_login_top.png', fit: BoxFit.contain))),
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
