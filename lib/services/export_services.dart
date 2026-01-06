@@ -1,7 +1,7 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
@@ -15,22 +15,16 @@ class ExportServices {
       return {401: "Unauthorized: Invalid or missing token."};
     }
 
-    final url = Uri.parse(
-      '${URL().getServerURL()}/expt-fetch/get_report_excel',
-    );
-
+    final url = Uri.parse('${URL().getServerURL()}/expt-fetch/get_report_excel');
+    debugPrint('patients: $patientIds');
+    debugPrint("url: $url");
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode({"patient_ids": patientIds}),
-      );
+      final response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"}, body: jsonEncode({"patient_ids": patientIds}));
+
+      debugPrint("response: ${response.statusCode}");
 
       if (response.statusCode == 200) {
-        return await _saveAndOpenFile(response.bodyBytes);
+        return await _saveFile(response.bodyBytes);
       } else {
         return {401: "Token expired"};
       }
@@ -39,22 +33,18 @@ class ExportServices {
     }
   }
 
-  Future<Map<int, String>> _saveAndOpenFile(List<int> excelData) async {
+  Future<Map<int, String>> _saveFile(List<int> excelData) async {
     try {
       Directory? directory;
-
       if (Platform.isAndroid) {
-        final directories = await getExternalStorageDirectories(
-          type: StorageDirectory.downloads,
-        );
+        final directories = await getExternalStorageDirectories(type: StorageDirectory.downloads);
         directory = directories?.first;
-        if (directory == null) {
-          return {500: "Internal Server Error: Could not get directory."};
-        }
       } else if (Platform.isIOS) {
         directory = await getApplicationDocumentsDirectory();
-      } else {
-        return {500: "Unsupported platform."};
+      }
+
+      if (directory == null) {
+        return {500: "Could not locate directory"};
       }
 
       final uuid = Uuid();
@@ -63,12 +53,7 @@ class ExportServices {
       final file = File(filePath);
       await file.writeAsBytes(excelData);
 
-      final result = await OpenFile.open(filePath);
-      if (result.type == ResultType.done) {
-        return {200: "File saved and opened successfully."};
-      } else {
-        return {500: "Error opening file: ${result.message}"};
-      }
+      return {200: filePath};
     } catch (e) {
       return {500: "Internal Server Error: $e"};
     }

@@ -31,33 +31,36 @@ class CustomAnimatedBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? const Color(0xff3362CC);
-    return SafeArea(
-      bottom: false,
-      top: false,
-      child: Container(
-        decoration: BoxDecoration(borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)), color: bgColor),
-        width: double.infinity,
-        height: containerHeight,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Row(
-          mainAxisAlignment: mainAxisAlignment,
-          children:
-              items.map((item) {
-                var index = items.indexOf(item);
-                return GestureDetector(
-                  onTap: () => onItemSelected(index),
-                  child: _ItemWidget(
-                    item: item,
-                    iconSize: iconSize,
-                    isSelected: index == selectedIndex,
-                    backgroundColor: bgColor,
-                    itemCornerRadius: itemCornerRadius,
-                    animationDuration: animationDuration,
-                    curve: curve,
-                    boxWidth: item.boxWidth,
-                  ),
-                );
-              }).toList(),
+    return Container(
+      decoration: BoxDecoration(color: const Color(0xff3362CC), borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+      child: SafeArea(
+        bottom: true,
+        top: false,
+        child: Container(
+          decoration: BoxDecoration(borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)), color: bgColor),
+          width: double.infinity,
+          height: containerHeight,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: mainAxisAlignment,
+            children:
+                items.map((item) {
+                  var index = items.indexOf(item);
+                  return GestureDetector(
+                    onTap: () => onItemSelected(index),
+                    child: _ItemWidget(
+                      item: item,
+                      iconSize: iconSize,
+                      isSelected: index == selectedIndex,
+                      backgroundColor: bgColor,
+                      itemCornerRadius: itemCornerRadius,
+                      animationDuration: animationDuration,
+                      curve: curve,
+                      boxWidth: item.boxWidth,
+                    ),
+                  );
+                }).toList(),
+          ),
         ),
       ),
     );
@@ -98,34 +101,41 @@ class _ItemWidget extends StatelessWidget {
         curve: curve,
         decoration: BoxDecoration(color: isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor, borderRadius: BorderRadius.circular(itemCornerRadius)),
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: IconTheme(
-                    data: IconThemeData(size: iconSize, color: isSelected ? item.activeColor.withOpacity(1) : item.inactiveColor ?? item.activeColor),
-                    child: item.icon,
-                  ),
-                ),
-                if (isSelected) SizedBox(width: size.width * 0.025), // Space between icon and text
-                if (isSelected)
-                  Flexible(
-                    child: FittedBox(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            child: Container(
+              constraints: BoxConstraints(maxWidth: isSelected ? boxWidth : size.width * 0.1),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: DefaultTextStyle.merge(
-                        style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: item.textAlign,
-                        child: item.title,
+                      child: IconTheme(
+                        data: IconThemeData(size: iconSize, color: isSelected ? item.activeColor.withOpacity(1) : item.inactiveColor ?? item.activeColor),
+                        child: item.icon,
                       ),
                     ),
-                  ),
-              ],
+                    if (isSelected) SizedBox(width: size.width * 0.025),
+                    if (isSelected)
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: DefaultTextStyle.merge(
+                            style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: item.textAlign,
+                            child: item.title,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

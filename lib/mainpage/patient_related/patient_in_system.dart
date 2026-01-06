@@ -81,158 +81,163 @@ class _PatientInSystemState extends State<PatientInSystem> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Gap(20),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: FittedBox(fit: BoxFit.scaleDown, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          showInfoDialog(context, homeSymbols());
-                        });
-                      },
-                      child: const FaIcon(FontAwesomeIcons.circleInfo, size: 28, color: Color(0xff3362CC)),
-                    ),
-                  ],
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          bottom: true,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Gap(20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: FittedBox(fit: BoxFit.scaleDown, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            showInfoDialog(context, homeSymbols());
+                          });
+                        },
+                        child: const FaIcon(FontAwesomeIcons.circleInfo, size: 28, color: Color(0xff3362CC)),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: "${"search".tr()}...",
-                            suffixIcon:
-                                _searchController.text.isNotEmpty
-                                    ? IconButton(
-                                      icon: const Icon(Icons.clear),
-                                      onPressed: () {
-                                        _searchController.clear();
-                                      },
-                                    )
-                                    : null,
-                            fillColor: const Color(0xffCADBFF),
-                            filled: true,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                            prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
-                            prefixIconConstraints: const BoxConstraints(minWidth: 60),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: "${"search".tr()}...",
+                              suffixIcon:
+                                  _searchController.text.isNotEmpty
+                                      ? IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () {
+                                          _searchController.clear();
+                                        },
+                                      )
+                                      : null,
+                              fillColor: const Color(0xffCADBFF),
+                              filled: true,
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                              prefixIconConstraints: const BoxConstraints(minWidth: 60),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const Gap(8),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const AddPatientForm();
-                          },
-                        );
-                      },
-                      icon: Icon(FontAwesomeIcons.userPlus, color: Colors.white, size: 26),
-                      label: Padding(
-                        padding: const EdgeInsets.only(left: 4.0),
-                        child: Text("addPatient".tr(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      const Gap(8),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return const AddPatientForm();
+                            },
+                          );
+                        },
+                        icon: Icon(FontAwesomeIcons.userPlus, color: Colors.white, size: 26),
+                        label: Padding(
+                          padding: const EdgeInsets.only(left: 4.0),
+                          child: Text("addPatient".tr(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff407BFF),
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                          // fixedSize: Size.fromHeight(60),
+                        ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff407BFF),
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        elevation: 0,
-                        // fixedSize: Size.fromHeight(60),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const Gap(8),
-              Expanded(
-                child: StreamBuilder<List<Map<String, dynamic>>>(
-                  stream: getPatientsStream(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                const Gap(8),
+                Expanded(
+                  child: StreamBuilder<List<Map<String, dynamic>>>(
+                    stream: getPatientsStream(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      }
 
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return NoPatientWidget();
-                    }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return NoPatientWidget();
+                      }
 
-                    final patients = snapshot.data!;
-                    final filteredPatients = _getFilteredPatients(patients);
+                      final patients = snapshot.data!;
+                      final filteredPatients = _getFilteredPatients(patients);
 
-                    if (filteredPatients.isEmpty) {
-                      return NoPatientWidget();
-                    }
+                      if (filteredPatients.isEmpty) {
+                        return NoPatientWidget();
+                      }
 
-                    return ListView.separated(
-                      padding: const EdgeInsets.only(top: 8),
-                      itemCount: filteredPatients.length,
-                      separatorBuilder: (BuildContext context, int index) {
-                        return const Gap(8);
-                      },
-                      itemBuilder: (BuildContext context, int index) {
-                        final data = filteredPatients[index];
+                      return ListView.separated(
+                        padding: const EdgeInsets.only(top: 8),
+                        itemCount: filteredPatients.length,
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const Gap(8);
+                        },
+                        itemBuilder: (BuildContext context, int index) {
+                          final data = filteredPatients[index];
 
-                        final timestamp = data['created_at'];
-                        DateTime? createdAt;
-                        if (timestamp != null && timestamp is Timestamp) {
-                          createdAt = timestamp.toDate().toLocal().toUtc();
-                        }
+                          final timestamp = data['created_at'];
+                          DateTime? createdAt;
+                          if (timestamp != null && timestamp is Timestamp) {
+                            createdAt = timestamp.toDate().toLocal().toUtc();
+                          }
 
-                        final timeString = data['inspectionTime'] as String?;
-                        TimeOfDay? inspectionTime;
-                        if (timeString != null && timeString.contains(':')) {
-                          final parts = timeString.split(':');
-                          final hour = int.tryParse(parts[0]) ?? 0;
-                          final minute = int.tryParse(parts[1]) ?? 0;
-                          inspectionTime = TimeOfDay(hour: hour, minute: minute);
-                        }
+                          final timeString = data['inspectionTime'] as String?;
+                          TimeOfDay? inspectionTime;
+                          if (timeString != null && timeString.contains(':')) {
+                            final parts = timeString.split(':');
+                            final hour = int.tryParse(parts[0]) ?? 0;
+                            final minute = int.tryParse(parts[1]) ?? 0;
+                            inspectionTime = TimeOfDay(hour: hour, minute: minute);
+                          }
 
-                        return HomeExpandableCards(
-                          data: HomeCardData(
-                            fullname: data['fullname'] as String?,
-                            gender: data['gender'] as String?,
-                            hn: data['hospital_number']?.toString(),
-                            age: data['age']?.toString(),
-                            bedNum: data['bed_number']?.toString(),
-                            ward: data['ward']?.toString(),
-                            mews: data['MEWs']?.toString(),
-                            patientID: data['patient_id'] as String?,
-                            createdAt: createdAt,
-                            inspectionTime: inspectionTime,
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          return HomeExpandableCards(
+                            data: HomeCardData(
+                              fullname: data['fullname'] as String?,
+                              gender: data['gender'] as String?,
+                              hn: data['hospital_number']?.toString(),
+                              age: data['age']?.toString(),
+                              bedNum: data['bed_number']?.toString(),
+                              ward: data['ward']?.toString(),
+                              mews: data['MEWs']?.toString(),
+                              patientID: data['patient_id'] as String?,
+                              createdAt: createdAt,
+                              inspectionTime: inspectionTime,
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

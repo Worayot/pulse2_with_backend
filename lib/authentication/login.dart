@@ -92,6 +92,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _login() async {
+    FocusScope.of(context).unfocus();
+
     if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
       return;
     }

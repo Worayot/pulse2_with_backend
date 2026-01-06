@@ -1,7 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:tuh_mews/utils/custom_header.dart';
+import 'package:tuh_mews/utils/flushbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutAppPage extends StatelessWidget {
   const AboutAppPage({super.key});
@@ -10,11 +13,7 @@ class AboutAppPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Remove the default back button
-        title: const Header(),
-        toolbarHeight: size.height * 0.13,
-      ),
+      appBar: AppBar(automaticallyImplyLeading: false, title: const Header(), toolbarHeight: size.height * 0.13),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -69,12 +68,28 @@ class AboutAppPage extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text("application".tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 10),
+                                    const Gap(10),
                                     Text("aboutAppContent".tr(), style: const TextStyle(fontSize: 14)),
-                                    const SizedBox(height: 16),
+                                    const Gap(16),
                                     Text('contactDev'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 10),
+                                    const Gap(10),
                                     Text("contactDevContent".tr(), style: const TextStyle(fontSize: 14)),
+                                    const Gap(16),
+                                    Text('policy'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                    const Gap(10),
+                                    InkWell(
+                                      onTap: () async {
+                                        final Uri url = Uri.parse("https://tuhmews.netlify.app/");
+
+                                        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                                          FlushbarService().showErrorMessage(context: context, message: 'Could not launch $url');
+                                        }
+                                      },
+                                      child: Text(
+                                        "https://tuhmews.netlify.app/",
+                                        style: const TextStyle(fontSize: 14, color: Colors.blue, decoration: TextDecoration.underline, decorationColor: Colors.blue),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),

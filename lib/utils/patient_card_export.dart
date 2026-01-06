@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
 import 'package:tuh_mews/services/validate_service.dart';
@@ -98,11 +99,23 @@ class _PatientCardExportState extends State<PatientCardExport> {
           child: buildExportButton(
             icon: FontAwesomeIcons.fileExport,
             onPressed: () async {
-              EasyLoading.show();
+              // 1. Capture the button's location for iPad support
+              final box = context.findRenderObject() as RenderBox?;
+
+              EasyLoading.show(status: 'Preparing file...');
               final exportService = ExportServices();
-              Map<int, String> status = await exportService.export([widget.patient.patientId ?? '']);
+
+              Map<int, String> result = await exportService.export([widget.patient.patientId ?? '']);
+
               EasyLoading.dismiss();
-              ValidateService(status: status, navigator: Navigator.of(context)).validate();
+
+              if (result.containsKey(200)) {
+                final filePath = result[200]!;
+
+                await SharePlus.instance.share(ShareParams(files: [XFile(filePath)], subject: 'Patient Report', sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size));
+              } else {
+                ValidateService(status: result, navigator: Navigator.of(context)).validate();
+              }
             },
             bgColor: Colors.white,
             iconColor: const Color(0xff4B74D1),

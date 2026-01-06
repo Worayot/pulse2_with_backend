@@ -42,7 +42,7 @@ class _PatientPageState extends State<PatientPage> {
 
     return Scaffold(
       body: SafeArea(
-        bottom: false,
+        bottom: true,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(

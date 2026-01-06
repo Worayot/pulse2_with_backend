@@ -53,7 +53,7 @@ void configLoading() {
     ..indicatorSize = 45.0
     ..radius = 10.0
     ..progressColor = Colors.blue
-    ..textColor = Colors.blue
+    ..textColor = Colors.white
     ..maskType = EasyLoadingMaskType.black
     ..userInteractions = false
     ..dismissOnTap = false;

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
 import 'package:tuh_mews/services/validate_service.dart';
@@ -342,193 +343,178 @@ class _ExportPageState extends State<ExportPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            const Gap(28),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Align(alignment: Alignment.topLeft, child: Text("exportData".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
-            ),
-            const Gap(8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          _fullnameFilter = value;
-                          _filterPatients();
-                        });
-                      },
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: "${"search".tr()}...",
-
-                        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)), borderSide: BorderSide.none),
-
-                        prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
-                        suffixIcon:
-                            _fullnameFilter.isNotEmpty
-                                ? IconButton(
-                                  icon: const Icon(Icons.clear, color: Colors.black),
-                                  onPressed: () {
-                                    setState(() {
-                                      _searchController.clear();
-                                      _fullnameFilter = '';
-                                      _filterPatients();
-                                    });
-                                  },
-                                )
-                                : null,
-                        filled: true, // Enables the background color
-                        fillColor: const Color(0xffCADBFF), // Sets the background color
-                        labelStyle: const TextStyle(color: Colors.black),
-                      ),
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  const Gap(8),
-                  GestureDetector(
-                    onTap: () {
-                      showFilterDialog(context);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      height: 55,
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: const Color(0xff407BFF)),
-                      child: Row(
-                        children: [
-                          const Icon(FontAwesomeIcons.filter, color: Color(0xffCADBFF)),
-                          const SizedBox(width: 5),
-                          Text('filterData'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     showFilterDialog(context);
-                  //   },
-                  //   style: ElevatedButton.styleFrom(
-                  //     elevation: 0,
-                  //     shape: RoundedRectangleBorder(
-                  //       borderRadius: BorderRadius.circular(15),
-                  //     ),
-                  //     padding: EdgeInsets.symmetric(
-                  //       vertical: 16,
-                  //       horizontal: 10,
-                  //     ),
-                  //     backgroundColor: const Color(0xff407BFF),
-                  //   ),
-                  //   child: Row(
-                  //     children: [
-                  //       const Icon(
-                  //         FontAwesomeIcons.filter,
-                  //         color: Color(0xffCADBFF),
-                  //       ),
-                  //       const SizedBox(width: 5),
-                  //       Text(
-                  //         'filterData'.tr(),
-                  //         style: const TextStyle(
-                  //           color: Colors.white,
-                  //           fontWeight: FontWeight.bold,
-                  //           fontSize: 14,
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                ],
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: SafeArea(
+          bottom: true,
+          child: Column(
+            children: [
+              const Gap(28),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Align(alignment: Alignment.topLeft, child: Text("exportData".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
               ),
-            ),
-            const Gap(8),
-            Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: buildPatientCards())),
-            const Gap(8),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  InkWell(
-                    onTap: _resetFilters,
-                    child: Text(
-                      'resetFilters'.tr(),
-                      style: TextStyle(
-                        color: Colors.red, // Set text color to red
-                        decoration: TextDecoration.underline, // Add underline
-                        decorationColor: Colors.red, // Set underline color to red
-                        fontWeight: FontWeight.bold,
-                        // fontSize: size.width * 0.035,
-                        fontSize: 14,
+              const Gap(8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            _fullnameFilter = value;
+                            _filterPatients();
+                          });
+                        },
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: "${"search".tr()}...",
+
+                          border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)), borderSide: BorderSide.none),
+
+                          prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                          suffixIcon:
+                              _fullnameFilter.isNotEmpty
+                                  ? IconButton(
+                                    icon: const Icon(Icons.clear, color: Colors.black),
+                                    onPressed: () {
+                                      setState(() {
+                                        _searchController.clear();
+                                        _fullnameFilter = '';
+                                        _filterPatients();
+                                      });
+                                    },
+                                  )
+                                  : null,
+                          filled: true, // Enables the background color
+                          fillColor: const Color(0xffCADBFF), // Sets the background color
+                          labelStyle: const TextStyle(color: Colors.black),
+                        ),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
-                  ),
-                  SizedBox(width: size.width * 0.035),
-                  GestureDetector(
-                    onTap:
-                        enableButton
-                            ? () async {
-                              setState(() {
-                                enableButton = false;
-                              });
-                              try {
-                                bool result = await showWarningDialog(context); // Wait for user choice
-                                final navigator = Navigator.of(context);
-                                if (result && mounted) {
-                                  // bool status = await _exportAll();
-                                  Map<int, String> status = await _exportAll();
-                                  ValidateService(status: status, navigator: navigator).validate();
-                                }
-                              } catch (e) {
-                                if (mounted) {
-                                  FlushbarService().showErrorMessage(context: context, message: 'An unexpected error occurred: $e');
-                                }
-                              } finally {
-                                if (mounted) {
-                                  setState(() {
-                                    enableButton = true;
-                                  });
-                                }
-                              }
-                            }
-                            : () {},
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      height: 40,
-                      decoration: BoxDecoration(color: const Color(0xff407BFF), borderRadius: BorderRadius.circular(8)),
-                      child: Center(
-                        child: Text(
-                          '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
+                    const Gap(8),
+                    GestureDetector(
+                      onTap: () {
+                        showFilterDialog(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        height: 55,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: const Color(0xff407BFF)),
+                        child: Row(
+                          children: [
+                            const Icon(FontAwesomeIcons.filter, color: Color(0xffCADBFF)),
+                            const SizedBox(width: 5),
+                            Text('filterData'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              const Gap(8),
+              Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: buildPatientCards())),
+              const Gap(8),
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0, bottom: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    InkWell(
+                      onTap: _resetFilters,
+                      child: Text(
+                        'resetFilters'.tr(),
+                        style: TextStyle(
+                          color: Colors.red, // Set text color to red
+                          decoration: TextDecoration.underline, // Add underline
+                          decorationColor: Colors.red, // Set underline color to red
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: size.width * 0.035),
+                    Builder(
+                      builder: (buttonContext) {
+                        return GestureDetector(
+                          onTap:
+                              enableButton
+                                  ? () async {
+                                    FocusScope.of(context).unfocus();
+
+                                    setState(() {
+                                      enableButton = false;
+                                    });
+                                    try {
+                                      bool result = await showWarningDialog(context);
+                                      if (result && mounted) {
+                                        await _exportAll(buttonContext);
+                                      }
+                                    } catch (e) {
+                                      if (mounted) {
+                                        FlushbarService().showErrorMessage(context: context, message: 'An unexpected error occurred: $e');
+                                      }
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() {
+                                          enableButton = true;
+                                        });
+                                      }
+                                    }
+                                  }
+                                  : () {},
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            height: 40,
+                            decoration: BoxDecoration(color: const Color(0xff407BFF), borderRadius: BorderRadius.circular(8)),
+                            child: Center(
+                              child: Text(
+                                '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Future<Map<int, String>> _exportAll() async {
-    EasyLoading.show();
-    final exportServices = ExportServices();
+  Future<void> _exportAll(BuildContext buttonContext) async {
+    final box = buttonContext.findRenderObject() as RenderBox?;
+
+    EasyLoading.show(status: 'Downloading...');
+    final exportService = ExportServices();
 
     List<String> patientIds = _filteredPatients.map((patient) => patient.patientId ?? '').toList();
 
-    Map<int, String> status = await exportServices.export(patientIds);
+    Map<int, String> result = await exportService.export(patientIds);
+
     EasyLoading.dismiss();
-    return status;
+
+    if (result.containsKey(200)) {
+      final filePath = result[200]!;
+      final file = XFile(filePath);
+
+      await SharePlus.instance.share(ShareParams(files: [file], sharePositionOrigin: box != null ? (box.localToGlobal(Offset.zero) & box.size) : null));
+    } else {
+      ValidateService(status: result, navigator: Navigator.of(context)).validate();
+    }
   }
 }
