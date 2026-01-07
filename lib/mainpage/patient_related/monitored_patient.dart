@@ -67,6 +67,8 @@ class _PatientPageState extends State<PatientPage> {
 
                       patients.sort((a, b) => a.fullname.compareTo(b.fullname));
 
+                      // debugPrint(patients.toString());
+
                       return ListView.builder(
                         itemCount: patients.length,
                         // Add cacheExtent to improve scroll smoothness

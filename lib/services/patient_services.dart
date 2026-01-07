@@ -7,110 +7,103 @@ import 'package:tuh_mews/models/patient_user_link.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
 import '../models/patient.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FirebasePatientService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Stream monitored patients linked to the given user ID
+  /// Stream monitored patients linked to the given user ID (Real-time & Reactive)
   Stream<List<PatientModel>> fetchMonitoredPatients(String userId) {
-    return _firestore.collection('patient_user_links').where('user_id', isEqualTo: userId).snapshots().asyncMap((querySnapshot) async {
-      if (querySnapshot.docs.isEmpty) return [];
+    return _firestore.collection('patient_user_links').where('user_id', isEqualTo: userId).snapshots().switchMap((linkSnapshot) {
+      // 1. If no links, return empty list immediately
+      if (linkSnapshot.docs.isEmpty) {
+        return Stream.value([]);
+      }
 
-      // 1. Create a list of Futures (tasks) to run in parallel
-      List<Future<PatientModel?>> tasks =
-          querySnapshot.docs.map((doc) async {
+      // 2. Map each link to a Stream of the fully assembled PatientModel
+      List<Stream<PatientModel?>> patientStreams =
+          linkSnapshot.docs.map((doc) {
             Map<String, dynamic> linkData = doc.data();
             String patientId = linkData['patient_id'];
 
-            // 2. Fire both sub-requests simultaneously for THIS patient
-            var detailsFuture = fetchPatientData(patientId);
-            var notesFuture = fetchInspectionNotes(patientId);
+            // Stream A: Patient Details (uses helper below)
+            var detailsStream = _fetchPatientStream(patientId);
 
-            // 3. Wait for both to finish
-            var results = await Future.wait([detailsFuture, notesFuture]);
+            // Stream B: Inspection Notes with MEWS (uses helper below)
+            var notesStream = _fetchInspectionNotesStream(patientId);
 
-            var patientDetails = results[0] as Map<String, dynamic>?;
-            var inspectionNotes = results[1] as List<Map<String, dynamic>>;
+            // 3. Combine Link + Patient + Notes
+            return Rx.combineLatest2<Map<String, dynamic>?, List<Map<String, dynamic>>, PatientModel?>(detailsStream, notesStream, (patientDetails, inspectionNotes) {
+              // If patient details are missing (e.g. deleted), return null so we can filter it out
+              if (patientDetails == null) return null;
 
-            // If patient details are missing, we might want to skip this patient
-            if (patientDetails == null) return null;
+              // Merge data exactly like before
+              Map<String, dynamic> fullData = {...linkData, 'patient_details': patientDetails, 'inspection_notes': inspectionNotes};
 
-            // Merge data
-            Map<String, dynamic> fullData = {...linkData, 'patient_details': patientDetails, 'inspection_notes': inspectionNotes};
-
-            // Convert to Model here (background work)
-            return PatientModel.fromMap(fullData);
+              return PatientModel.fromMap(fullData);
+            });
           }).toList();
 
-      // 4. Wait for ALL patients to finish loading in parallel
-      List<PatientModel?> results = await Future.wait(tasks);
-
-      // Filter out any nulls (failed loads) and return
-      return results.whereType<PatientModel>().toList();
+      // 4. Combine all patients into one list and filter out nulls
+      return CombineLatestStream.list(patientStreams).map((list) {
+        return list.whereType<PatientModel>().toList();
+      });
     });
   }
 
-  /// Fetch patient data from the 'patients' collection
-  Future<Map<String, dynamic>?> fetchPatientData(String patientId) async {
-    try {
-      final DocumentSnapshot docSnapshot = await _firestore.collection('patients').doc(patientId).get();
+  // ---------------------------------------------------------------------------
+  // PRIVATE STREAM HELPERS
+  // ---------------------------------------------------------------------------
 
-      if (docSnapshot.exists) {
-        return docSnapshot.data() as Map<String, dynamic>;
-      } else {
-        // print("No patient data found for patientId $patientId");
-        return null; // No patient data found
+  /// Stream A: Real-time Patient Data
+  Stream<Map<String, dynamic>?> _fetchPatientStream(String patientId) {
+    return _firestore.collection('patients').doc(patientId).snapshots().map((doc) {
+      if (doc.exists) {
+        return doc.data();
       }
-    } catch (e) {
-      // print("Error fetching patient data for patientId $patientId: $e");
-      return null; // Error fetching patient data
-    }
-  }
-
-  /// Fetch inspection notes for a specific patient
-  Future<List<Map<String, dynamic>>> fetchInspectionNotes(String patientId) async {
-    List<Map<String, dynamic>> inspectionNotes = [];
-
-    try {
-      final QuerySnapshot querySnapshot = await _firestore.collection('inspection_notes').where('patient_id', isEqualTo: patientId).get();
-
-      for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> noteData = doc.data() as Map<String, dynamic>;
-        noteData['note_id'] = doc.id; // Add document ID (doc name)
-
-        String? mewsId = noteData['mews_id'];
-
-        if (mewsId != null && mewsId.isNotEmpty) {
-          // Fetch MEWS data
-          Map<String, dynamic>? mewsData = await fetchMewsData(mewsId);
-          noteData['mews'] = mewsData; // Attach MEWS data to the note
-        } else {
-          noteData['mews'] = null; // No MEWS data available
-        }
-
-        inspectionNotes.add(noteData);
-      }
-    } catch (e) {
-      // print("Error fetching inspection notes for patient $patientId: $e");
-    }
-
-    return inspectionNotes;
-  }
-
-  /// Fetch MEWS data using mews_id
-  Future<Map<String, dynamic>?> fetchMewsData(String mewsId) async {
-    try {
-      final DocumentSnapshot docSnapshot = await _firestore.collection('mews').doc(mewsId).get();
-
-      if (docSnapshot.exists) {
-        return docSnapshot.data() as Map<String, dynamic>;
-      } else {
-        return null; // No MEWS data found
-      }
-    } catch (e) {
-      // print("Error fetching MEWS data for mews_id $mewsId: $e");
       return null;
-    }
+    });
+  }
+
+  /// Stream B: Real-time Inspection Notes (Root Collection) + Joined MEWS Data
+  Stream<List<Map<String, dynamic>>> _fetchInspectionNotesStream(String patientId) {
+    return _firestore
+        .collection('inspection_notes') // Root collection (matches your original)
+        .where('patient_id', isEqualTo: patientId)
+        .snapshots()
+        .switchMap((querySnapshot) {
+          if (querySnapshot.docs.isEmpty) {
+            return Stream.value([]);
+          }
+
+          // Create a stream for EACH note to handle the MEWS join independently
+          List<Stream<Map<String, dynamic>>> noteStreams =
+              querySnapshot.docs.map((doc) {
+                Map<String, dynamic> noteData = doc.data();
+                noteData['note_id'] = doc.id; // Inject ID (matches your original)
+
+                String? mewsId = noteData['mews_id'];
+
+                // Case 1: No MEWS ID -> Return note immediately
+                if (mewsId == null || mewsId.isEmpty) {
+                  noteData['mews'] = null;
+                  return Stream.value(noteData);
+                }
+
+                // Case 2: Has MEWS ID -> Listen to MEWS document and merge
+                return _firestore.collection('mews').doc(mewsId).snapshots().map((mewsDoc) {
+                  if (mewsDoc.exists) {
+                    noteData['mews'] = mewsDoc.data();
+                  } else {
+                    noteData['mews'] = null;
+                  }
+                  return noteData;
+                });
+              }).toList();
+
+          // Combine all individual note streams into one List
+          return CombineLatestStream.list(noteStreams);
+        });
   }
 }
 

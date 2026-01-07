@@ -445,7 +445,7 @@ class _ExportPageState extends State<ExportPage> {
                       builder: (buttonContext) {
                         return GestureDetector(
                           onTap:
-                              enableButton
+                              enableButton & _filteredPatients.isNotEmpty
                                   ? () async {
                                     FocusScope.of(context).unfocus();
 
@@ -473,7 +473,7 @@ class _ExportPageState extends State<ExportPage> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 4),
                             height: 40,
-                            decoration: BoxDecoration(color: const Color(0xff407BFF), borderRadius: BorderRadius.circular(8)),
+                            decoration: BoxDecoration(color: _filteredPatients.isNotEmpty ? const Color(0xff407BFF) : Colors.black26, borderRadius: BorderRadius.circular(8)),
                             child: Center(
                               child: Text(
                                 '${'downloadAllDisplayed'.tr()} (${_filteredPatients.length})',

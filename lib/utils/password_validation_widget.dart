@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class PasswordValidationWidget extends StatelessWidget {
@@ -21,11 +22,11 @@ class PasswordValidationWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildItem(PasswordValidator.hasMinLength(password), "At least 8 characters"),
-        _buildItem(PasswordValidator.hasUppercase(password), "Contains uppercase (A-Z)"),
-        _buildItem(PasswordValidator.hasLowercase(password), "Contains lowercase (a-z)"),
-        _buildItem(PasswordValidator.hasDigit(password), "Contains a number (0-9)"),
-        _buildItem(PasswordValidator.hasSpecial(password), "Contains a special character (!@#\$%^&*)"),
+        _buildItem(PasswordValidator.hasMinLength(password), "password_rules.min_length".tr()),
+        _buildItem(PasswordValidator.hasUppercase(password), "password_rules.uppercase".tr()),
+        _buildItem(PasswordValidator.hasLowercase(password), "password_rules.lowercase".tr()),
+        _buildItem(PasswordValidator.hasDigit(password), "password_rules.digit".tr()),
+        _buildItem(PasswordValidator.hasSpecial(password), "password_rules.special_char".tr()),
       ],
     );
   }

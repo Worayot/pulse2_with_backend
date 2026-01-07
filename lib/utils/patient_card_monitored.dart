@@ -62,7 +62,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     List<InspectionNoteModel> notes = widget.patient.inspectionNotes;
 
     // 2. Sort using Model DateTime (Ascending or Descending as needed)
-    notes.sort((a, b) => a.time.compareTo(b.time));
+    notes.sort((a, b) => b.time.compareTo(a.time));
 
     // 3. Process into UI-ready data
     final bangkokTimezone = tz.getLocation('Asia/Bangkok');
@@ -183,7 +183,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
     // Logic to find latest score
     List<String> scores = _allProcessedRows.map((item) => item["mews"].toString()).toList();
-    int latestIndex = scores.lastIndexWhere((score) => int.tryParse(score) != null);
+    int latestIndex = scores.indexWhere((score) => int.tryParse(score) != null);
     String latestMews = latestIndex != -1 ? scores[latestIndex] : "-";
 
     return Padding(
@@ -210,11 +210,12 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 75), // Space for the header
+                          const SizedBox(height: 75),
                           if (isExpanded)
                             ..._groupedRows.entries.map((entry) {
                               String dateHeader = entry.key;
                               List<Map<String, dynamic>> rows = entry.value;
+                              // debugPrint(rows.toString());
 
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

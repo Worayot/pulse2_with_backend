@@ -125,6 +125,13 @@
   "overallMEWS": "Overall MEWS :",
   "pain": "Responds to pain",
   "password": "Password",
+  "password_rules": {
+    "min_length": "At least 8 characters",
+    "uppercase": "Contains uppercase (A-Z)",
+    "lowercase": "Contains lowercase (a-z)",
+    "digit": "Contains a number (0-9)",
+    "special_char": "Contains a special character (!@#$%^&*)"
+  },
   "passwordWarning": "Password must be at least 6 characters",
   "patient": "Patient",
   "patientData": "Patient Data",

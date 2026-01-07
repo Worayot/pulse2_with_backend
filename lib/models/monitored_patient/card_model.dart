@@ -37,6 +37,11 @@ class InspectionNoteModel {
       auditor: map['audit_by'] ?? '',
     );
   }
+
+  @override
+  String toString() {
+    return 'InspectionNoteModel(time: $time, mewsScore: $mewsScore, isAssessed: $isAssessed, mewsId: $mewsId, noteId: $noteId, noteText: $noteText, auditor: $auditor)';
+  }
 }
 
 class PatientModel {
@@ -52,5 +57,10 @@ class PatientModel {
     List<InspectionNoteModel> parsedNotes = notesList.map((note) => InspectionNoteModel.fromMap(note as Map<String, dynamic>)).toList();
 
     return PatientModel(patientId: map['patient_id'] ?? '', userId: map['user_id'] ?? '', fullname: map['patient_details']?['fullname'] ?? 'Unknown', inspectionNotes: parsedNotes);
+  }
+
+  @override
+  String toString() {
+    return 'PatientModel(patientId: $patientId, userId: $userId, fullname: $fullname, inspectionNotes: $inspectionNotes)';
   }
 }
