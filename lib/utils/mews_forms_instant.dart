@@ -454,13 +454,13 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
 
                                     Map<String, dynamic> decoded = jsonDecode(response);
                                     inspectionNotesID = decoded['inspection_notes_id'];
-                                    // print(inspectionNotesId);
+                                    // debugPrint(inspectionNotesId);
                                   } catch (e) {
                                     setState(() {
                                       enableButton = true;
                                     });
                                     return;
-                                    // print('Failed: $e');
+                                    // debugPrint('Failed: $e');
                                   }
 
                                   String hr = heartRateController.text.trim();

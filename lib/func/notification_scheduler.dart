@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -32,7 +33,7 @@ class NotificationScheduler {
 
     if (isGranted != null && isGranted) {
     } else {
-      print("Permission denied for notifications on iOS. Please enable it in settings.");
+      debugPrint("Permission denied for notifications on iOS. Please enable it in settings.");
       // Guide user to settings if permission denied
       openAppSettings();
     }
@@ -41,13 +42,13 @@ class NotificationScheduler {
   void onDidReceiveNotificationResponse(NotificationResponse response) async {
     if (response.payload != null) {
       final payload = jsonDecode(response.payload!);
-      print("Payload type: ${payload['type']}, ID: ${payload['id']}");
+      debugPrint("Payload type: ${payload['type']}, ID: ${payload['id']}");
     }
   }
 
   Future<void> scheduleNotificationAtTime(DateTime notificationTime, String message) async {
-    print('Scheduling notification at: $notificationTime');
-    print('Converted TZ DateTime: ${_convertToTZ(notificationTime)}');
+    debugPrint('Scheduling notification at: $notificationTime');
+    debugPrint('Converted TZ DateTime: ${_convertToTZ(notificationTime)}');
 
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'your_channel_id',
@@ -69,7 +70,7 @@ class NotificationScheduler {
     );
 
     if (isGranted != null && isGranted) {
-      print("Permission granted for notifications, scheduling notification.");
+      debugPrint("Permission granted for notifications, scheduling notification.");
       try {
         await flutterLocalNotificationsPlugin.zonedSchedule(
           0,
@@ -105,9 +106,9 @@ class NotificationScheduler {
     final Uri url = Uri.parse('app-settings:');
     if (await canLaunchUrl(url)) {
       await launchUrl(url);
-      print('Opened app settings.');
+      debugPrint('Opened app settings.');
     } else {
-      print('Could not open settings.');
+      debugPrint('Could not open settings.');
     }
   }
 }

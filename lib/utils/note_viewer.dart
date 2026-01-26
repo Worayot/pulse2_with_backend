@@ -32,11 +32,7 @@ class _NoteViewerState extends State<NoteViewer> {
   void fetchNoteData(String reportID) async {
     try {
       // Fetch inspection note from 'inspection_notes' collection by reportID
-      var noteDoc =
-          await FirebaseFirestore.instance
-              .collection('inspection_notes')
-              .doc(reportID)
-              .get();
+      var noteDoc = await FirebaseFirestore.instance.collection('inspection_notes').doc(reportID).get();
 
       if (noteDoc.exists) {
         // Extract fields from the note document
@@ -60,11 +56,7 @@ class _NoteViewerState extends State<NoteViewer> {
         });
 
         // Fetch the author's full name from 'users' collection based on audit_by (user_id)
-        var userDoc =
-            await FirebaseFirestore.instance
-                .collection('users')
-                .where('nurse_id', isEqualTo: authorID)
-                .get();
+        var userDoc = await FirebaseFirestore.instance.collection('users').where('nurse_id', isEqualTo: authorID).get();
 
         if (userDoc.docs.isNotEmpty) {
           var userData = userDoc.docs.first.data();
@@ -74,7 +66,7 @@ class _NoteViewerState extends State<NoteViewer> {
         }
       }
     } catch (e) {
-      print("Error fetching note data: $e");
+      debugPrint("Error fetching note data: $e");
     }
   }
 
@@ -90,9 +82,7 @@ class _NoteViewerState extends State<NoteViewer> {
             height: size.height * 0.42,
             child: Card(
               margin: const EdgeInsets.all(16.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 4.0,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -100,28 +90,13 @@ class _NoteViewerState extends State<NoteViewer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title and Close Button Row
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "note".tr(),
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    Align(alignment: Alignment.center, child: Text("note".tr(), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold))),
                     const SizedBox(height: 60),
 
                     // Text Editor Field with TextController for noteText
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: TextField(
-                        controller: _noteController,
-                        decoration: const InputDecoration(
-                          border: UnderlineInputBorder(),
-                        ),
-                        readOnly: true,
-                      ),
+                      child: TextField(controller: _noteController, decoration: const InputDecoration(border: UnderlineInputBorder()), readOnly: true),
                     ),
                     const Spacer(),
                     Row(
@@ -130,20 +105,8 @@ class _NoteViewerState extends State<NoteViewer> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              "${"ofDate".tr()} $date ${"atTime".tr()} $time",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xff565656),
-                              ),
-                            ),
-                            Text(
-                              "${"by".tr()} $author ${"id".tr()} $authorID",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                              ),
-                            ),
+                            Text("${"ofDate".tr()} $date ${"atTime".tr()} $time", style: const TextStyle(fontSize: 12, color: Color(0xff565656))),
+                            Text("${"by".tr()} $author ${"id".tr()} $authorID", style: const TextStyle(fontSize: 12, color: Colors.black)),
                           ],
                         ),
                       ],

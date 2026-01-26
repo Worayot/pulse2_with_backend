@@ -19,18 +19,11 @@ Future<void> savePatientPreference(List<String> patients) async {
 }
 
 // Function to save a string preference
-Future<void> saveStringPreference(
-  String key,
-  String value,
-  BuildContext context,
-) async {
+Future<void> saveStringPreference(String key, String value, BuildContext context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setString(key, value);
 
-  final userDataProvider = Provider.of<UserDataProvider>(
-    context,
-    listen: false,
-  );
+  final userDataProvider = Provider.of<UserDataProvider>(context, listen: false);
 
   // Ensure correct values are updated based on the key
   if (key == 'name') {
@@ -82,7 +75,7 @@ Future<int?> loadIntPreference(String key) async {
 //     patientIDs.add(newID);
 //     await prefs.setStringList('patient_ids', patientIDs);
 //   }
-//   print('Updated List After Adding: $patientIDs'); // Debugging
+//   debugPrint('Updated List After Adding: $patientIDs'); // Debugging
 // }
 
 // Future<void> removePatientID(String id) async {
@@ -91,7 +84,7 @@ Future<int?> loadIntPreference(String key) async {
 
 //   patientIDs.remove(id);
 //   await prefs.setStringList('patient_ids', patientIDs);
-//   // print('Updated List After Removing: $patientIDs'); // Debugging
+//   // debugPrint('Updated List After Removing: $patientIDs'); // Debugging
 // }
 
 Future<void> saveAlarmToPrefs(AlarmSettings alarmSettings) async {

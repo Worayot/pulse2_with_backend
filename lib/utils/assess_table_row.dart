@@ -16,7 +16,7 @@ class AssessTableRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // print(combinedData['formatted_time']);
+    // debugPrint(combinedData['formatted_time']);
     final String time = combinedData['formatted_time'].split(' ')[0];
     final fullTime = combinedData['time'];
     // final String time = combinedData['formatted_time'];

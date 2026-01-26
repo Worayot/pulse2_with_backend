@@ -1,5 +1,6 @@
 // alarm_service.dart
 import 'package:alarm/alarm.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -15,31 +16,28 @@ class AlarmService {
 
   Future<void> initialize() async {
     if (!_isInitialized) {
-      await Alarm.init(); // Corrected: Removed showDebugLogs
+      await Alarm.init();
       Alarm.ringStream.stream.listen((AlarmSettings triggeredAlarm) {
-        // print('Alarm with ID ${triggeredAlarm.id} is ringing!');
-        deleteAlarmFromPrefs(triggeredAlarm.id); // Use your delete function
-        // Add your logic to handle the ringing alarm (e.g., show a dialog, play sound)
+        debugPrint('Alarm with ID ${triggeredAlarm.id} is ringing!');
+        deleteAlarmFromPrefs(triggeredAlarm.id);
       });
       await rootBundle.load('assets/audio/alarm.mp3').then((_) => true).catchError((_) => false);
 
       _isInitialized = true;
-      // print('Alarm Service Initialized');
+      debugPrint('Alarm Service Initialized');
     }
   }
 
   Future<void> setAlarm(AlarmSettings alarmSettings) async {
     await Alarm.set(alarmSettings: alarmSettings);
-    await saveAlarmToPrefs(alarmSettings); // Use your save function
-    // print(
-    //   'Alarm set and saved in preference with ID: ${alarmSettings.id}, Time: ${alarmSettings.dateTime}',
-    // );
+    await saveAlarmToPrefs(alarmSettings);
+    debugPrint('Alarm set and saved in preference with ID: ${alarmSettings.id}, Time: ${alarmSettings.dateTime}');
   }
 
   Future<void> stopAlarm(int alarmId) async {
     await Alarm.stop(alarmId);
     await removeAlarmFromPrefs(alarmId); // Implement this if needed
-    // print('Alarm $alarmId stopped and has been removed from preference');
+    // debugPrint('Alarm $alarmId stopped and has been removed from preference');
   }
 
   Future<void> stopAllAlarms() async {
@@ -53,20 +51,19 @@ class AlarmService {
           final int? alarmId = alarmMap['id'];
           if (alarmId != null) {
             await Alarm.stop(alarmId);
-            // print('Stopped alarm with ID: $alarmId');
+            debugPrint('Stopped alarm with ID: $alarmId');
           }
         } catch (e) {
-          // print('Error decoding alarm JSON: $e');
+          debugPrint('Error decoding alarm JSON: $e');
         }
       }
       await prefs.remove('scheduled_alarms');
-      // print('All alarms stopped and removed from preferences.');
+      debugPrint('All alarms stopped and removed from preferences.');
     } else {
-      // print('No alarms found in preferences to stop.');
+      debugPrint('No alarms found in preferences to stop.');
     }
   }
 
-  // Your preference functions (move these here)
   Future<void> saveAlarmToPrefs(AlarmSettings alarmSettings) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
@@ -95,7 +92,6 @@ class AlarmService {
     await prefs.setStringList('scheduled_alarms', savedAlarms);
   }
 
-  // Implement removeAlarmFromPrefs if you need a separate function
   Future<void> removeAlarmFromPrefs(int alarmId) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];

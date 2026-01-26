@@ -275,7 +275,7 @@ Future<void> saveAlarmId(int alarmId) async {
 // Stop an alarm manually
 Future<void> stopAlarm(int alarmId) async {
   await Alarm.stop(alarmId);
-  print('Alarm $alarmId stopped');
+  debugPrint('Alarm $alarmId stopped');
 
   // Remove the ID from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
@@ -290,7 +290,7 @@ Future<void> stopAlarm(int alarmId) async {
 //   await deleteAlarmFromPrefs(alarmId);
 
 //   // You can also perform other actions here, such as showing a dialog or notifying the user
-//   print(
+//   debugPrint(
 //     "Alarm with ID $alarmId has been triggered and deleted from preferences.",
 //   );
 // }

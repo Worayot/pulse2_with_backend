@@ -10,8 +10,6 @@ void showPatientDetails(BuildContext context, Patient patient) {
   String name = nameParts[0];
   String surname = nameParts[1];
 
-  print('Patient: $patient');
-
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -49,20 +47,7 @@ void showPatientDetails(BuildContext context, Patient patient) {
                     },
                   ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: IgnorePointer(
-                    child: Opacity(
-                      opacity: 0.8,
-                      child: Image.asset(
-                        "assets/images/therapy.png",
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
+                Positioned(bottom: 0, left: 0, right: 0, child: IgnorePointer(child: Opacity(opacity: 0.8, child: Image.asset("assets/images/therapy.png", fit: BoxFit.contain)))),
 
                 Column(
                   children: [
@@ -72,50 +57,20 @@ void showPatientDetails(BuildContext context, Patient patient) {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          displayData(
-                            context,
-                            "name-surname".tr(),
-                            "$name $surname",
-                          ),
+                          displayData(context, "name-surname".tr(), "$name $surname"),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Expanded(
-                                child: displayData(
-                                  context,
-                                  "age".tr(),
-                                  patient.age,
-                                ),
-                              ),
+                              Expanded(child: displayData(context, "age".tr(), patient.age)),
                               const SizedBox(width: 10),
-                              Expanded(
-                                child: displayData(
-                                  context,
-                                  "gender".tr(),
-                                  patient.gender.tr(),
-                                ),
-                              ),
+                              Expanded(child: displayData(context, "gender".tr(), patient.gender.tr())),
                             ],
                           ),
-                          displayData(
-                            context,
-                            "bedNumber".tr(),
-                            patient.bedNumber,
-                          ),
-                          displayData(
-                            context,
-                            "hn".tr(),
-                            patient.hospitalNumber,
-                          ),
+                          displayData(context, "bedNumber".tr(), patient.bedNumber),
+                          displayData(context, "hn".tr(), patient.hospitalNumber),
                           displayData(context, "ward".tr(), patient.ward),
-                          SizedBox(
-                            height: screenHeight * 0.6,
-                            child: ReportWidget(
-                              tableHeight: screenHeight * 0.5,
-                              patientID: patient.patientId ?? '',
-                            ),
-                          ),
+                          SizedBox(height: screenHeight * 0.6, child: ReportWidget(tableHeight: screenHeight * 0.5, patientID: patient.patientId ?? '')),
                         ],
                       ),
                     ),
@@ -143,14 +98,7 @@ Widget displayData(BuildContext context, String title, String content) {
               readOnly: true,
               controller: TextEditingController(text: content),
               textAlign: TextAlign.center,
-              decoration: const InputDecoration(
-                border: UnderlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  vertical: 0,
-                  horizontal: 0,
-                ),
-                isDense: true,
-              ),
+              decoration: const InputDecoration(border: UnderlineInputBorder(), contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0), isDense: true),
             ),
           ),
         ],
