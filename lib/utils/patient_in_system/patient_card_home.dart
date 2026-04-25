@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:tuh_mews/mainpage/patient_related/patient_ind_data.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
@@ -235,7 +236,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                               },
                               buttonState: !_linkedPatient.contains(patientID),
                             ),
-                            const SizedBox(width: 8),
+                            const Gap(8),
                             buildActionButton(
                               FontAwesomeIcons.clipboardList,
                               () {
@@ -243,10 +244,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                               },
                               Colors.white,
                               const Color(0xff3362CC),
+                              buttonSize: 40,
                             ),
-                            const SizedBox(width: 8),
+                            const Gap(8),
                             SizedBox(
-                              height: 30,
+                              height: 40,
                               child: OutlinedButton(
                                 onPressed: () {
                                   showDialog(

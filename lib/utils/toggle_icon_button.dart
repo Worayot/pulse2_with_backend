@@ -6,13 +6,7 @@ class ToggleIconButton extends StatefulWidget {
   final VoidCallback addPatientFunc;
   final VoidCallback removePatientFunc;
   final bool buttonState;
-  const ToggleIconButton({
-    super.key,
-    required this.enableButton,
-    required this.addPatientFunc,
-    required this.removePatientFunc,
-    required this.buttonState,
-  });
+  const ToggleIconButton({super.key, required this.enableButton, required this.addPatientFunc, required this.removePatientFunc, required this.buttonState});
 
   @override
   _ToggleIconButtonState createState() => _ToggleIconButtonState();
@@ -47,8 +41,8 @@ class _ToggleIconButtonState extends State<ToggleIconButton> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 30,
-      height: 30,
+      width: 40,
+      height: 40,
       child: ElevatedButton(
         onPressed:
             widget.enableButton
@@ -61,19 +55,8 @@ class _ToggleIconButtonState extends State<ToggleIconButton> {
                   setState(() {});
                 }
                 : () {},
-        style: ElevatedButton.styleFrom(
-          shape: const CircleBorder(),
-          backgroundColor: Colors.white,
-          padding: const EdgeInsets.only(left: 2),
-          elevation: 0,
-        ),
-        child: Center(
-          child: Icon(
-            _isPlus ? FontAwesomeIcons.plus : FontAwesomeIcons.minus,
-            size: 25,
-            color: _isPlus ? const Color(0xff3362CC) : Colors.red,
-          ),
-        ),
+        style: ElevatedButton.styleFrom(shape: const CircleBorder(), backgroundColor: Colors.white, padding: const EdgeInsets.only(left: 2), elevation: 0),
+        child: Center(child: Icon(_isPlus ? FontAwesomeIcons.plus : FontAwesomeIcons.minus, size: 25, color: _isPlus ? const Color(0xff3362CC) : Colors.red)),
       ),
     );
   }

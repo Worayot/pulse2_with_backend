@@ -514,7 +514,7 @@ class _ExportPageState extends State<ExportPage> {
 
       await SharePlus.instance.share(ShareParams(files: [file], sharePositionOrigin: box != null ? (box.localToGlobal(Offset.zero) & box.size) : null));
     } else {
-      ValidateService(status: result, navigator: Navigator.of(context)).validate();
+      ValidateService(status: result, context: context).validate();
     }
   }
 }

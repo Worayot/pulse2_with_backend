@@ -8,7 +8,7 @@ import 'package:tuh_mews/models/monitored_patient/card_model.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 import 'package:tuh_mews/utils/circle_with_num.dart';
 import 'package:tuh_mews/utils/assess_table_row.dart';
-import 'package:tuh_mews/utils/mews_forms_instant.dart';
+import 'package:tuh_mews/utils/mews_form/mews_forms_instant.dart';
 import 'package:tuh_mews/utils/time_manager.dart';
 import 'package:timezone/timezone.dart' as tz;
 

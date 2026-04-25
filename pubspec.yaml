@@ -52,6 +52,7 @@ dependencies:
   upgrader: ^12.2.0
   share_plus: ^12.0.1
   rxdart: ^0.28.0
+  dropdown_search: ^7.0.0
 
 dev_dependencies:
   freezed: ^3.1.0

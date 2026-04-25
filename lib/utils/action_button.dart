@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-Widget buildActionButton(IconData icon, VoidCallback onPressed, Color bgColor, Color iconColor, {double fontSize = 22}) {
+Widget buildActionButton(IconData icon, VoidCallback onPressed, Color bgColor, Color iconColor, {double fontSize = 22, double buttonSize = 40}) {
   return SizedBox(
-    width: 30,
-    height: 30,
+    width: buttonSize,
+    height: buttonSize,
     child: ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(shape: const CircleBorder(), backgroundColor: bgColor, padding: const EdgeInsets.only(left: 0), elevation: 0),

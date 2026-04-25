@@ -2,8 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
+import 'package:tuh_mews/utils/mews_form/mews_forms_instant.dart';
 import 'package:tuh_mews/utils/patient_in_system/home_card_data.dart';
 import 'package:tuh_mews/utils/patient_in_system/patient_card_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +21,16 @@ class PatientInSystem extends StatefulWidget {
 }
 
 class _PatientInSystemState extends State<PatientInSystem> {
+  String userId = '';
+  List<Map<String, dynamic>> allPatients = [];
+
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('nurseID') ?? "N/A";
+    });
+  }
+
   bool isLoading = true;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -33,6 +45,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
         _searchQuery = _searchController.text.toLowerCase();
       });
     });
+    _loadProfileData();
   }
 
   @override
@@ -86,6 +99,22 @@ class _PatientInSystemState extends State<PatientInSystem> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: const Color(0xff3362CC),
+          elevation: 2,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return InstantMEWsForm(auditorID: userId, onPop: () {}, patientList: allPatients, showPatientSelector: true);
+              },
+            );
+          },
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Icon(FontAwesomeIcons.calculator, color: Colors.white, size: 28),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
         resizeToAvoidBottomInset: false,
         body: SafeArea(
           bottom: true,
@@ -187,6 +216,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
                       }
 
                       final patients = snapshot.data!;
+                      allPatients = patients;
                       final filteredPatients = _getFilteredPatients(patients);
 
                       if (filteredPatients.isEmpty) {

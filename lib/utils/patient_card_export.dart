@@ -114,7 +114,7 @@ class _PatientCardExportState extends State<PatientCardExport> {
 
                 await SharePlus.instance.share(ShareParams(files: [XFile(filePath)], subject: 'Patient Report', sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size));
               } else {
-                ValidateService(status: result, navigator: Navigator.of(context)).validate();
+                ValidateService(status: result, context: context).validate();
               }
             },
             bgColor: Colors.white,
