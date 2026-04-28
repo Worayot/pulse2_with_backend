@@ -1,6 +1,8 @@
+import 'package:draggable_float_widget/draggable_float_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/patient_related/patient_in_system.dart';
@@ -9,6 +11,7 @@ import 'package:tuh_mews/mainpage/patient_related/monitored_patient.dart';
 // import 'package:tuh_mews/mainpage/patient_data/monitored_patient_original.dart';
 import 'package:tuh_mews/mainpage/settings/setting.dart';
 import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
+import 'package:tuh_mews/utils/global_mews_fab.dart';
 import 'package:tuh_mews/utils/navbar.dart';
 
 class NavigationPage extends StatefulWidget {
@@ -21,6 +24,14 @@ class NavigationPage extends StatefulWidget {
 class _NavigationPageState extends State<NavigationPage> {
   // Single index to manage navigation
   int _selectedIndex = 0;
+  String userId = '';
+
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('nurseID') ?? "N/A";
+    });
+  }
 
   // Different pages for each tab
   static final List<Widget> _pages = <Widget>[const PatientInSystem(), const PatientPage(), const ExportPage(), SettingsPage()];
@@ -55,7 +66,33 @@ class _NavigationPageState extends State<NavigationPage> {
     double fontSize = 20;
 
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: Stack(
+        children: [
+          _pages[_selectedIndex],
+          DraggableFloatWidget(
+            config: DraggableFloatWidgetBaseConfig(
+              isFullScreen: false,
+              appBarHeight: kToolbarHeight,
+
+              // Initial Position (Bottom-Right)
+              initPositionXInLeft: false, // false = Start on the right
+              initPositionYInTop: false, // false = Start at the bottom
+              // Distance from the bottom edge
+              initPositionYMarginBorder: 50,
+
+              // Boundaries from screen edges
+              borderRight: 8,
+              borderBottom: 8,
+              borderTop: 8,
+              borderLeft: 8,
+              // Visuals
+              animDuration: const Duration(milliseconds: 100),
+              debug: false,
+            ),
+            child: GlobalMewsFAB(userId: userId),
+          ),
+        ],
+      ),
       bottomNavigationBar: CustomAnimatedBottomBar(
         selectedIndex: _selectedIndex,
         onItemSelected: _onItemTapped,

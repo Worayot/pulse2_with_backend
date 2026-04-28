@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/monitored_patient/card_model.dart';
+import 'package:tuh_mews/models/patient_id_name.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
@@ -11,6 +13,16 @@ import 'package:rxdart/rxdart.dart';
 
 class FirebasePatientService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Stream<List<PatientIdName>> streamPatientIdNames() {
+    return _firestore.collection('patients').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+
+        return PatientIdName(id: doc.id, name: (data['fullname'] ?? '').toString());
+      }).toList();
+    });
+  }
 
   /// Stream monitored patients linked to the given user ID (Real-time & Reactive)
   Stream<List<PatientModel>> fetchMonitoredPatients(String userId) {
@@ -332,15 +344,18 @@ class PatientService {
         }
       }
 
-      DateTime queryDateStart = DateTime(date.year, date.month, date.day);
+      DateTime queryDateStart = DateTime.utc(date.year, date.month, date.day);
       DateTime queryDateEnd = queryDateStart.add(const Duration(days: 1));
+      debugPrint("Fetching patient id $patientId date start $queryDateStart date end $queryDateEnd");
       final QuerySnapshot mewsSnapshot =
           await FirebaseFirestore.instance
               .collection('mews')
               .where('patient_id', isEqualTo: patientId)
               .where('assessed_time', isGreaterThanOrEqualTo: Timestamp.fromDate(queryDateStart))
               .where('assessed_time', isLessThan: Timestamp.fromDate(queryDateEnd))
+              .orderBy('assessed_time')
               .get();
+      debugPrint("Docs found: ${mewsSnapshot.docs.length}");
 
       List<Map<String, dynamic>> fullReports = [];
       for (var doc in mewsSnapshot.docs) {

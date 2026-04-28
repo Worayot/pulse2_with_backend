@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tuh_mews/func/filter_patient.dart';
+import 'package:tuh_mews/models/patient_filter_state.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
-import 'package:tuh_mews/utils/mews_form/mews_forms_instant.dart';
 import 'package:tuh_mews/utils/patient_in_system/home_card_data.dart';
 import 'package:tuh_mews/utils/patient_in_system/patient_card_home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,14 +15,14 @@ import 'package:tuh_mews/utils/symbols_dialog/home_symbols.dart';
 import 'package:tuh_mews/utils/symbols_dialog/info_dialog.dart';
 import '../../utils/add_patient_form.dart';
 
-class PatientInSystem extends StatefulWidget {
+class PatientInSystem extends ConsumerStatefulWidget {
   const PatientInSystem({super.key});
 
   @override
   _PatientInSystemState createState() => _PatientInSystemState();
 }
 
-class _PatientInSystemState extends State<PatientInSystem> {
+class _PatientInSystemState extends ConsumerState<PatientInSystem> {
   String userId = '';
   List<Map<String, dynamic>> allPatients = [];
 
@@ -33,6 +35,11 @@ class _PatientInSystemState extends State<PatientInSystem> {
 
   bool isLoading = true;
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _wardController = TextEditingController();
+  final TextEditingController _hnController = TextEditingController();
+  final TextEditingController _bedController = TextEditingController();
   String _searchQuery = '';
 
   @override
@@ -51,13 +58,46 @@ class _PatientInSystemState extends State<PatientInSystem> {
   @override
   void dispose() {
     _searchController.dispose();
+    _nameController.dispose();
+    _surnameController.dispose();
+    _wardController.dispose();
+    _hnController.dispose();
+    _bedController.dispose();
     super.dispose();
   }
 
-  List<Map<String, dynamic>> _getFilteredPatients(List<Map<String, dynamic>> patients) {
-    if (_searchQuery.isEmpty) return patients;
+  List<Map<String, dynamic>> _getFilteredPatients(List<Map<String, dynamic>> patients, PatientFilterState filter) {
+    return patients.where((patient) {
+      final fullname = (patient["fullname"] ?? "").toString().toLowerCase();
+      final ward = (patient["ward"] ?? "").toString().toLowerCase();
+      final hn = (patient["hospital_number"] ?? "").toString().toLowerCase();
+      final bed = (patient["bed_number"] ?? "").toString().toLowerCase();
+      final gender = (patient["gender"] ?? "").toString().toLowerCase();
 
-    return patients.where((patient) => patient["fullname"]?.toString().toLowerCase().contains(_searchQuery) ?? false).toList();
+      final nameParts = fullname.split(" ");
+      final firstName = nameParts.isNotEmpty ? nameParts[0] : "";
+      final lastName = nameParts.length > 1 ? nameParts[1] : "";
+
+      final age = int.tryParse(patient["age"]?.toString() ?? "") ?? 0;
+
+      final matchesSearch = _searchQuery.isEmpty || fullname.contains(_searchQuery);
+
+      final matchesName = filter.name.isEmpty || firstName.contains(filter.name.toLowerCase());
+
+      final matchesSurname = filter.surname.isEmpty || lastName.contains(filter.surname.toLowerCase());
+
+      final matchesWard = filter.ward.isEmpty || ward.contains(filter.ward.toLowerCase());
+
+      final matchesHN = filter.hn.isEmpty || hn.contains(filter.hn.toLowerCase());
+
+      final matchesBed = filter.bedNumber.isEmpty || bed.contains(filter.bedNumber.toLowerCase());
+
+      final matchesGender = (filter.male == filter.female) || (filter.male && gender == "male") || (filter.female && gender == "female");
+
+      final matchesAge = age >= filter.ageRange.start && age <= filter.ageRange.end;
+
+      return matchesSearch && matchesName && matchesSurname && matchesWard && matchesHN && matchesBed && matchesGender && matchesAge;
+    }).toList();
   }
 
   Stream<List<Map<String, dynamic>>> getPatientsStream() {
@@ -94,109 +134,109 @@ class _PatientInSystemState extends State<PatientInSystem> {
 
   @override
   Widget build(BuildContext context) {
+    final filter = ref.watch(patientFilterProvider);
     return GestureDetector(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color(0xff3362CC),
-          elevation: 2,
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return InstantMEWsForm(auditorID: userId, onPop: () {}, patientList: allPatients, showPatientSelector: true);
-              },
-            );
-          },
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Icon(FontAwesomeIcons.calculator, color: Colors.white, size: 28),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
         resizeToAvoidBottomInset: false,
         body: SafeArea(
           bottom: true,
           child: Padding(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 16, right: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Gap(20),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: FittedBox(fit: BoxFit.scaleDown, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            showInfoDialog(context, homeSymbols());
-                          });
-                        },
-                        child: const FaIcon(FontAwesomeIcons.circleInfo, size: 28, color: Color(0xff3362CC)),
-                      ),
-                    ],
-                  ),
+                const Gap(28),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: FittedBox(fit: BoxFit.scaleDown, child: Text("patientsInSystem".tr(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          showInfoDialog(context, homeSymbols());
+                        });
+                      },
+                      child: const FaIcon(FontAwesomeIcons.circleInfo, size: 28, color: Color(0xff3362CC)),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          child: TextField(
-                            controller: _searchController,
-                            decoration: InputDecoration(
-                              hintText: "${"search".tr()}...",
-                              suffixIcon:
-                                  _searchController.text.isNotEmpty
-                                      ? IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () {
-                                          _searchController.clear();
-                                        },
-                                      )
-                                      : null,
-                              fillColor: const Color(0xffCADBFF),
-                              filled: true,
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                              prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
-                              prefixIconConstraints: const BoxConstraints(minWidth: 60),
-                            ),
+                const Gap(8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 60,
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: "${"search".tr()}...",
+                            suffixIcon:
+                                _searchController.text.isNotEmpty
+                                    ? IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        _searchController.clear();
+                                        setState(() {
+                                          _searchQuery = '';
+                                        });
+                                      },
+                                    )
+                                    : null,
+                            fillColor: const Color(0xffCADBFF),
+                            filled: true,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                            prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                            prefixIconConstraints: const BoxConstraints(minWidth: 60),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 18),
                           ),
                         ),
                       ),
-                      const Gap(8),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const AddPatientForm();
-                            },
-                          );
-                        },
-                        icon: Icon(FontAwesomeIcons.userPlus, color: Colors.white, size: 26),
-                        label: Padding(
-                          padding: const EdgeInsets.only(left: 4.0),
-                          child: Text("addPatient".tr(), style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff407BFF),
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                          // fixedSize: Size.fromHeight(60),
-                        ),
+                    ),
+                    const Gap(8),
+
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const AddPatientForm();
+                          },
+                        );
+                      },
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        decoration: BoxDecoration(color: Color(0xff407BFF), borderRadius: BorderRadius.circular(12)),
+                        child: Center(child: Icon(FontAwesomeIcons.userPlus, color: Colors.white, size: 25)),
                       ),
-                    ],
-                  ),
+                    ),
+                    const Gap(8),
+                    GestureDetector(
+                      onTap: () {
+                        showFilterDialog(
+                          context: context,
+                          ref: ref,
+                          nameController: _nameController,
+                          surnameController: _surnameController,
+                          wardController: _wardController,
+                          hnController: _hnController,
+                          bedController: _bedController,
+                        );
+                      },
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        decoration: BoxDecoration(color: Color(0xff407BFF), borderRadius: BorderRadius.circular(12)),
+                        child: Center(child: Icon(FontAwesomeIcons.filter, color: Colors.white, size: 25)),
+                      ),
+                    ),
+                  ],
                 ),
                 const Gap(8),
                 Expanded(
@@ -217,7 +257,7 @@ class _PatientInSystemState extends State<PatientInSystem> {
 
                       final patients = snapshot.data!;
                       allPatients = patients;
-                      final filteredPatients = _getFilteredPatients(patients);
+                      final filteredPatients = _getFilteredPatients(patients, filter);
 
                       if (filteredPatients.isEmpty) {
                         return NoPatientWidget();

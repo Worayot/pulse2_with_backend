@@ -4,54 +4,97 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tuh_mews/func/filter_patient.dart';
 import 'package:tuh_mews/models/patient.dart';
+import 'package:tuh_mews/models/patient_filter_state.dart';
 import 'package:tuh_mews/services/export_services.dart';
 import 'package:tuh_mews/services/validate_service.dart';
-import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
-import 'package:tuh_mews/utils/info_text_field_filter.dart';
 import 'package:tuh_mews/utils/patient_card_export.dart';
-import 'package:tuh_mews/utils/toggle_button.dart';
 import 'package:tuh_mews/utils/warning_dialog.dart';
 
-class ExportPage extends StatefulWidget {
+class ExportPage extends ConsumerStatefulWidget {
   const ExportPage({super.key});
 
   @override
-  _ExportPageState createState() => _ExportPageState();
+  ConsumerState<ExportPage> createState() => _ExportPageState();
 }
 
-class _ExportPageState extends State<ExportPage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _surnameController = TextEditingController();
-  final TextEditingController _wardController = TextEditingController();
-  final TextEditingController _hnController = TextEditingController();
-  final TextEditingController _bedNumController = TextEditingController();
+class _ExportPageState extends ConsumerState<ExportPage> {
   final TextEditingController _searchController = TextEditingController();
-  bool _maleToggle = false;
-  bool _femaleToggle = false;
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
+  final TextEditingController wardController = TextEditingController();
+  final TextEditingController hnController = TextEditingController();
+  final TextEditingController bedController = TextEditingController();
+
   bool enableButton = true;
+  bool isDownloadCanceled = false;
 
   List<Patient> _patients = [];
-  List<Patient> _filteredPatients = [];
-
+  final List<Patient> _filteredPatients = [];
   String _fullnameFilter = '';
-  double _minAge = 0;
-  double _maxAge = 120;
+
+  List<Patient> _applyFilters(List<Patient> patients, PatientFilterState filter) {
+    return patients.where((patient) {
+      final nameParts = patient.fullname.split(" ");
+      final firstName = nameParts.isNotEmpty ? nameParts[0] : "";
+      final lastName = nameParts.length > 1 ? nameParts[1] : "";
+
+      final matchesName = filter.name.isEmpty || firstName.toLowerCase().contains(filter.name.toLowerCase());
+
+      final matchesSurname = filter.surname.isEmpty || lastName.toLowerCase().contains(filter.surname.toLowerCase());
+
+      final matchesWard = filter.ward.isEmpty || patient.ward.toLowerCase().contains(filter.ward.toLowerCase());
+
+      final matchesHN = filter.hn.isEmpty || patient.hospitalNumber.toLowerCase().contains(filter.hn.toLowerCase());
+
+      final matchesBed = filter.bedNumber.isEmpty || patient.bedNumber.toLowerCase().contains(filter.bedNumber.toLowerCase());
+
+      final matchesGender =
+          (filter.male == filter.female) || (filter.male && patient.gender.toLowerCase() == "male") || (filter.female && patient.gender.toLowerCase() == "female");
+
+      final age = int.tryParse(patient.age) ?? 0;
+
+      final matchesAge = age >= filter.ageRange.start && age <= filter.ageRange.end;
+
+      return matchesName && matchesSurname && matchesWard && matchesHN && matchesBed && matchesGender && matchesAge;
+    }).toList();
+  }
+
+  void cancelDownload() {
+    debugPrint("User dismissed");
+    setState(() {
+      isDownloadCanceled = true;
+      enableButton = true;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+
+    EasyLoading.instance
+      ..dismissOnTap = true
+      ..userInteractions = true;
+    EasyLoading.addStatusCallback((status) {
+      if (status == EasyLoadingStatus.dismiss) {
+        cancelDownload();
+      }
+    });
+
     FirebaseFirestore.instance.collection('patients').snapshots().listen((snapshot) {
       final patients =
           snapshot.docs.map((doc) {
             var patientData = doc.data();
             var docId = doc.id;
 
-            Patient patient = Patient(
+            return Patient(
               age: patientData['age'],
               bedNumber: patientData['bed_number'],
               fullname: patientData['fullname'],
@@ -60,270 +103,49 @@ class _ExportPageState extends State<ExportPage> {
               hospitalNumber: patientData['hospital_number'],
               patientId: docId,
             );
-            return patient;
           }).toList();
 
       patients.sort((a, b) => a.fullname.compareTo(b.fullname));
 
-      // Update patients list and filter
       setState(() {
         _patients = patients;
-        _filterPatients();
-        _resetFilters();
+        resetPatientFilter(ref: ref); // reset filter
+        _filterPatients(); // apply immediately
       });
     });
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _surnameController.dispose();
-    _wardController.dispose();
-    _hnController.dispose();
-    _bedNumController.dispose();
+    _searchController.dispose();
+
+    nameController.dispose();
+    surnameController.dispose();
+    wardController.dispose();
+    hnController.dispose();
+    bedController.dispose();
+
+    EasyLoading.removeAllCallbacks();
+    EasyLoading.instance
+      ..dismissOnTap = false
+      ..userInteractions = false;
+
     super.dispose();
   }
 
   void _filterPatients() {
+    final filter = ref.read(patientFilterProvider);
+
     setState(() {
-      _filteredPatients =
-          _patients.where((patient) {
-            // Extract patient names safely
-            final nameParts = patient.fullname.split(" ");
-            final firstName = nameParts.isNotEmpty ? nameParts[0] : "";
-            final lastName = nameParts.length > 1 ? nameParts[1] : "";
+      final baseFiltered = _applyFilters(_patients, filter);
 
-            // Apply name and other filters
-            final matchesFullname = _fullnameFilter.isEmpty || patient.fullname.trim().toLowerCase().contains(_fullnameFilter.toLowerCase().trim());
-            final matchesName = _nameController.text.isEmpty || firstName.toLowerCase().trim().contains(_nameController.text.toLowerCase().trim());
-            final matchesSurname = _surnameController.text.isEmpty || lastName.toLowerCase().trim().contains(_surnameController.text.toLowerCase().trim());
-            final matchesWard = _wardController.text.isEmpty || patient.ward.toLowerCase().trim().contains(_wardController.text.toLowerCase().trim());
-
-            // Gender filter logic
-            final matchesGender =
-                (_maleToggle == _femaleToggle) ||
-                (_maleToggle && patient.gender.toLowerCase().trim() == "male") ||
-                (_femaleToggle && patient.gender.toLowerCase().trim() == "female");
-
-            // Other filters
-            final matchesHospitalNumber = _hnController.text.isEmpty || patient.hospitalNumber.toLowerCase().trim().contains(_hnController.text.toLowerCase().trim());
-            final matchesBedNumber = _bedNumController.text.isEmpty || patient.bedNumber.toLowerCase().trim().contains(_bedNumController.text.toLowerCase().trim());
-            final matchesAge = (int.tryParse(patient.age)! >= _minAge) && (int.tryParse(patient.age)! <= _maxAge);
-
-            // Combine all conditions
-            return matchesName && matchesSurname && matchesWard && matchesGender && matchesHospitalNumber && matchesBedNumber && matchesAge && matchesFullname;
-          }).toList();
+      _filteredPatients.clear();
+      _filteredPatients.addAll(
+        baseFiltered.where((patient) {
+          return _fullnameFilter.isEmpty || patient.fullname.toLowerCase().contains(_fullnameFilter.toLowerCase());
+        }),
+      );
     });
-  }
-
-  void _resetFilters() {
-    setState(() {
-      _fullnameFilter = '';
-      _nameController.text = '';
-      _surnameController.text = '';
-      _wardController.text = '';
-      _maleToggle = false;
-      _femaleToggle = false;
-      _hnController.text = '';
-      _bedNumController.text = '';
-      _minAge = 0;
-      _maxAge = 120;
-      _filteredPatients = _patients;
-    });
-    savePreference("male_toggle_state", false);
-    savePreference("female_toggle_state", false);
-  }
-
-  void showFilterDialog(context) {
-    // TextWidgetSize tws = TextWidgetSize(context: context);
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Color(0xffF5F5F5),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(), // Prevent unnecessary scrolling
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
-                  child: SizedBox(
-                    width: 400,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: 5,
-                          right: 5,
-                          child: IconButton(
-                            icon: const Icon(Icons.close, color: Colors.black, size: 30),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: ClipRect(child: SizedBox(height: 280, child: Opacity(opacity: 1, child: Image.asset('assets/images/filter.png', fit: BoxFit.contain)))),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: FittedBox(fit: BoxFit.scaleDown, child: Text('filterPatients'.tr(), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                              ),
-                              const SizedBox(height: 16.0),
-                              _buildFilterInputs(),
-                              StatefulBuilder(
-                                builder: (context, setState) {
-                                  return _buildAgeSlider(setState);
-                                },
-                              ),
-                              const SizedBox(height: 16.0),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      _filterPatients();
-                                      Navigator.of(context).pop();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xff407BFF),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-                                    ),
-                                    child: Text('filterData'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFilterInputs() {
-    return Column(
-      children: [
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(child: InfoTextField(title: "name".tr(), controller: _nameController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-")),
-            const SizedBox(width: 10),
-            Expanded(
-              child: InfoTextField(title: "surname".tr(), controller: _surnameController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-"),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6.0),
-          child: Column(
-            children: [
-              Row(children: [Text("gender".tr(), textAlign: TextAlign.left, style: const TextStyle(fontWeight: FontWeight.bold))]),
-              const SizedBox(height: 3),
-              Row(
-                children: [
-                  Expanded(
-                    child: ToggleButton(
-                      text: "male".tr(),
-                      icon: Icons.male,
-                      activeColor: const Color(0xff5C9FEE),
-                      inactiveColor: const Color(0xffE0EAFF),
-                      onToggle: (value) {
-                        _maleToggle = value;
-                      },
-                      preferenceKey: "male_toggle_state", // Unique key for male toggle
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ToggleButton(
-                      text: "female".tr(),
-                      icon: Icons.female,
-                      activeColor: const Color(0xffD63A67),
-                      inactiveColor: const Color(0xffF9AEC3),
-                      onToggle: (value) {
-                        _femaleToggle = value;
-                      },
-                      preferenceKey: "female_toggle_state", // Unique key for female toggle
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(child: InfoTextField(title: "hn".tr(), controller: _hnController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-")),
-            const SizedBox(width: 10),
-            Expanded(
-              child: InfoTextField(title: "bedNumber".tr(), controller: _bedNumController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-"),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6.0),
-          child: InfoTextField(title: "ward".tr(), controller: _wardController, boxColor: const Color(0xffE0EAFF), context: context, fillSpace: true, hintText: "-"),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8),
-          child: Align(alignment: Alignment.centerLeft, child: Text("age".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAgeSlider(StateSetter setState) {
-    return Column(
-      children: [
-        SliderTheme(
-          data: const SliderThemeData(
-            activeTrackColor: Color(0xff4672D6), // Color of the active track
-            inactiveTrackColor: Colors.grey, // Color of the inactive track
-            thumbColor: Color(0xff5677C3), // Color of the thumb circle
-            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 16), // Thumb size (radius)
-            overlayColor: Colors.transparent, // Color of the overlay when the thumb is pressed
-            trackHeight: 6, // Height of the track
-            rangeTrackShape: RectangularRangeSliderTrackShape(),
-            valueIndicatorColor: Color(0xff407BFF),
-          ),
-          child: RangeSlider(
-            values: RangeValues(_minAge, _maxAge),
-            min: 0,
-            max: 120,
-            divisions: 120,
-            labels: RangeLabels('${_minAge.toInt()} ${"yrs".tr()}', '${_maxAge.toInt()} ${"yrs".tr()}'),
-            activeColor: const Color(0xff4672D6),
-            inactiveColor: const Color(0xffE0EAFF), // Set the inactive color (track)
-            onChanged: (values) {
-              setState(() {
-                _minAge = values.start;
-                _maxAge = values.end;
-              });
-            },
-          ),
-        ),
-      ],
-    );
   }
 
   Widget buildPatientCards() {
@@ -341,6 +163,9 @@ class _ExportPageState extends State<ExportPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<PatientFilterState>(patientFilterProvider, (previous, next) {
+      _filterPatients();
+    });
     Size size = MediaQuery.of(context).size;
 
     return GestureDetector(
@@ -401,7 +226,15 @@ class _ExportPageState extends State<ExportPage> {
                     const Gap(8),
                     GestureDetector(
                       onTap: () {
-                        showFilterDialog(context);
+                        showFilterDialog(
+                          context: context,
+                          ref: ref,
+                          nameController: nameController,
+                          surnameController: surnameController,
+                          wardController: wardController,
+                          hnController: hnController,
+                          bedController: bedController,
+                        );
                       },
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 8),
@@ -428,7 +261,9 @@ class _ExportPageState extends State<ExportPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     InkWell(
-                      onTap: _resetFilters,
+                      onTap: () {
+                        resetPatientFilter(ref: ref);
+                      },
                       child: Text(
                         'resetFilters'.tr(),
                         style: TextStyle(
@@ -499,22 +334,48 @@ class _ExportPageState extends State<ExportPage> {
   Future<void> _exportAll(BuildContext buttonContext) async {
     final box = buttonContext.findRenderObject() as RenderBox?;
 
-    EasyLoading.show(status: 'Downloading...');
-    final exportService = ExportServices();
+    setState(() {
+      isDownloadCanceled = false;
+      enableButton = false;
+    });
 
+    EasyLoading.show(status: 'Downloading...');
+
+    final exportService = ExportServices();
     List<String> patientIds = _filteredPatients.map((patient) => patient.patientId ?? '').toList();
 
-    Map<int, String> result = await exportService.export(patientIds);
+    Map<int, String> result = await exportService.export(patientIds, onCheckCancel: () => isDownloadCanceled);
 
+    if (isDownloadCanceled) {
+      debugPrint("Stopping: User already canceled.");
+      return;
+    }
+
+    EasyLoading.removeAllCallbacks();
     EasyLoading.dismiss();
 
     if (result.containsKey(200)) {
       final filePath = result[200]!;
       final file = XFile(filePath);
 
-      await SharePlus.instance.share(ShareParams(files: [file], sharePositionOrigin: box != null ? (box.localToGlobal(Offset.zero) & box.size) : null));
+      if (!isDownloadCanceled && mounted) {
+        debugPrint("Opening Share Sheet...");
+        await SharePlus.instance.share(ShareParams(files: [file], sharePositionOrigin: box != null ? (box.localToGlobal(Offset.zero) & box.size) : null));
+      }
     } else {
-      ValidateService(status: result, context: context).validate();
+      if (!isDownloadCanceled) {
+        ValidateService(status: result, context: context).validate();
+      }
     }
+
+    _setupEasyLoadingCallback();
+  }
+
+  void _setupEasyLoadingCallback() {
+    EasyLoading.addStatusCallback((status) {
+      if (status == EasyLoadingStatus.dismiss) {
+        cancelDownload();
+      }
+    });
   }
 }

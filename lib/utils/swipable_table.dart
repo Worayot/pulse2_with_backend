@@ -114,6 +114,9 @@ class _SwipableTableState extends State<SwipableTable> {
 
   @override
   Widget build(BuildContext context) {
+    if (_fullReports.isEmpty) {
+      return SizedBox(child: Center(child: Text("noDataFound".tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))));
+    }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(

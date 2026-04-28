@@ -8,6 +8,7 @@ import 'package:tuh_mews/func/calculate_mews.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/models/patient_id_name.dart';
+import 'package:tuh_mews/provider/patient_id_name_provider.dart';
 import 'package:tuh_mews/results/result_screens.dart';
 import 'package:tuh_mews/services/mews_services.dart';
 import 'package:tuh_mews/services/validate_service.dart';
@@ -18,10 +19,9 @@ class InstantMEWsForm extends ConsumerStatefulWidget {
   final String? patientID;
   final String auditorID;
   final VoidCallback onPop;
-  final List<Map<String, dynamic>> patientList;
   final bool showPatientSelector;
 
-  const InstantMEWsForm({super.key, this.patientID, required this.auditorID, required this.onPop, this.patientList = const [], this.showPatientSelector = false});
+  const InstantMEWsForm({super.key, this.patientID, required this.auditorID, required this.onPop, this.showPatientSelector = false});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -40,12 +40,6 @@ class _InstantMEWsFormState extends ConsumerState<InstantMEWsForm> {
   final FocusNode sysBpFocusNode = FocusNode();
   final FocusNode diasBpFocusNode = FocusNode();
   String consciousnessValue = "-";
-
-  List<PatientIdName> get patients {
-    return widget.patientList.map((p) {
-      return PatientIdName(id: p['patient_id'], name: p['fullname']);
-    }).toList();
-  }
 
   @override
   void initState() {
@@ -86,6 +80,7 @@ class _InstantMEWsFormState extends ConsumerState<InstantMEWsForm> {
   Widget _showMEWsForms(BuildContext context, MewsFormState state) {
     bool showPatientSelector = widget.showPatientSelector;
     bool enableButton = state.selectedPatient != null;
+    final patientsAsync = ref.watch(patientListProvider);
 
     return AnimatedPadding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -389,30 +384,37 @@ class _InstantMEWsFormState extends ConsumerState<InstantMEWsForm> {
                             if (showPatientSelector)
                               SizedBox(
                                 height: 40,
-                                child: DropdownSearch<PatientIdName>(
-                                  items: (String filter, LoadProps? loadProps) async {
-                                    return patients;
+                                child: patientsAsync.when(
+                                  data: (patients) {
+                                    return DropdownSearch<PatientIdName>(
+                                      items: (filter, _) async => patients,
+
+                                      itemAsString: (PatientIdName p) => p.name,
+                                      compareFn: (a, b) => a.id == b.id,
+
+                                      selectedItem: state.selectedPatient,
+
+                                      onSelected: (PatientIdName? value) {
+                                        ref.read(mewsFormProvider.notifier).setPatient(value);
+                                      },
+
+                                      decoratorProps: DropDownDecoratorProps(
+                                        decoration: InputDecoration(
+                                          hintText: '-',
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                        ),
+                                      ),
+
+                                      popupProps: const PopupProps.menu(showSelectedItems: true, showSearchBox: true),
+                                    );
                                   },
-                                  itemAsString: (PatientIdName p) => p.name,
-                                  compareFn: (PatientIdName a, PatientIdName b) => a.id == b.id,
 
-                                  selectedItem: state.selectedPatient,
+                                  loading: () => const SizedBox(height: 40, child: Center(child: CircularProgressIndicator())),
 
-                                  onSelected: (PatientIdName? value) {
-                                    ref.read(mewsFormProvider.notifier).setPatient(value);
-                                  },
-
-                                  decoratorProps: DropDownDecoratorProps(
-                                    decoration: InputDecoration(
-                                      hintText: '-',
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
-                                    ),
-                                  ),
-
-                                  popupProps: PopupProps.menu(showSelectedItems: true, showSearchBox: true),
+                                  error: (err, stack) => SizedBox(height: 40, child: Center(child: Text('Error loading patients'))),
                                 ),
                               ),
                           ],
