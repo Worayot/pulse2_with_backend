@@ -104,6 +104,8 @@
   "noDataFound": "No data found.",
   "noPatient": "There's no one here.",
   "note": "Note",
+  "noteSavedFailed": "Error saving note",
+  "noteSavedSuccess": "Note saved successfully",
   "notifications": "Notifications",
   "now": "Now",
   "Nurse": "Nurse",

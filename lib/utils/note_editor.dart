@@ -9,12 +9,7 @@ class NoteEditor extends StatefulWidget {
   final String noteID;
   final VoidCallback onPop;
 
-  const NoteEditor({
-    super.key,
-    required this.note,
-    required this.noteID,
-    required this.onPop,
-  });
+  const NoteEditor({super.key, required this.note, required this.noteID, required this.onPop});
 
   @override
   State<NoteEditor> createState() => _NoteEditorState();
@@ -56,9 +51,7 @@ class _NoteEditorState extends State<NoteEditor> {
             height: size.height * 0.42,
             child: Card(
               margin: const EdgeInsets.all(16.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 4.0,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -66,27 +59,13 @@ class _NoteEditorState extends State<NoteEditor> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Title and Close Button Row
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "note".tr(),
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    Align(alignment: Alignment.center, child: Text("note".tr(), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold))),
                     const SizedBox(height: 60),
 
                     // Text Editor Field
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: TextField(
-                        controller: _noteController,
-                        decoration: const InputDecoration(
-                          border: UnderlineInputBorder(),
-                        ),
-                      ),
+                      child: TextField(controller: _noteController, decoration: const InputDecoration(border: UnderlineInputBorder())),
                     ),
                     const SizedBox(height: 16),
 
@@ -96,35 +75,29 @@ class _NoteEditorState extends State<NoteEditor> {
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: ElevatedButton(
-                          onPressed: () {
-                            MEWsService().addNote(
-                              noteID: widget.noteID,
-                              note: Note(
-                                text: _noteController.text,
-                                auditorID: myUserID,
-                              ),
-                            );
-                            Navigator.pop(context);
-                            widget.onPop();
+                          onPressed: () async {
+                            try {
+                              await MEWsService().addNote(noteID: widget.noteID, note: Note(text: _noteController.text.trim(), auditorID: myUserID));
+
+                              if (!context.mounted) return;
+
+                              Navigator.pop(context);
+                              widget.onPop();
+
+                              showResponseDialog(context: context, title: "success".tr(), message: "noteSavedSuccess".tr(), isSuccess: true);
+                            } catch (e) {
+                              if (!context.mounted) return;
+
+                              showResponseDialog(context: context, title: "error".tr(), message: "noteSavedFailed".tr(), isSuccess: false);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xff407BFF),
                             foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
-                          child: Text(
-                            'saveAgain'.tr(),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: Text('saveAgain'.tr(), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
@@ -147,4 +120,42 @@ class _NoteEditorState extends State<NoteEditor> {
       ),
     );
   }
+}
+
+void showResponseDialog({required BuildContext context, required String title, required String message, required bool isSuccess}) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(isSuccess ? Icons.check_circle : Icons.error, color: isSuccess ? Colors.green : Colors.red, size: 48),
+              const SizedBox(height: 12),
+
+              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+
+              const SizedBox(height: 8),
+
+              Text(message, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14)),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(backgroundColor: isSuccess ? Colors.green : Colors.red, foregroundColor: Colors.white),
+                  child: Text("ok".tr()),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

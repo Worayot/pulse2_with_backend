@@ -12,6 +12,7 @@ class GlobalMewsFAB extends StatelessWidget {
     return FloatingActionButton(
       backgroundColor: const Color(0xff3362CC),
       elevation: 2,
+      shape: const CircleBorder(),
       onPressed: () {
         showDialog(
           context: context,
@@ -20,7 +21,6 @@ class GlobalMewsFAB extends StatelessWidget {
           },
         );
       },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: const Icon(FontAwesomeIcons.calculator, color: Colors.white, size: 28),
     );
   }

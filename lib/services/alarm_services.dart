@@ -28,38 +28,50 @@ class AlarmService {
 
     await _notifications.initialize(initSettings);
 
+    // 🔥 ADD THIS (IMPORTANT)
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'alarm_channel',
+      'Alarms',
+      description: 'Alarm notifications',
+      importance: Importance.max,
+      playSound: true,
+    );
+
+    final androidPlugin = _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+    await androidPlugin?.createNotificationChannel(channel);
+
+    await androidPlugin?.requestNotificationsPermission();
+
     _isInitialized = true;
-    debugPrint('Alarm Service Initialized');
   }
 
-  // 🔔 SET ALARM
-  Future<void> setAlarm({required int id, required DateTime dateTime, required String title, required String body}) async {
+  Future<void> setAlarm({required int id, required DateTime dateTime, required String title, required String body, String sound = 'alarm'}) async {
     await _notifications.zonedSchedule(
       id,
       title,
       body,
       tz.TZDateTime.from(dateTime, tz.local),
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'alarm_channel',
           'Alarms',
           channelDescription: 'Alarm notifications',
           importance: Importance.max,
           priority: Priority.high,
-          fullScreenIntent: true, // 👈 makes it behave like alarm
+          fullScreenIntent: true,
           playSound: true,
+          sound: RawResourceAndroidNotificationSound(sound),
         ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentBadge: true, presentSound: true, sound: sound),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
     );
 
     await saveAlarmToPrefs(id, dateTime, title, body);
-
-    debugPrint('Alarm scheduled: ID=$id Time=$dateTime');
   }
 
-  // 🛑 STOP ALARM
   Future<void> stopAlarm(int alarmId) async {
     await _notifications.cancel(alarmId);
     await removeAlarmFromPrefs(alarmId);
@@ -67,7 +79,6 @@ class AlarmService {
     debugPrint('Alarm $alarmId cancelled');
   }
 
-  // 🛑 STOP ALL
   Future<void> stopAllAlarms() async {
     await _notifications.cancelAll();
 
@@ -77,7 +88,6 @@ class AlarmService {
     debugPrint('All alarms cancelled');
   }
 
-  // 💾 SAVE
   Future<void> saveAlarmToPrefs(int id, DateTime dateTime, String title, String body) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
