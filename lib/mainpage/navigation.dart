@@ -78,7 +78,7 @@ class _NavigationPageState extends State<NavigationPage> {
               initPositionXInLeft: false, // false = Start on the right
               initPositionYInTop: false, // false = Start at the bottom
               // Distance from the bottom edge
-              initPositionYMarginBorder: 50,
+              initPositionYMarginBorder: 0,
 
               // Boundaries from screen edges
               borderRight: 8,

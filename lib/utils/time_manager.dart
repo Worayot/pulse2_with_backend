@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:alarm/alarm.dart' as a;
-import 'package:alarm/model/volume_settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +12,6 @@ import 'package:tuh_mews/services/mews_services.dart';
 import 'package:timezone/data/latest.dart' as tzdata; // Import for initializeTimeZones
 import 'package:timezone/timezone.dart' as tz; // Import for timezone functionality
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tuh_mews/services/notification_sender.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 
 void showTimeManager({
@@ -173,83 +170,59 @@ void showTimeManager({
 
                                             if (status.containsKey(200)) {
                                               String desc = "";
-                                              String stringToHash = patientID + recordTime.toString();
-                                              String? myToken = await FirebaseMessaging.instance.getToken();
 
+                                              String stringToHash = patientID + recordTime.toString();
                                               int alarmId = StringTransformer().generateID(stringToHash);
 
-                                              var alarmSettings = a.AlarmSettings(
+                                              // 🔔 MAIN ALARM
+                                              await AlarmService().setAlarm(
                                                 id: alarmId,
                                                 dateTime: notificationTime,
-                                                assetAudioPath: AlarmService.alarmPathNormal,
-                                                loopAudio: false,
-                                                vibrate: true,
-                                                warningNotificationOnKill: true,
-                                                androidFullScreenIntent: true,
-                                                volumeSettings: VolumeSettings.fixed(volume: 0.8, volumeEnforced: true),
-                                                notificationSettings: a.NotificationSettings(
-                                                  title: 'TUH MEWs',
-                                                  body: '${'remindAssess'.tr()} "$patientName"',
-                                                  stopButton: 'stop'.tr(),
-                                                  icon: 'notification_icon',
-                                                ),
+                                                title: 'TUH MEWs',
+                                                body: '${'remindAssess'.tr()} "$patientName"',
                                               );
-
-                                              await AlarmService().setAlarm(alarmSettings);
-                                              if (myToken != null) {
-                                                await NotificationSender.sendSelfAlarm(
-                                                  deviceToken: myToken,
-                                                  patientID: patientID,
-                                                  patientName: patientName,
-                                                  alarmTime: notificationTime,
-                                                );
-                                              }
 
                                               desc += '${'successfullySetNotificationFor'.tr()}\n$patientName\n${notificationTime.toString().split('.')[0]}';
 
-                                              // Set alarm 5 minutes before the initial alarm
+                                              // 🔔 5 MINUTES BEFORE
                                               if (notificationTime.difference(now).inMinutes > 5) {
                                                 DateTime secondNotificationTime = notificationTime.subtract(const Duration(minutes: 5));
 
-                                                // Create a unique ID for the warning alarm
                                                 String secondStringToHash = patientID + secondNotificationTime.toString();
                                                 int secondAlarmId = StringTransformer().generateID(secondStringToHash);
 
-                                                final alarmSettingsBefore = alarmSettings.copyWith(id: secondAlarmId, dateTime: secondNotificationTime);
+                                                await AlarmService().setAlarm(
+                                                  id: secondAlarmId,
+                                                  dateTime: secondNotificationTime,
+                                                  title: 'TUH MEWs',
+                                                  body: '${'remindAssess'.tr()} "$patientName"',
+                                                );
 
-                                                await AlarmService().setAlarm(alarmSettingsBefore);
                                                 desc += ', ${secondNotificationTime.toString().split('.')[0]}';
-
-                                                if (myToken != null) {
-                                                  await NotificationSender.sendSelfAlarm(
-                                                    deviceToken: myToken,
-                                                    patientID: patientID,
-                                                    patientName: patientName,
-                                                    alarmTime: secondNotificationTime,
-                                                  );
-                                                }
                                               }
+
                                               if (context.mounted) {
                                                 Navigator.of(context).pop();
                                                 FlushbarService().showSuccessMessage(context: context, message: desc, duration: 3);
                                               }
+
                                               onPop();
                                             } else {
                                               setState(() {
                                                 enableButton = true;
                                               });
+
                                               if (context.mounted) {
                                                 FlushbarService().showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
-                                                return;
                                               }
                                             }
                                           } catch (e) {
                                             setState(() {
                                               enableButton = true;
                                             });
+
                                             if (context.mounted) {
                                               FlushbarService().showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
-                                              return; // Check before popping
                                             }
                                           }
                                         }
@@ -301,14 +274,12 @@ Future<void> saveAlarmId(int alarmId) async {
 
 // Stop an alarm manually
 Future<void> stopAlarm(int alarmId) async {
-  await a.Alarm.stop(alarmId);
-  debugPrint('Alarm $alarmId stopped');
-
   // Remove the ID from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
   alarmIds.remove(alarmId.toString());
   await prefs.setStringList('activeAlarms', alarmIds);
+  debugPrint('Alarm $alarmId stopped');
 }
 
 //* Function that will be triggered when the alarm goes off

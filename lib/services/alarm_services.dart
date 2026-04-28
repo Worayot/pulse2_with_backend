@@ -1,107 +1,102 @@
-// alarm_service.dart
-import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class AlarmService {
   static final AlarmService _instance = AlarmService._internal();
-
   factory AlarmService() => _instance;
 
-  static String alarmPathNormal = 'assets/audio/alarm.mp3';
-  static String alarmPathHigh = 'assets/audio/alarm.mp3'; //TODO: Add sound
-
   AlarmService._internal();
+
+  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
 
   Future<void> initialize() async {
-    if (!_isInitialized) {
-      await Alarm.init();
-      Alarm.ringStream.stream.listen((AlarmSettings triggeredAlarm) {
-        debugPrint('Alarm with ID ${triggeredAlarm.id} is ringing!');
-        deleteAlarmFromPrefs(triggeredAlarm.id);
-      });
-      await rootBundle.load(alarmPathNormal).then((_) => true).catchError((_) => false);
+    if (_isInitialized) return;
 
-      _isInitialized = true;
-      debugPrint('Alarm Service Initialized');
-    }
+    tz.initializeTimeZones();
+
+    final androidSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    final iosSettings = const DarwinInitializationSettings(requestAlertPermission: true, requestBadgePermission: true, requestSoundPermission: true);
+
+    final initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
+
+    await _notifications.initialize(initSettings);
+
+    _isInitialized = true;
+    debugPrint('Alarm Service Initialized');
   }
 
-  Future<void> setAlarm(AlarmSettings alarmSettings) async {
-    await Alarm.set(alarmSettings: alarmSettings);
-    await saveAlarmToPrefs(alarmSettings);
-    debugPrint('Alarm set and saved in preference with ID: ${alarmSettings.id}, Time: ${alarmSettings.dateTime}');
-  }
-
-  Future<void> stopAlarm(int alarmId) async {
-    await Alarm.stop(alarmId);
-    await removeAlarmFromPrefs(alarmId);
-    debugPrint('Alarm $alarmId stopped and has been removed from preference');
-  }
-
-  Future<void> stopAllAlarms() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String>? savedAlarms = prefs.getStringList('scheduled_alarms');
-
-    if (savedAlarms != null) {
-      for (final alarmJson in savedAlarms) {
-        try {
-          final alarmMap = jsonDecode(alarmJson);
-          final int? alarmId = alarmMap['id'];
-          if (alarmId != null) {
-            await Alarm.stop(alarmId);
-            debugPrint('Stopped alarm with ID: $alarmId');
-          }
-        } catch (e) {
-          debugPrint('Error decoding alarm JSON: $e');
-        }
-      }
-      await prefs.remove('scheduled_alarms');
-      debugPrint('All alarms stopped and removed from preferences.');
-    } else {
-      debugPrint('No alarms found in preferences to stop.');
-    }
-  }
-
-  Future<void> saveAlarmToPrefs(AlarmSettings alarmSettings) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
-
-    savedAlarms.add(
-      jsonEncode({
-        'id': alarmSettings.id,
-        'dateTime': alarmSettings.dateTime.toIso8601String(),
-        'title': alarmSettings.notificationSettings.title,
-        'body': alarmSettings.notificationSettings.body,
-      }),
+  // 🔔 SET ALARM
+  Future<void> setAlarm({required int id, required DateTime dateTime, required String title, required String body}) async {
+    await _notifications.zonedSchedule(
+      id,
+      title,
+      body,
+      tz.TZDateTime.from(dateTime, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'alarm_channel',
+          'Alarms',
+          channelDescription: 'Alarm notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          fullScreenIntent: true, // 👈 makes it behave like alarm
+          playSound: true,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
     );
 
-    await prefs.setStringList('scheduled_alarms', savedAlarms);
+    await saveAlarmToPrefs(id, dateTime, title, body);
+
+    debugPrint('Alarm scheduled: ID=$id Time=$dateTime');
   }
 
-  Future<void> deleteAlarmFromPrefs(int alarmId) async {
+  // 🛑 STOP ALARM
+  Future<void> stopAlarm(int alarmId) async {
+    await _notifications.cancel(alarmId);
+    await removeAlarmFromPrefs(alarmId);
+
+    debugPrint('Alarm $alarmId cancelled');
+  }
+
+  // 🛑 STOP ALL
+  Future<void> stopAllAlarms() async {
+    await _notifications.cancelAll();
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('scheduled_alarms');
+
+    debugPrint('All alarms cancelled');
+  }
+
+  // 💾 SAVE
+  Future<void> saveAlarmToPrefs(int id, DateTime dateTime, String title, String body) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
 
-    savedAlarms.removeWhere((alarmJson) {
-      final alarmMap = jsonDecode(alarmJson);
-      return alarmMap['id'] == alarmId;
-    });
+    savedAlarms.add(jsonEncode({'id': id, 'dateTime': dateTime.toIso8601String(), 'title': title, 'body': body}));
 
     await prefs.setStringList('scheduled_alarms', savedAlarms);
   }
 
+  // ❌ REMOVE WHEN TRIGGERED OR CANCELLED
   Future<void> removeAlarmFromPrefs(int alarmId) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
+
     savedAlarms.removeWhere((item) {
       final data = jsonDecode(item);
       return data['id'] == alarmId;
     });
+
     await prefs.setStringList('scheduled_alarms', savedAlarms);
   }
 }

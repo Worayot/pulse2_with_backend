@@ -1,36 +1,42 @@
 import 'dart:io';
-import 'package:alarm/alarm.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart' as provider;
+import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/firebase_options.dart';
-import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/mainpage/navigation.dart';
 import 'package:tuh_mews/provider/user_data_provider.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:firebase_messaging/firebase_messaging.dart' as fcm;
-import 'package:alarm/alarm.dart' as am;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Alarm.init();
   await AlarmService().initialize();
 
   tzdata.initializeTimeZones();
-  tz.setLocalLocation(tz.getLocation(tz.local.name));
+  try {
+    final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneName));
+  } catch (e) {
+    tz.setLocalLocation(tz.getLocation('UTC'));
+  }
 
+  // 🔥 Firebase init
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   await EasyLocalization.ensureInitialized();
 
+  // 📱 Lock orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   runApp(
@@ -43,53 +49,12 @@ void main() async {
       ),
     ),
   );
+
   configLoading();
 
+  // Optional: keep FCM token logging
   Future.microtask(() => initMessaging());
-}
-
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(fcm.RemoteMessage message) async {
-  await Firebase.initializeApp();
-
-  final alarmService = AlarmService();
-  await alarmService.initialize();
-
-  final data = message.data;
-
-  if (data.containsKey('time') && data.containsKey('patientID')) {
-    final String patientID = data['patientID'];
-    final String patientName = data['patientName'] ?? 'Unknown Patient';
-    final DateTime notificationTime = DateTime.parse(data['time']);
-    final DateTime now = DateTime.now();
-
-    String stringToHash = patientID + notificationTime.toString();
-    int alarmId = StringTransformer().generateID(stringToHash);
-
-    final alarmSettings = am.AlarmSettings(
-      id: alarmId,
-      dateTime: notificationTime,
-      assetAudioPath: AlarmService.alarmPathNormal,
-      loopAudio: false,
-      vibrate: true,
-      warningNotificationOnKill: true,
-      androidFullScreenIntent: true,
-      volumeSettings: const am.VolumeSettings.fixed(volume: 0.8, volumeEnforced: true),
-      notificationSettings: am.NotificationSettings(title: 'TUH MEWs', body: 'Remind Assess: "$patientName"', stopButton: 'Stop', icon: 'notification_icon'),
-    );
-
-    await alarmService.setAlarm(alarmSettings);
-
-    if (notificationTime.difference(now).inMinutes > 5) {
-      DateTime secondNotificationTime = notificationTime.subtract(const Duration(minutes: 5));
-      String secondStringToHash = patientID + secondNotificationTime.toString();
-      int secondAlarmId = StringTransformer().generateID(secondStringToHash);
-
-      final alarmSettingsBefore = alarmSettings.copyWith(id: secondAlarmId, dateTime: secondNotificationTime);
-
-      await alarmService.setAlarm(alarmSettingsBefore);
-    }
-  }
+  return null;
 }
 
 Future<void> initMessaging() async {
@@ -173,7 +138,7 @@ class MyApp extends StatelessWidget {
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-        home: const NavigationPage(),
+        home: FirebaseAuth.instance.currentUser == null ? LoginPage() : NavigationPage(),
         builder: EasyLoading.init(),
       ),
     );
