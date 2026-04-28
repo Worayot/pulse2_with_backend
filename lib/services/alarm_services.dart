@@ -10,6 +10,9 @@ class AlarmService {
 
   factory AlarmService() => _instance;
 
+  static String alarmPathNormal = 'assets/audio/alarm.mp3';
+  static String alarmPathHigh = 'assets/audio/alarm.mp3'; //TODO: Add sound
+
   AlarmService._internal();
 
   bool _isInitialized = false;
@@ -21,7 +24,7 @@ class AlarmService {
         debugPrint('Alarm with ID ${triggeredAlarm.id} is ringing!');
         deleteAlarmFromPrefs(triggeredAlarm.id);
       });
-      await rootBundle.load('assets/audio/alarm.mp3').then((_) => true).catchError((_) => false);
+      await rootBundle.load(alarmPathNormal).then((_) => true).catchError((_) => false);
 
       _isInitialized = true;
       debugPrint('Alarm Service Initialized');
@@ -36,8 +39,8 @@ class AlarmService {
 
   Future<void> stopAlarm(int alarmId) async {
     await Alarm.stop(alarmId);
-    await removeAlarmFromPrefs(alarmId); // Implement this if needed
-    // debugPrint('Alarm $alarmId stopped and has been removed from preference');
+    await removeAlarmFromPrefs(alarmId);
+    debugPrint('Alarm $alarmId stopped and has been removed from preference');
   }
 
   Future<void> stopAllAlarms() async {

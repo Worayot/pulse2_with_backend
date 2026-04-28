@@ -1,7 +1,12 @@
-import 'package:alarm/alarm.dart';
+import 'dart:convert';
+
+import 'package:alarm/alarm.dart' as a;
 import 'package:alarm/model/volume_settings.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/services/alarm_services.dart';
@@ -9,6 +14,7 @@ import 'package:tuh_mews/services/mews_services.dart';
 import 'package:timezone/data/latest.dart' as tzdata; // Import for initializeTimeZones
 import 'package:timezone/timezone.dart' as tz; // Import for timezone functionality
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tuh_mews/services/notification_sender.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 
 void showTimeManager({
@@ -168,19 +174,20 @@ void showTimeManager({
                                             if (status.containsKey(200)) {
                                               String desc = "";
                                               String stringToHash = patientID + recordTime.toString();
+                                              String? myToken = await FirebaseMessaging.instance.getToken();
 
                                               int alarmId = StringTransformer().generateID(stringToHash);
 
-                                              var alarmSettings = AlarmSettings(
+                                              var alarmSettings = a.AlarmSettings(
                                                 id: alarmId,
                                                 dateTime: notificationTime,
-                                                assetAudioPath: "assets/audio/alarm.mp3",
+                                                assetAudioPath: AlarmService.alarmPathNormal,
                                                 loopAudio: false,
                                                 vibrate: true,
                                                 warningNotificationOnKill: true,
                                                 androidFullScreenIntent: true,
                                                 volumeSettings: VolumeSettings.fixed(volume: 0.8, volumeEnforced: true),
-                                                notificationSettings: NotificationSettings(
+                                                notificationSettings: a.NotificationSettings(
                                                   title: 'TUH MEWs',
                                                   body: '${'remindAssess'.tr()} "$patientName"',
                                                   stopButton: 'stop'.tr(),
@@ -189,22 +196,38 @@ void showTimeManager({
                                               );
 
                                               await AlarmService().setAlarm(alarmSettings);
+                                              if (myToken != null) {
+                                                await NotificationSender.sendSelfAlarm(
+                                                  deviceToken: myToken,
+                                                  patientID: patientID,
+                                                  patientName: patientName,
+                                                  alarmTime: notificationTime,
+                                                );
+                                              }
 
                                               desc += '${'successfullySetNotificationFor'.tr()}\n$patientName\n${notificationTime.toString().split('.')[0]}';
 
                                               // Set alarm 5 minutes before the initial alarm
                                               if (notificationTime.difference(now).inMinutes > 5) {
                                                 DateTime secondNotificationTime = notificationTime.subtract(const Duration(minutes: 5));
-                                                String secondStringToHash = patientID + secondNotificationTime.toString();
 
+                                                // Create a unique ID for the warning alarm
+                                                String secondStringToHash = patientID + secondNotificationTime.toString();
                                                 int secondAlarmId = StringTransformer().generateID(secondStringToHash);
 
-                                                final alarmSettingsBefore = alarmSettings.copyWith(
-                                                  id: secondAlarmId,
-                                                  dateTime: notificationTime.subtract(const Duration(minutes: 5)),
-                                                );
+                                                final alarmSettingsBefore = alarmSettings.copyWith(id: secondAlarmId, dateTime: secondNotificationTime);
+
                                                 await AlarmService().setAlarm(alarmSettingsBefore);
                                                 desc += ', ${secondNotificationTime.toString().split('.')[0]}';
+
+                                                if (myToken != null) {
+                                                  await NotificationSender.sendSelfAlarm(
+                                                    deviceToken: myToken,
+                                                    patientID: patientID,
+                                                    patientName: patientName,
+                                                    alarmTime: secondNotificationTime,
+                                                  );
+                                                }
                                               }
                                               if (context.mounted) {
                                                 Navigator.of(context).pop();
@@ -258,10 +281,14 @@ void showTimeManager({
   });
 }
 
-// Function to initialize the timezone database
 Future<void> _loadTimezone() async {
   tzdata.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Bangkok'));
+
+  var status = await Permission.notification.status;
+  if (status.isDenied) {
+    await Permission.notification.request();
+  }
 }
 
 // Save active alarm ID to SharedPreferences
@@ -274,7 +301,7 @@ Future<void> saveAlarmId(int alarmId) async {
 
 // Stop an alarm manually
 Future<void> stopAlarm(int alarmId) async {
-  await Alarm.stop(alarmId);
+  await a.Alarm.stop(alarmId);
   debugPrint('Alarm $alarmId stopped');
 
   // Remove the ID from SharedPreferences

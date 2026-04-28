@@ -1,7 +1,6 @@
-# Uncomment this line to define a global platform for your project
-platform :ios, '13.0'
+# 1. Update platform to at least 15.0 for iOS 26 SDK compatibility
+platform :ios, '15.0'
 
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
 project 'Runner', {
@@ -41,7 +40,11 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      # 2. Force all pods to use iOS 15.0 to match the SDK requirements
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+      
+      # 3. Fix for Apple Silicon (M3) compilation errors in some plugins
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
     end
   end
 end

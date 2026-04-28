@@ -2,7 +2,7 @@ name: tuh_mews
 description: "TUH MEWS Project"
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.12+13
+version: 1.1.0+15
 
 environment:
   sdk: ^3.7.0
@@ -55,6 +55,7 @@ dependencies:
   dropdown_search: ^7.0.0
   table_calendar: ^3.2.0
   draggable_float_widget: ^0.1.0
+  googleapis_auth: ^2.3.0
 
 dev_dependencies:
   freezed: ^3.1.0
