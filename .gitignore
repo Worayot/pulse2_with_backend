@@ -50,3 +50,7 @@ app.*.map.json
 # *.lock
 
 sec.txt
+
+/android/.gradle/
+/android/app/build/
+/android/build/

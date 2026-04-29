@@ -10,6 +10,9 @@ buildscript {
     }
 }
 
+val rootBuildDir: Directory = rootProject.layout.projectDirectory.dir("../build")
+rootProject.layout.buildDirectory.value(rootBuildDir)
+
 allprojects {
     repositories {
         google()
@@ -17,10 +20,10 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
-rootProject.layout.buildDirectory.value(newBuildDir)
-
 subprojects {
+    val projectBuildDir = rootBuildDir.dir(project.name)
+    project.layout.buildDirectory.value(projectBuildDir)
+
     configurations.configureEach {
         resolutionStrategy {
             force("androidx.core:core:1.15.0")

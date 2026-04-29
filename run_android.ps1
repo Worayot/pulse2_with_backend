@@ -25,6 +25,13 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Cleaning Android build..."
 Set-Location android
+
+Stop-Process -Name "java" -Force -ErrorAction SilentlyContinue
+Stop-Process -Name "kotlin" -Force -ErrorAction SilentlyContinue
+./gradlew --stop
+
+Start-Sleep -Seconds 2
+
 ./gradlew clean
 
 if ($LASTEXITCODE -ne 0) {
