@@ -34,7 +34,12 @@ class _NavigationPageState extends State<NavigationPage> {
   }
 
   // Different pages for each tab
-  static final List<Widget> _pages = <Widget>[const PatientInSystem(), const PatientPage(), const ExportPage(), SettingsPage()];
+  static final List<Widget> _pages = <Widget>[
+    const PatientInSystem(),
+    const PatientPage(),
+    const ExportPage(),
+    SettingsPage(),
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -49,7 +54,10 @@ class _NavigationPageState extends State<NavigationPage> {
   Future<void> _checkAuthentication() async {
     final isAuthenticated = await AuthenticationState().isAuthenticated();
     if (!isAuthenticated) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
     }
   }
 
@@ -93,39 +101,63 @@ class _NavigationPageState extends State<NavigationPage> {
           ),
         ],
       ),
-      bottomNavigationBar: CustomAnimatedBottomBar(
-        selectedIndex: _selectedIndex,
-        onItemSelected: _onItemTapped,
-        items: <BottomNavyBarItem>[
-          BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.userGroup, size: iconSize),
-            title: FittedBox(fit: BoxFit.scaleDown, child: Text("\t${'patientsInSystem'.tr()}", style: TextStyle(fontSize: fontSize))),
-            activeColor: const Color(0xffFEFEFE),
-            inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: screenWidth * 0.4,
+      bottomNavigationBar: SafeArea(
+        child: Material(
+          child: CustomAnimatedBottomBar(
+            selectedIndex: _selectedIndex,
+            onItemSelected: _onItemTapped,
+            items: <BottomNavyBarItem>[
+              BottomNavyBarItem(
+                icon: Icon(FontAwesomeIcons.userGroup, size: iconSize),
+                title: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    "\t${'patientsInSystem'.tr()}",
+                    style: TextStyle(fontSize: fontSize),
+                  ),
+                ),
+                activeColor: const Color(0xffFEFEFE),
+                inactiveColor: const Color(0xffC6D8FF),
+              ),
+              BottomNavyBarItem(
+                icon: Icon(FontAwesomeIcons.userNurse, size: iconSize),
+                title: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    "\t${'patientInMonitoring'.tr()}",
+                    style: TextStyle(fontSize: fontSize),
+                  ),
+                ),
+                activeColor: const Color(0xffFEFEFE),
+                inactiveColor: const Color(0xffC6D8FF),
+              ),
+              BottomNavyBarItem(
+                icon: Icon(FontAwesomeIcons.fileArrowDown, size: iconSize),
+                title: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'data'.tr(),
+                    style: TextStyle(fontSize: fontSize),
+                  ),
+                ),
+                activeColor: const Color(0xffFEFEFE),
+                inactiveColor: const Color(0xffC6D8FF),
+              ),
+              BottomNavyBarItem(
+                icon: Icon(FontAwesomeIcons.gear, size: iconSize),
+                title: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    'settings'.tr(),
+                    style: TextStyle(fontSize: fontSize),
+                  ),
+                ),
+                activeColor: const Color(0xffFEFEFE),
+                inactiveColor: const Color(0xffC6D8FF),
+              ),
+            ],
           ),
-          BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.userNurse, size: iconSize),
-            title: FittedBox(fit: BoxFit.scaleDown, child: Text("\t${'patientInMonitoring'.tr()}", style: TextStyle(fontSize: fontSize))),
-            activeColor: const Color(0xffFEFEFE),
-            inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: screenWidth * 0.4,
-          ),
-          BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.fileArrowDown, size: iconSize),
-            title: FittedBox(fit: BoxFit.scaleDown, child: Text('data'.tr(), style: TextStyle(fontSize: fontSize))),
-            activeColor: const Color(0xffFEFEFE),
-            inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: screenWidth * 0.3,
-          ),
-          BottomNavyBarItem(
-            icon: Icon(FontAwesomeIcons.gear, size: iconSize),
-            title: FittedBox(fit: BoxFit.scaleDown, child: Text('settings'.tr(), style: TextStyle(fontSize: fontSize))),
-            activeColor: const Color(0xffFEFEFE),
-            inactiveColor: const Color(0xffC6D8FF),
-            boxWidth: screenWidth * 0.33,
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -236,16 +236,11 @@ void showTimeManager({
                                           setState(() {
                                             enableButton = false;
                                           });
-                                          DateTime now = DateTime.now();
-                                          DateTime recordTime = DateTime(
-                                            now.year,
-                                            now.month,
-                                            now.day,
-                                            selectedHour,
-                                            selectedMinute,
-                                            now.second,
-                                          );
-                                          DateTime notificationTime = DateTime(
+
+                                          final now = DateTime.now();
+
+                                          // ⬇️ Build raw local time first
+                                          DateTime rawTime = DateTime(
                                             now.year,
                                             now.month,
                                             now.day,
@@ -254,16 +249,26 @@ void showTimeManager({
                                             now.second,
                                           );
 
-                                          if (notificationTime.isBefore(now)) {
-                                            notificationTime = notificationTime
-                                                .add(Duration(days: 1));
-                                          }
-
-                                          if (recordTime.isBefore(now)) {
-                                            recordTime = recordTime.add(
-                                              Duration(days: 1),
+                                          // ⬇️ Move to next day if time already passed
+                                          if (rawTime.isBefore(now)) {
+                                            rawTime = rawTime.add(
+                                              const Duration(days: 1),
                                             );
                                           }
+
+                                          // ⬇️ Convert ONCE to TZ time (FIXED)
+                                          final tz.TZDateTime notificationTime =
+                                              tz.TZDateTime.local(
+                                                rawTime.year,
+                                                rawTime.month,
+                                                rawTime.day,
+                                                rawTime.hour,
+                                                rawTime.minute,
+                                                rawTime.second,
+                                              );
+
+                                          final tz.TZDateTime recordTime =
+                                              notificationTime;
 
                                           InspectionNote newInspection =
                                               InspectionNote(
@@ -286,13 +291,15 @@ void showTimeManager({
                                               String stringToHash =
                                                   patientID +
                                                   recordTime.toString();
+
                                               int alarmId = StringTransformer()
                                                   .generateID(stringToHash);
 
                                               // 🔔 MAIN ALARM
                                               await AlarmService().setAlarm(
                                                 id: alarmId,
-                                                dateTime: notificationTime,
+                                                dateTime:
+                                                    notificationTime, // already TZ-safe
                                                 title: 'TUH MEWs',
                                                 body:
                                                     '${'remindAssess'.tr()} "$patientName"',
@@ -301,13 +308,14 @@ void showTimeManager({
                                               desc +=
                                                   '${'successfullySetNotificationFor'.tr()}\n$patientName\n${notificationTime.toString().split('.')[0]}';
 
-                                              // 🔔 5 MINUTES BEFORE
-                                              if (notificationTime
-                                                      .difference(now)
-                                                      .inMinutes >
-                                                  5) {
-                                                DateTime
-                                                secondNotificationTime =
+                                              // 🔔 5 MIN BEFORE
+                                              final diff = notificationTime
+                                                  .difference(
+                                                    tz.TZDateTime.now(tz.local),
+                                                  );
+
+                                              if (diff.inMinutes > 5) {
+                                                final secondNotificationTime =
                                                     notificationTime.subtract(
                                                       const Duration(
                                                         minutes: 5,
@@ -318,6 +326,7 @@ void showTimeManager({
                                                     patientID +
                                                     secondNotificationTime
                                                         .toString();
+
                                                 int secondAlarmId =
                                                     StringTransformer()
                                                         .generateID(
@@ -339,6 +348,7 @@ void showTimeManager({
 
                                               if (context.mounted) {
                                                 Navigator.of(context).pop();
+
                                                 FlushbarService()
                                                     .showSuccessMessage(
                                                       context: context,
@@ -352,7 +362,6 @@ void showTimeManager({
                                               setState(() {
                                                 enableButton = true;
                                               });
-
                                               throw "Failed to add note";
                                             }
                                           } catch (e) {
@@ -422,55 +431,3 @@ Future<void> _loadTimezone() async {
     await Permission.notification.request();
   }
 }
-
-// Save active alarm ID to SharedPreferences
-Future<void> saveAlarmId(int alarmId) async {
-  final prefs = await SharedPreferences.getInstance();
-  List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
-  alarmIds.add(alarmId.toString());
-  await prefs.setStringList('activeAlarms', alarmIds);
-}
-
-// Stop an alarm manually
-Future<void> stopAlarm(int alarmId) async {
-  // Remove the ID from SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
-  List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
-  alarmIds.remove(alarmId.toString());
-  await prefs.setStringList('activeAlarms', alarmIds);
-  debugPrint('Alarm $alarmId stopped');
-}
-
-//* Function that will be triggered when the alarm goes off
-// void onAlarmTriggered(int alarmId) async {
-//   // Delete the alarm from preferences when triggered
-//   await deleteAlarmFromPrefs(alarmId);
-
-//   // You can also perform other actions here, such as showing a dialog or notifying the user
-//   debugPrint(
-//     "Alarm with ID $alarmId has been triggered and deleted from preferences.",
-//   );
-// }
-
-// Future<void> _deleteAlarm(int id) async {
-//   await Alarm.stop(id);
-//   final prefs = await SharedPreferences.getInstance();
-//   List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
-
-//   savedAlarms.removeWhere((item) {
-//     final data = jsonDecode(item);
-//     return data['id'] == id;
-//   });
-
-//   await prefs.setStringList('scheduled_alarms', savedAlarms);
-//   // _loadAlarms();
-// }
-
-// Future<void> _loadAlarms() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
-//   setState(() {
-//     _alarms =
-//         savedAlarms.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
-//   });
-// }

@@ -32,12 +32,24 @@ class CustomAnimatedBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor = backgroundColor ?? const Color(0xff3362CC);
     return Container(
-      decoration: BoxDecoration(color: const Color(0xff3362CC), borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+      decoration: BoxDecoration(
+        color: const Color(0xff3362CC),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
       child: SafeArea(
         bottom: true,
         top: false,
         child: Container(
-          decoration: BoxDecoration(borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)), color: bgColor),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+            color: bgColor,
+          ),
           width: double.infinity,
           height: containerHeight,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -56,7 +68,6 @@ class CustomAnimatedBottomBar extends StatelessWidget {
                       itemCornerRadius: itemCornerRadius,
                       animationDuration: animationDuration,
                       curve: curve,
-                      boxWidth: item.boxWidth,
                     ),
                   );
                 }).toList(),
@@ -75,7 +86,6 @@ class _ItemWidget extends StatelessWidget {
   final double itemCornerRadius;
   final Duration animationDuration;
   final Curve curve;
-  final double boxWidth;
 
   const _ItemWidget({
     required this.item,
@@ -84,7 +94,6 @@ class _ItemWidget extends StatelessWidget {
     required this.animationDuration,
     required this.itemCornerRadius,
     required this.iconSize,
-    required this.boxWidth, // Accept boxWidth from parent
     this.curve = Curves.linear,
   });
 
@@ -95,47 +104,52 @@ class _ItemWidget extends StatelessWidget {
       container: true,
       selected: isSelected,
       child: AnimatedContainer(
-        width: isSelected ? boxWidth : size.width * 0.1,
         height: double.maxFinite,
         duration: animationDuration,
         curve: curve,
-        decoration: BoxDecoration(color: isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor, borderRadius: BorderRadius.circular(itemCornerRadius)),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor,
+          borderRadius: BorderRadius.circular(itemCornerRadius),
+        ),
         child: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            child: Container(
-              constraints: BoxConstraints(maxWidth: isSelected ? boxWidth : size.width * 0.1),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: IconTheme(
-                        data: IconThemeData(size: iconSize, color: isSelected ? item.activeColor.withOpacity(1) : item.inactiveColor ?? item.activeColor),
-                        child: item.icon,
-                      ),
+          child: AnimatedPadding(
+            duration: animationDuration,
+            curve: curve,
+            padding: EdgeInsets.symmetric(horizontal: isSelected ? 16 : 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: IconTheme(
+                    data: IconThemeData(
+                      size: iconSize,
+                      color:
+                          isSelected
+                              ? item.activeColor.withOpacity(1)
+                              : item.inactiveColor ?? item.activeColor,
                     ),
-                    if (isSelected) SizedBox(width: size.width * 0.025),
-                    if (isSelected)
-                      Flexible(
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: DefaultTextStyle.merge(
-                            style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: item.textAlign,
-                            child: item.title,
-                          ),
-                        ),
-                      ),
-                  ],
+                    child: item.icon,
+                  ),
                 ),
-              ),
+                if (isSelected) SizedBox(width: size.width * 0.025),
+                if (isSelected)
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: DefaultTextStyle.merge(
+                      style: TextStyle(
+                        color: item.activeColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: item.textAlign,
+                      child: item.title,
+                    ),
+                  ),
+              ],
             ),
           ),
         ),
@@ -145,12 +159,17 @@ class _ItemWidget extends StatelessWidget {
 }
 
 class BottomNavyBarItem {
-  BottomNavyBarItem({required this.icon, required this.title, this.activeColor = const Color(0xff407BFF), this.textAlign, this.inactiveColor, required this.boxWidth});
+  BottomNavyBarItem({
+    required this.icon,
+    required this.title,
+    this.activeColor = const Color(0xff407BFF),
+    this.textAlign,
+    this.inactiveColor,
+  });
 
   final Widget icon;
   final Widget title;
   final Color activeColor;
   final Color? inactiveColor;
   final TextAlign? textAlign;
-  final double boxWidth;
 }

@@ -21,8 +21,6 @@ import 'package:upgrader/upgrader.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AlarmService().initialize();
-
   tzdata.initializeTimeZones();
   try {
     final String timeZoneName =
@@ -32,7 +30,7 @@ void main() async {
     tz.setLocalLocation(tz.getLocation('UTC'));
   }
 
-  // 🔥 Firebase init
+  await AlarmService().initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await EasyLocalization.ensureInitialized();
