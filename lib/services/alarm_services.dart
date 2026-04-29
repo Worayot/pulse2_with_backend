@@ -17,6 +17,7 @@ class AlarmService {
       FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
+  bool _isRestoring = false;
 
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -66,28 +67,37 @@ class AlarmService {
   }
 
   Future<bool> ensureAlarmPermission() async {
-    final androidPlugin =
+    final platform =
         _notifications
             .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin
             >();
 
-    if (androidPlugin == null) return false;
+    final iosPlatform =
+        _notifications
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
 
-    // Notification permission
-    final notifGranted = await androidPlugin.requestNotificationsPermission();
+    if (iosPlatform != null) {
+      final granted = await iosPlatform.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
-    if (notifGranted != true) return false;
-
-    // Exact alarm permission (Android 12+)
-    final exactGranted = await androidPlugin.requestExactAlarmsPermission();
-
-    if (exactGranted != true) {
-      debugPrint("Exact alarm permission NOT granted");
-      return false;
+      return granted ?? false;
     }
 
-    return true;
+    if (platform != null) {
+      final notifGranted = await platform.requestNotificationsPermission();
+      if (notifGranted != true) return false;
+
+      final exactGranted = await platform.requestExactAlarmsPermission();
+      return exactGranted ?? false;
+    }
+
+    return false;
   }
 
   Future<void> setAlarm({
@@ -97,12 +107,13 @@ class AlarmService {
     required String body,
     String sound = 'alarm',
   }) async {
-    // CHECK PERMISSION FIRST
-    final allowed = await ensureAlarmPermission();
+    if (!_isRestoring) {
+      final allowed = await ensureAlarmPermission();
 
-    if (!allowed) {
-      debugPrint("Alarm NOT scheduled: permission denied");
-      throw Exception("Alarm permission not granted");
+      if (!allowed) {
+        debugPrint("Alarm NOT scheduled: permission denied");
+        return; // better than throwing
+      }
     }
 
     await _notifications.zonedSchedule(
@@ -192,15 +203,39 @@ class AlarmService {
     final prefs = await SharedPreferences.getInstance();
     List<String> saved = prefs.getStringList('scheduled_alarms') ?? [];
 
+    _isRestoring = true;
+
     for (final item in saved) {
       final data = jsonDecode(item);
 
-      await setAlarm(
-        id: data['id'],
-        dateTime: DateTime.parse(data['dateTime']),
-        title: data['title'],
-        body: data['body'],
+      await _notifications.zonedSchedule(
+        data['id'],
+        data['title'],
+        data['body'],
+        tz.TZDateTime.from(DateTime.parse(data['dateTime']), tz.local),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'alarm_channel_v2',
+            'Alarms',
+            importance: Importance.max,
+            priority: Priority.high,
+            fullScreenIntent: true,
+            playSound: true,
+            sound: RawResourceAndroidNotificationSound('alarm'),
+            enableVibration: true,
+            vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]),
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentSound: true,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
       );
     }
+
+    _isRestoring = false;
   }
 }
