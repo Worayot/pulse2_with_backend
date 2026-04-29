@@ -9,8 +9,10 @@ import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/mews_services.dart';
-import 'package:timezone/data/latest.dart' as tzdata; // Import for initializeTimeZones
-import 'package:timezone/timezone.dart' as tz; // Import for timezone functionality
+import 'package:timezone/data/latest.dart'
+    as tzdata; // Import for initializeTimeZones
+import 'package:timezone/timezone.dart'
+    as tz; // Import for timezone functionality
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 
@@ -30,8 +32,12 @@ void showTimeManager({
     int selectedHour = 0;
     int selectedMinute = 0;
 
-    FixedExtentScrollController hourController = FixedExtentScrollController(initialItem: selectedHour);
-    FixedExtentScrollController minuteController = FixedExtentScrollController(initialItem: selectedMinute);
+    FixedExtentScrollController hourController = FixedExtentScrollController(
+      initialItem: selectedHour,
+    );
+    FixedExtentScrollController minuteController = FixedExtentScrollController(
+      initialItem: selectedMinute,
+    );
 
     bool enableButton = true;
 
@@ -43,8 +49,15 @@ void showTimeManager({
             return Padding(
               padding: EdgeInsets.symmetric(vertical: screenWidth * 0.03),
               child: AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                contentPadding: const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                contentPadding: const EdgeInsets.only(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: 0,
+                ),
                 content: SizedBox(
                   height: 400,
                   child: Stack(
@@ -54,11 +67,21 @@ void showTimeManager({
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(left: 15.0),
-                              child: Text("notifications".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              child: Text(
+                                "notifications".tr(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
                             ),
                             const Spacer(),
                             IconButton(
-                              icon: const Icon(Icons.close, color: Colors.black, size: 30),
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.black,
+                                size: 30,
+                              ),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
@@ -69,7 +92,15 @@ void showTimeManager({
                       Positioned(
                         bottom: 0,
                         right: -20,
-                        child: Opacity(opacity: 1, child: Image.asset('./assets/images/timeline.png', width: 270, height: 270, fit: BoxFit.contain)),
+                        child: Opacity(
+                          opacity: 1,
+                          child: Image.asset(
+                            './assets/images/timeline.png',
+                            width: 270,
+                            height: 270,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                       Stack(
                         children: [
@@ -87,7 +118,14 @@ void showTimeManager({
                                   shape: BoxShape.rectangle,
                                   color: const Color(0xffC6D8FF),
                                   borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), offset: const Offset(0.5, 0.25), blurRadius: 1, spreadRadius: 1)],
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.15),
+                                      offset: const Offset(0.5, 0.25),
+                                      blurRadius: 1,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -95,7 +133,16 @@ void showTimeManager({
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Padding(padding: const EdgeInsets.only(top: 60.0), child: Text("setTimer".tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 60.0),
+                                child: Text(
+                                  "setTimer".tr(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: 40),
                               Center(
                                 child: SizedBox(
@@ -110,32 +157,70 @@ void showTimeManager({
                                           controller: hourController,
                                           itemExtent: 50,
                                           perspective: 0.005,
-                                          physics: const FixedExtentScrollPhysics(),
+                                          physics:
+                                              const FixedExtentScrollPhysics(),
                                           onSelectedItemChanged: (index) {
                                             selectedHour = index;
                                           },
-                                          childDelegate: ListWheelChildLoopingListDelegate(
-                                            children: List<Widget>.generate(24, (index) {
-                                              return Center(child: Text(index.toString().padLeft(2, '0'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)));
-                                            }),
-                                          ),
+                                          childDelegate:
+                                              ListWheelChildLoopingListDelegate(
+                                                children: List<Widget>.generate(
+                                                  24,
+                                                  (index) {
+                                                    return Center(
+                                                      child: Text(
+                                                        index
+                                                            .toString()
+                                                            .padLeft(2, '0'),
+                                                        style: const TextStyle(
+                                                          fontSize: 24,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
                                         ),
                                       ),
-                                      const Text(":", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                      const Text(
+                                        ":",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                       Expanded(
                                         child: ListWheelScrollView.useDelegate(
                                           controller: minuteController,
                                           itemExtent: 50,
                                           perspective: 0.005,
-                                          physics: const FixedExtentScrollPhysics(),
+                                          physics:
+                                              const FixedExtentScrollPhysics(),
                                           onSelectedItemChanged: (index) {
                                             selectedMinute = index;
                                           },
-                                          childDelegate: ListWheelChildLoopingListDelegate(
-                                            children: List<Widget>.generate(60, (index) {
-                                              return Center(child: Text(index.toString().padLeft(2, '0'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)));
-                                            }),
-                                          ),
+                                          childDelegate:
+                                              ListWheelChildLoopingListDelegate(
+                                                children: List<Widget>.generate(
+                                                  60,
+                                                  (index) {
+                                                    return Center(
+                                                      child: Text(
+                                                        index
+                                                            .toString()
+                                                            .padLeft(2, '0'),
+                                                        style: const TextStyle(
+                                                          fontSize: 24,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
                                         ),
                                       ),
                                       const SizedBox(width: 30),
@@ -152,58 +237,114 @@ void showTimeManager({
                                             enableButton = false;
                                           });
                                           DateTime now = DateTime.now();
-                                          DateTime recordTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute, now.second);
-                                          DateTime notificationTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute, now.second);
+                                          DateTime recordTime = DateTime(
+                                            now.year,
+                                            now.month,
+                                            now.day,
+                                            selectedHour,
+                                            selectedMinute,
+                                            now.second,
+                                          );
+                                          DateTime notificationTime = DateTime(
+                                            now.year,
+                                            now.month,
+                                            now.day,
+                                            selectedHour,
+                                            selectedMinute,
+                                            now.second,
+                                          );
 
                                           if (notificationTime.isBefore(now)) {
-                                            notificationTime = notificationTime.add(Duration(days: 1));
+                                            notificationTime = notificationTime
+                                                .add(Duration(days: 1));
                                           }
 
                                           if (recordTime.isBefore(now)) {
-                                            recordTime = recordTime.add(Duration(days: 1));
+                                            recordTime = recordTime.add(
+                                              Duration(days: 1),
+                                            );
                                           }
 
-                                          InspectionNote newInspection = InspectionNote(patientID: patientID, auditorID: auditorID, time: recordTime);
+                                          InspectionNote newInspection =
+                                              InspectionNote(
+                                                patientID: patientID,
+                                                auditorID: auditorID,
+                                                time: recordTime,
+                                              );
 
                                           try {
-                                            Map<int, String> status = await MEWsService().addNewInspection(inspectionNote: newInspection);
+                                            Map<int, String> status =
+                                                await MEWsService()
+                                                    .addNewInspection(
+                                                      inspectionNote:
+                                                          newInspection,
+                                                    );
 
                                             if (status.containsKey(200)) {
                                               String desc = "";
 
-                                              String stringToHash = patientID + recordTime.toString();
-                                              int alarmId = StringTransformer().generateID(stringToHash);
+                                              String stringToHash =
+                                                  patientID +
+                                                  recordTime.toString();
+                                              int alarmId = StringTransformer()
+                                                  .generateID(stringToHash);
 
                                               // 🔔 MAIN ALARM
                                               await AlarmService().setAlarm(
                                                 id: alarmId,
                                                 dateTime: notificationTime,
                                                 title: 'TUH MEWs',
-                                                body: '${'remindAssess'.tr()} "$patientName"',
+                                                body:
+                                                    '${'remindAssess'.tr()} "$patientName"',
                                               );
 
-                                              desc += '${'successfullySetNotificationFor'.tr()}\n$patientName\n${notificationTime.toString().split('.')[0]}';
+                                              desc +=
+                                                  '${'successfullySetNotificationFor'.tr()}\n$patientName\n${notificationTime.toString().split('.')[0]}';
 
                                               // 🔔 5 MINUTES BEFORE
-                                              if (notificationTime.difference(now).inMinutes > 5) {
-                                                DateTime secondNotificationTime = notificationTime.subtract(const Duration(minutes: 5));
+                                              if (notificationTime
+                                                      .difference(now)
+                                                      .inMinutes >
+                                                  5) {
+                                                DateTime
+                                                secondNotificationTime =
+                                                    notificationTime.subtract(
+                                                      const Duration(
+                                                        minutes: 5,
+                                                      ),
+                                                    );
 
-                                                String secondStringToHash = patientID + secondNotificationTime.toString();
-                                                int secondAlarmId = StringTransformer().generateID(secondStringToHash);
+                                                String secondStringToHash =
+                                                    patientID +
+                                                    secondNotificationTime
+                                                        .toString();
+                                                int secondAlarmId =
+                                                    StringTransformer()
+                                                        .generateID(
+                                                          secondStringToHash,
+                                                        );
 
                                                 await AlarmService().setAlarm(
                                                   id: secondAlarmId,
-                                                  dateTime: secondNotificationTime,
+                                                  dateTime:
+                                                      secondNotificationTime,
                                                   title: 'TUH MEWs',
-                                                  body: '${'remindAssess'.tr()} "$patientName"',
+                                                  body:
+                                                      '${'remindAssess'.tr()} "$patientName"',
                                                 );
 
-                                                desc += ', ${secondNotificationTime.toString().split('.')[0]}';
+                                                desc +=
+                                                    ', ${secondNotificationTime.toString().split('.')[0]}';
                                               }
 
                                               if (context.mounted) {
                                                 Navigator.of(context).pop();
-                                                FlushbarService().showSuccessMessage(context: context, message: desc, duration: 3);
+                                                FlushbarService()
+                                                    .showSuccessMessage(
+                                                      context: context,
+                                                      message: desc,
+                                                      duration: 3,
+                                                    );
                                               }
 
                                               onPop();
@@ -212,30 +353,48 @@ void showTimeManager({
                                                 enableButton = true;
                                               });
 
-                                              if (context.mounted) {
-                                                FlushbarService().showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
-                                              }
+                                              throw "Failed to add note";
                                             }
                                           } catch (e) {
                                             setState(() {
                                               enableButton = true;
                                             });
 
+                                            debugPrint('Error: $e');
+
                                             if (context.mounted) {
-                                              FlushbarService().showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
+                                              FlushbarService().showErrorMessage(
+                                                context: context,
+                                                message:
+                                                    'failedToSetNotification'
+                                                        .tr(),
+                                              );
                                             }
                                           }
                                         }
                                         : () {},
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 20,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
                                   backgroundColor: const Color(0xffC6D8FF),
                                 ),
                                 child:
                                     enableButton
-                                        ? Text("setNotification".tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black))
-                                        : CircularProgressIndicator(color: Colors.white),
+                                        ? Text(
+                                          "setNotification".tr(),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        )
+                                        : CircularProgressIndicator(
+                                          color: Colors.white,
+                                        ),
                               ),
                               const SizedBox(height: 10),
                             ],

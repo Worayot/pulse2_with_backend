@@ -1,4 +1,4 @@
-# توقفเมื่อมี error
+# if has error
 $ErrorActionPreference = "Stop"
 
 # Set JAVA_HOME
