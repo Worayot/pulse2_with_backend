@@ -30,26 +30,14 @@ class CustomAnimatedBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? const Color(0xff3362CC);
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xff3362CC),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
-      child: SafeArea(
-        bottom: true,
-        top: false,
+    final bgColor = Color(0xff3362CC);
+    return SafeArea(
+      bottom: true,
+      top: false,
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
         child: Container(
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
-            ),
-            color: bgColor,
-          ),
+          decoration: BoxDecoration(color: bgColor),
           width: double.infinity,
           height: containerHeight,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -107,11 +95,7 @@ class _ItemWidget extends StatelessWidget {
         height: double.maxFinite,
         duration: animationDuration,
         curve: curve,
-        decoration: BoxDecoration(
-          color:
-              isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor,
-          borderRadius: BorderRadius.circular(itemCornerRadius),
-        ),
+        decoration: BoxDecoration(color: isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor, borderRadius: BorderRadius.circular(itemCornerRadius)),
         child: Center(
           child: AnimatedPadding(
             duration: animationDuration,
@@ -124,13 +108,7 @@ class _ItemWidget extends StatelessWidget {
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: IconTheme(
-                    data: IconThemeData(
-                      size: iconSize,
-                      color:
-                          isSelected
-                              ? item.activeColor.withOpacity(1)
-                              : item.inactiveColor ?? item.activeColor,
-                    ),
+                    data: IconThemeData(size: iconSize, color: isSelected ? item.activeColor.withOpacity(1) : item.inactiveColor ?? item.activeColor),
                     child: item.icon,
                   ),
                 ),
@@ -139,10 +117,7 @@ class _ItemWidget extends StatelessWidget {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: DefaultTextStyle.merge(
-                      style: TextStyle(
-                        color: item.activeColor,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: item.textAlign,
@@ -159,13 +134,7 @@ class _ItemWidget extends StatelessWidget {
 }
 
 class BottomNavyBarItem {
-  BottomNavyBarItem({
-    required this.icon,
-    required this.title,
-    this.activeColor = const Color(0xff407BFF),
-    this.textAlign,
-    this.inactiveColor,
-  });
+  BottomNavyBarItem({required this.icon, required this.title, this.activeColor = const Color(0xff407BFF), this.textAlign, this.inactiveColor});
 
   final Widget icon;
   final Widget title;

@@ -16,23 +16,16 @@ class GlobalMewsFAB extends StatelessWidget {
       backgroundColor: const Color(0xff3362CC),
       elevation: 2,
       shape: const CircleBorder(),
+
       onPressed: () async {
         showDialog(
           context: context,
           builder: (_) {
-            return InstantMEWsForm(
-              auditorID: userId,
-              onPop: () {},
-              showPatientSelector: true,
-            );
+            return InstantMEWsForm(auditorID: userId, onPop: () {}, showPatientSelector: true);
           },
         );
       },
-      child: const Icon(
-        FontAwesomeIcons.calculator,
-        color: Colors.white,
-        size: 28,
-      ),
+      child: const Icon(FontAwesomeIcons.calculator, color: Colors.white, size: 28),
     );
   }
 }

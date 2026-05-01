@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/monitored_patient/card_model.dart';
 import 'package:tuh_mews/models/patient_id_name.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
+import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
 import '../models/patient.dart';
@@ -312,20 +313,18 @@ class PatientService {
     try {
       CollectionReference linkCollection = firestore.collection('patient_user_links');
 
-      // Query for the document with matching userId and patientId
       QuerySnapshot querySnapshot = await linkCollection.where('user_id', isEqualTo: userId).where('patient_id', isEqualTo: patientId).get();
 
-      // Check if any documents were found
       if (querySnapshot.docs.isNotEmpty) {
-        // Delete the first matching document (assuming there's only one)
         await linkCollection.doc(querySnapshot.docs.first.id).delete();
-        return true; // Deletion successful
+
+        AlarmService().cancelAlarmsByPatientId(patientId: patientId);
+        return true;
       } else {
-        // No matching document found
         return false;
       }
     } catch (e) {
-      return false; // Error occurred
+      return false;
     }
   }
 

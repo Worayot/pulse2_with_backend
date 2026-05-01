@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
@@ -23,8 +21,7 @@ void main() async {
 
   tzdata.initializeTimeZones();
   try {
-    final String timeZoneName =
-        (await FlutterTimezone.getLocalTimezone()).identifier;
+    final String timeZoneName = (await FlutterTimezone.getLocalTimezone()).identifier;
     tz.setLocalLocation(tz.getLocation(timeZoneName));
   } catch (e) {
     tz.setLocalLocation(tz.getLocation('UTC'));
@@ -36,10 +33,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
 
   // 📱 Lock orientation
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   runApp(
     ProviderScope(
@@ -47,54 +41,14 @@ void main() async {
         supportedLocales: const [Locale('en', 'US'), Locale('th', 'TH')],
         path: 'lang',
         fallbackLocale: const Locale('th', 'TH'),
-        child: provider.ChangeNotifierProvider(
-          create: (context) => UserDataProvider()..loadUserData(),
-          child: const MyApp(),
-        ),
+        child: provider.ChangeNotifierProvider(create: (context) => UserDataProvider()..loadUserData(), child: const MyApp()),
       ),
     ),
   );
 
   configLoading();
 
-  // Optional: keep FCM token logging
-  Future.microtask(() => initMessaging());
   return null;
-}
-
-Future<void> initMessaging() async {
-  if (Platform.isAndroid) {
-    final token = await FirebaseMessaging.instance.getToken();
-    debugPrint("FCM Token (Android): $token");
-    return;
-  }
-
-  if (Platform.isIOS) {
-    final settings = await FirebaseMessaging.instance.requestPermission();
-
-    if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-      debugPrint("Permission denied");
-      return;
-    }
-
-    try {
-      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-
-      if (apnsToken == null) {
-        debugPrint("iOS Simulator detected → skipping FCM token");
-        return;
-      }
-
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      debugPrint("FCM Token (iOS): $fcmToken");
-    } catch (e) {
-      debugPrint("FCM skipped (likely simulator): $e");
-    }
-
-    FirebaseMessaging.instance.onTokenRefresh.listen((token) {
-      debugPrint("Token updated: $token");
-    });
-  }
 }
 
 void configLoading() {
@@ -126,10 +80,7 @@ class MyApp extends StatelessWidget {
       debugDisplayAlways: false,
       durationUntilAlertAgain: const Duration(days: 1),
       messages: null,
-      storeController: UpgraderStoreController(
-        onAndroid: () => UpgraderPlayStore(),
-        oniOS: () => UpgraderAppStore(),
-      ),
+      storeController: UpgraderStoreController(onAndroid: () => UpgraderPlayStore(), oniOS: () => UpgraderAppStore()),
     );
 
     return UpgradeAlert(
@@ -141,18 +92,12 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-            selectedItemColor: Colors.blue,
-            unselectedItemColor: Colors.grey,
-          ),
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(selectedItemColor: Colors.blue, unselectedItemColor: Colors.grey),
         ),
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,
         locale: context.locale,
-        home:
-            FirebaseAuth.instance.currentUser == null
-                ? LoginPage()
-                : NavigationPage(),
+        home: FirebaseAuth.instance.currentUser == null ? LoginPage() : NavigationPage(),
         builder: EasyLoading.init(),
       ),
     );

@@ -290,7 +290,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
 
                       // Action Buttons
                       buildActionButton(
-                        FontAwesomeIcons.magnifyingGlassPlus,
+                        FontAwesomeIcons.calculator,
                         () {
                           showDialog(
                             context: context,

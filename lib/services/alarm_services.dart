@@ -1,11 +1,14 @@
-import 'dart:typed_data';
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter/foundation.dart';
+
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse response) {
+  debugPrint("BACKGROUND TAP: ${response.id}");
+}
 
 class AlarmService {
   static final AlarmService _instance = AlarmService._internal();
@@ -13,8 +16,7 @@ class AlarmService {
 
   AlarmService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
   bool _isRestoring = false;
@@ -27,79 +29,63 @@ class AlarmService {
 
     tz.initializeTimeZones();
 
-    const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
-    );
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+    const iosSettings = DarwinInitializationSettings(requestAlertPermission: true, requestBadgePermission: true, requestSoundPermission: true, notificationCategories: []);
 
-    const initSettings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
-    );
+    const initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
 
-    // Named parameter 'settings' is required in v21
     await _notifications.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         debugPrint("Notification tapped: ${response.id}");
       },
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
-    final androidPlugin =
-        _notifications
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+    final ios = _notifications.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
 
-    await androidPlugin?.createNotificationChannel(
-      AndroidNotificationChannel(
-        alarmChannel,
+    final iosGranted = await ios?.requestPermissions(alert: true, badge: true, sound: true);
+
+    debugPrint("iOS permission granted = $iosGranted");
+
+    // 5. Android channel setup (safe to call every launch)
+    final android = _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+    await android?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'alarm_channel_v5',
         'Alarms',
         description: 'Alarm notifications',
         importance: Importance.max,
         playSound: true,
-        // Set a default sound for the channel
-        sound: const RawResourceAndroidNotificationSound('alarm'),
         enableVibration: true,
+        sound: RawResourceAndroidNotificationSound('alarm'),
       ),
     );
 
-    await androidPlugin?.requestNotificationsPermission();
-    await androidPlugin?.requestExactAlarmsPermission();
+    // 6. Android permissions
+    await android?.requestNotificationsPermission();
+    await android?.requestExactAlarmsPermission();
 
-    final canExact = await androidPlugin?.canScheduleExactNotifications();
-    debugPrint("canScheduleExactNotifications: $canExact");
+    final canExact = await android?.canScheduleExactNotifications();
+    debugPrint("canScheduleExactNotifications = $canExact");
 
+    // 7. Restore saved alarms
     await restoreAlarms();
 
     _isInitialized = true;
+
+    debugPrint("AlarmService initialized successfully");
   }
 
   Future<bool> ensureAlarmPermission() async {
-    final platform =
-        _notifications
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+    final platform = _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
-    final iosPlatform =
-        _notifications
-            .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin
-            >();
+    final iosPlatform = _notifications.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
 
     if (iosPlatform != null) {
-      final granted = await iosPlatform.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-      return granted ?? false;
+      return true;
     }
 
     if (platform != null) {
@@ -118,6 +104,7 @@ class AlarmService {
     required DateTime dateTime,
     required String title,
     required String body,
+    String? patientID,
     String sound = 'alarm', // Supports dynamic sound selection
   }) async {
     debugPrint("setAlarm called for sound: $sound");
@@ -160,11 +147,7 @@ class AlarmService {
           vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]),
           category: AndroidNotificationCategory.alarm,
         ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentSound: true,
-          sound: '$sound.wav',
-        ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true, sound: '$sound.mp3'),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
@@ -175,22 +158,13 @@ class AlarmService {
       title: 'Alarm Scheduled',
       body: 'Your alarm is set for ${scheduled.toString()}',
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          alarmChannel,
-          'Confirmation',
-          importance: Importance.max,
-          priority: Priority.high,
-          playSound: true,
-        ),
-        iOS: const DarwinNotificationDetails(
-          presentAlert: true,
-          presentSound: true,
-        ),
+        android: AndroidNotificationDetails(alarmChannel, 'Confirmation', importance: Importance.max, priority: Priority.high, playSound: true),
+        iOS: const DarwinNotificationDetails(presentAlert: true, presentSound: true),
       ),
     );
 
     debugPrint("Alarm scheduled successfully: ID=$id with sound=$sound");
-    await saveAlarmToPrefs(id, dateTime, title, body, sound);
+    await saveAlarmToPrefs(id, dateTime, title, body, sound, patientID);
   }
 
   Future<void> stopAlarm(int alarmId) async {
@@ -207,27 +181,13 @@ class AlarmService {
     debugPrint('All alarms cancelled');
   }
 
-  Future<void> saveAlarmToPrefs(
-    int id,
-    DateTime dateTime,
-    String title,
-    String body,
-    String sound,
-  ) async {
+  Future<void> saveAlarmToPrefs(int id, DateTime dateTime, String title, String body, String sound, String? patientID) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
 
     savedAlarms.removeWhere((item) => jsonDecode(item)['id'] == id);
 
-    savedAlarms.add(
-      jsonEncode({
-        'id': id,
-        'dateTime': dateTime.toIso8601String(),
-        'title': title,
-        'body': body,
-        'sound': sound,
-      }),
-    );
+    savedAlarms.add(jsonEncode({'id': id, 'patientId': patientID, 'dateTime': dateTime.toIso8601String(), 'title': title, 'body': body, 'sound': sound}));
     await prefs.setStringList('scheduled_alarms', savedAlarms);
   }
 
@@ -248,10 +208,7 @@ class AlarmService {
 
     for (final item in saved) {
       final data = jsonDecode(item);
-      final scheduled = tz.TZDateTime.from(
-        DateTime.parse(data['dateTime']),
-        tz.local,
-      );
+      final scheduled = tz.TZDateTime.from(DateTime.parse(data['dateTime']), tz.local);
 
       if (scheduled.isBefore(now)) {
         debugPrint("SKIPPED (past alarm): ${data['id']}");
@@ -271,17 +228,11 @@ class AlarmService {
             priority: Priority.high,
             fullScreenIntent: true,
             playSound: true,
-            sound: RawResourceAndroidNotificationSound(
-              data['sound'] ?? 'alarm',
-            ),
+            sound: RawResourceAndroidNotificationSound(data['sound'] ?? 'alarm'),
             enableVibration: true,
             category: AndroidNotificationCategory.alarm,
           ),
-          iOS: DarwinNotificationDetails(
-            presentAlert: true,
-            presentSound: true,
-            sound: '${data['sound'] ?? 'alarm'}.wav',
-          ),
+          iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true, sound: '${data['sound'] ?? 'alarm'}.mp3'),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
@@ -289,5 +240,52 @@ class AlarmService {
     }
     _isRestoring = false;
     debugPrint("restoreAlarms END");
+  }
+
+  Future<void> cancelAlarmsByPatientId({required String patientId}) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
+
+    List<String> remainingAlarms = [];
+
+    for (String item in savedAlarms) {
+      final data = jsonDecode(item);
+      if (data['patientId'] == patientId) {
+        await _notifications.cancel(id: data['id']);
+        debugPrint("Cancelled notification ID: ${data['id']} for patient: $patientId");
+      } else {
+        remainingAlarms.add(item);
+      }
+    }
+
+    await prefs.setStringList('scheduled_alarms', remainingAlarms);
+    debugPrint("All alarms for patient $patientId have been removed.");
+  }
+
+  Future<void> showTestNotification() async {
+    debugPrint("🚀 Triggering Instant Test Notification (v21.0.0)");
+
+    final DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true, // Update app icon badge
+      presentSound: true, // Play the sound
+      sound: 'alarm.mp3',
+      interruptionLevel: InterruptionLevel.active,
+    );
+
+    final NotificationDetails platformDetails = NotificationDetails(
+      iOS: iosDetails,
+      android: AndroidNotificationDetails(
+        alarmChannel,
+        'Alarms',
+        channelDescription: 'Alarm notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+        sound: RawResourceAndroidNotificationSound('alarm'),
+      ),
+    );
+
+    await _notifications.show(id: DateTime.now().millisecondsSinceEpoch ~/ 1000, title: 'TUH MEWS Test', body: 'Syntax fixed for v21.0.0!', notificationDetails: platformDetails);
   }
 }

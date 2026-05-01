@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:tuh_mews/models/patient_filter_state.dart';
 import 'package:tuh_mews/utils/info_text_field_filter.dart';
@@ -239,10 +240,10 @@ void showFilterDialog({
                                           bedController: bedController,
                                         );
                                       },
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                                      child: Text('resetFilters'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, shape: const CircleBorder()),
+                                      child: Icon(FontAwesomeIcons.arrowsRotate, color: Colors.white),
                                     ),
-                                    const Gap(8),
+                                    const Gap(4),
 
                                     ElevatedButton(
                                       onPressed: () {
