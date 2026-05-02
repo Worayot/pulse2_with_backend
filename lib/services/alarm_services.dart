@@ -16,7 +16,8 @@ class AlarmService {
 
   AlarmService._internal();
 
-  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
   bool _isRestoring = false;
@@ -29,11 +30,21 @@ class AlarmService {
 
     tz.initializeTimeZones();
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
-    const iosSettings = DarwinInitializationSettings(requestAlertPermission: true, requestBadgePermission: true, requestSoundPermission: true, notificationCategories: []);
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+      notificationCategories: [],
+    );
 
-    const initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
 
     await _notifications.initialize(
       settings: initSettings,
@@ -43,14 +54,26 @@ class AlarmService {
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
 
-    final ios = _notifications.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+    final ios =
+        _notifications
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
 
-    final iosGranted = await ios?.requestPermissions(alert: true, badge: true, sound: true);
+    final iosGranted = await ios?.requestPermissions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
 
     debugPrint("iOS permission granted = $iosGranted");
 
     // 5. Android channel setup (safe to call every launch)
-    final android = _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final android =
+        _notifications
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
 
     await android?.createNotificationChannel(
       const AndroidNotificationChannel(
@@ -80,9 +103,17 @@ class AlarmService {
   }
 
   Future<bool> ensureAlarmPermission() async {
-    final platform = _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final platform =
+        _notifications
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
 
-    final iosPlatform = _notifications.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+    final iosPlatform =
+        _notifications
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
 
     if (iosPlatform != null) {
       return true;
@@ -147,19 +178,31 @@ class AlarmService {
           vibrationPattern: Int64List.fromList([0, 1000, 500, 1000]),
           category: AndroidNotificationCategory.alarm,
         ),
-        iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true, sound: '$sound.mp3'),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+          sound: '$sound.mp3',
+        ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
     );
 
-    // Original Context: Confirmation Notification (No Sound)
     await _notifications.show(
       id: id + 999999,
       title: 'Alarm Scheduled',
       body: 'Your alarm is set for ${scheduled.toString()}',
       notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(alarmChannel, 'Confirmation', importance: Importance.max, priority: Priority.high, playSound: true),
-        iOS: const DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        android: AndroidNotificationDetails(
+          alarmChannel,
+          'Confirmation',
+          importance: Importance.max,
+          priority: Priority.high,
+          playSound: false,
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+        ),
       ),
     );
 
@@ -181,13 +224,29 @@ class AlarmService {
     debugPrint('All alarms cancelled');
   }
 
-  Future<void> saveAlarmToPrefs(int id, DateTime dateTime, String title, String body, String sound, String? patientID) async {
+  Future<void> saveAlarmToPrefs(
+    int id,
+    DateTime dateTime,
+    String title,
+    String body,
+    String sound,
+    String? patientID,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
 
     savedAlarms.removeWhere((item) => jsonDecode(item)['id'] == id);
 
-    savedAlarms.add(jsonEncode({'id': id, 'patientId': patientID, 'dateTime': dateTime.toIso8601String(), 'title': title, 'body': body, 'sound': sound}));
+    savedAlarms.add(
+      jsonEncode({
+        'id': id,
+        'patientId': patientID,
+        'dateTime': dateTime.toIso8601String(),
+        'title': title,
+        'body': body,
+        'sound': sound,
+      }),
+    );
     await prefs.setStringList('scheduled_alarms', savedAlarms);
   }
 
@@ -208,7 +267,10 @@ class AlarmService {
 
     for (final item in saved) {
       final data = jsonDecode(item);
-      final scheduled = tz.TZDateTime.from(DateTime.parse(data['dateTime']), tz.local);
+      final scheduled = tz.TZDateTime.from(
+        DateTime.parse(data['dateTime']),
+        tz.local,
+      );
 
       if (scheduled.isBefore(now)) {
         debugPrint("SKIPPED (past alarm): ${data['id']}");
@@ -228,11 +290,17 @@ class AlarmService {
             priority: Priority.high,
             fullScreenIntent: true,
             playSound: true,
-            sound: RawResourceAndroidNotificationSound(data['sound'] ?? 'alarm'),
+            sound: RawResourceAndroidNotificationSound(
+              data['sound'] ?? 'alarm',
+            ),
             enableVibration: true,
             category: AndroidNotificationCategory.alarm,
           ),
-          iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true, sound: '${data['sound'] ?? 'alarm'}.mp3'),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentSound: true,
+            sound: '${data['sound'] ?? 'alarm'}.mp3',
+          ),
         ),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
@@ -252,7 +320,9 @@ class AlarmService {
       final data = jsonDecode(item);
       if (data['patientId'] == patientId) {
         await _notifications.cancel(id: data['id']);
-        debugPrint("Cancelled notification ID: ${data['id']} for patient: $patientId");
+        debugPrint(
+          "Cancelled notification ID: ${data['id']} for patient: $patientId",
+        );
       } else {
         remainingAlarms.add(item);
       }
@@ -286,6 +356,11 @@ class AlarmService {
       ),
     );
 
-    await _notifications.show(id: DateTime.now().millisecondsSinceEpoch ~/ 1000, title: 'TUH MEWS Test', body: 'Syntax fixed for v21.0.0!', notificationDetails: platformDetails);
+    await _notifications.show(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: 'TUH MEWS Test',
+      body: 'Syntax fixed for v21.0.0!',
+      notificationDetails: platformDetails,
+    );
   }
 }

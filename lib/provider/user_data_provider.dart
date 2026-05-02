@@ -35,7 +35,7 @@ class UserDataProvider extends ChangeNotifier {
     await loadUserData();
   }
 
-  Future<void> updateUserRole(String nurseID) async {
+  Future<void> updateUserRole(String role) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('role', role);
     await loadUserData();
