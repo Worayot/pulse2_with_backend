@@ -15,6 +15,9 @@ flutter clean
 Write-Host "Getting dependencies..."
 flutter pub get
 
+Write-Host "Running build_runner..."
+dart run build_runner build --delete-conflicting-outputs
+
 Write-Host "Building APK (release)..."
 flutter build apk --release
 
