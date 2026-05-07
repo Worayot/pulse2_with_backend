@@ -1,0 +1,42 @@
+name: Staging Deployment
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    runs-on: macos-latest # GitHub provides the Mac environment
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # DEPLOY ANDROID
+      - name: Deploy Android to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_CREDENTIALS }}
+        run: |
+          cd android
+          # Save the json key to a file for Fastlane to read
+          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > firebase-key.json
+          bundle install
+          bundle exec fastlane distribute_staging
+        
+      # DEPLOY iOS
+      - name: Deploy iOS to TestFlight
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+        run: |
+          cd ios
+          bundle install
+          bundle exec fastlane distribute_staging
