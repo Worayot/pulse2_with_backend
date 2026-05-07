@@ -1,28 +1,34 @@
 import 'dart:convert';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tuh_mews/func/calculate_mews.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/parameters.dart';
+import 'package:tuh_mews/models/patient_id_name.dart';
+import 'package:tuh_mews/provider/patient_id_name_provider.dart';
 import 'package:tuh_mews/results/result_screens.dart';
 import 'package:tuh_mews/services/mews_services.dart';
 import 'package:tuh_mews/services/validate_service.dart';
+import 'package:tuh_mews/utils/mews_form/model/mews_form_state.dart';
+import 'package:tuh_mews/utils/mews_form/state/mews_form_provider.dart';
 
-class InstantMEWsForm extends StatefulWidget {
-  final String patientID;
+class InstantMEWsForm extends ConsumerStatefulWidget {
+  final String? patientID;
   final String auditorID;
   final VoidCallback onPop;
+  final bool showPatientSelector;
 
-  const InstantMEWsForm({super.key, required this.patientID, required this.auditorID, required this.onPop});
+  const InstantMEWsForm({super.key, this.patientID, required this.auditorID, required this.onPop, this.showPatientSelector = false});
 
   @override
   // ignore: library_private_types_in_public_api
   _InstantMEWsFormState createState() => _InstantMEWsFormState();
 }
 
-class _InstantMEWsFormState extends State<InstantMEWsForm> {
-  // Declare TextEditingController for each input field
+class _InstantMEWsFormState extends ConsumerState<InstantMEWsForm> {
   final TextEditingController heartRateController = TextEditingController();
   final TextEditingController temperatureController = TextEditingController();
   final TextEditingController sysBloodPressureController = TextEditingController();
@@ -34,7 +40,17 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
   final FocusNode sysBpFocusNode = FocusNode();
   final FocusNode diasBpFocusNode = FocusNode();
   String consciousnessValue = "-";
-  bool enableButton = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (!widget.showPatientSelector && widget.patientID != null) {
+      Future.microtask(() {
+        ref.read(mewsFormProvider.notifier).setPatient(PatientIdName(id: widget.patientID!, name: ''));
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -52,15 +68,20 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(mewsFormProvider);
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: _showMEWsForms(context),
+      child: _showMEWsForms(context, state),
     );
   }
 
-  Widget _showMEWsForms(BuildContext context) {
+  Widget _showMEWsForms(BuildContext context, MewsFormState state) {
+    bool showPatientSelector = widget.showPatientSelector;
+    bool enableButton = state.selectedPatient != null;
+    final patientsAsync = ref.watch(patientListProvider);
+
     return AnimatedPadding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       duration: const Duration(milliseconds: 200),
@@ -352,15 +373,50 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                   filled: true,
                                   fillColor: Colors.white,
                                   contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjusts height/padding
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15), // Rounded corners
-                                    borderSide: BorderSide.none, // Removes visible border line
-                                  ),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                                   focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                                 ),
                               ),
                             ),
+                            if (showPatientSelector)
+                              Padding(padding: const EdgeInsets.only(top: 5, bottom: 5), child: Text("selectPatient".tr(), style: const TextStyle(fontWeight: FontWeight.bold))),
+                            if (showPatientSelector)
+                              SizedBox(
+                                height: 40,
+                                child: patientsAsync.when(
+                                  data: (patients) {
+                                    return DropdownSearch<PatientIdName>(
+                                      items: (filter, _) async => patients,
+
+                                      itemAsString: (PatientIdName p) => p.name,
+                                      compareFn: (a, b) => a.id == b.id,
+
+                                      selectedItem: state.selectedPatient,
+
+                                      onSelected: (PatientIdName? value) {
+                                        ref.read(mewsFormProvider.notifier).setPatient(value);
+                                      },
+
+                                      decoratorProps: DropDownDecoratorProps(
+                                        decoration: InputDecoration(
+                                          hintText: '-',
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+                                        ),
+                                      ),
+
+                                      popupProps: const PopupProps.menu(showSelectedItems: true, showSearchBox: true),
+                                    );
+                                  },
+
+                                  loading: () => const SizedBox(height: 40, child: Center(child: CircularProgressIndicator())),
+
+                                  error: (err, stack) => SizedBox(height: 40, child: Center(child: Text('Error loading patients'))),
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -409,131 +465,32 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
                                 respiratoryRateController.text = "";
                                 urineController.text = "";
                                 cvpController.text = "";
-                                consciousnessValue = "-"; // Reset dropdown safely
+                                consciousnessValue = "-";
+
+                                ref.read(mewsFormProvider.notifier).setPatient(null);
                               });
                             }
                           });
                         },
                         child: Text(
                           'reset'.tr(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red, // Text color
-                            decoration: TextDecoration.underline, // Underline to indicate it's clickable
-                            decorationColor: Colors.red,
-                          ),
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, decoration: TextDecoration.underline, decorationColor: Colors.red),
                         ),
                       ),
                       const SizedBox(width: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: const Color(0xFF3362CC),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15), // Set border radius here
-                          ),
+                          backgroundColor: enableButton ? const Color(0xFF3362CC) : Colors.black12,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                         ),
                         onPressed:
                             enableButton
                                 ? () async {
-                                  setState(() {
-                                    enableButton = false;
-                                  });
-                                  DateTime now = DateTime.now();
-
-                                  // Add new Note in Database collection
-                                  InspectionNote newInspection = InspectionNote(patientID: widget.patientID, auditorID: widget.auditorID, time: now);
-
-                                  String inspectionNotesID = '';
-
-                                  try {
-                                    // Get NoteID from response
-                                    Map<int, String> status = await MEWsService().addNewInspection(inspectionNote: newInspection);
-                                    ValidateService(navigator: Navigator.of(context), status: status, showSuccessFlushbar: false).validate();
-                                    String response = status.values.first;
-
-                                    Map<String, dynamic> decoded = jsonDecode(response);
-                                    inspectionNotesID = decoded['inspection_notes_id'];
-                                    // print(inspectionNotesId);
-                                  } catch (e) {
-                                    setState(() {
-                                      enableButton = true;
-                                    });
-                                    return;
-                                    // print('Failed: $e');
-                                  }
-
-                                  String hr = heartRateController.text.trim();
-                                  String temp = temperatureController.text.trim();
-                                  String sBp = sysBloodPressureController.text.trim();
-                                  String dBp = diaBloodPressureController.text.trim();
-                                  String spO2 = spo2Controller.text.trim();
-                                  String rr = respiratoryRateController.text.trim();
-                                  String urine = urineController.text.trim();
-                                  String conscious = consciousnessValue;
-                                  String cvp = cvpController.text.trim();
-
-                                  hr = (hr == ' ') ? '-' : hr;
-                                  temp = (temp == ' ') ? '-' : temp;
-                                  sBp = (sBp == ' ') ? '-' : sBp;
-                                  dBp = (dBp == ' ') ? '-' : dBp;
-                                  spO2 = (spO2 == ' ') ? '-' : spO2;
-                                  rr = (rr == ' ') ? '-' : rr;
-                                  urine = (urine == ' ') ? '-' : urine;
-                                  cvp = (cvp == ' ') ? '-' : cvp;
-
-                                  int MEWs = calculateMEWs(
-                                    consciousness: conscious,
-                                    heartRate: (hr != '-') ? int.tryParse(hr) : null,
-                                    temperature: (temp != '-') ? double.tryParse(temp) : null,
-                                    respiratoryRate: (rr != '-') ? int.tryParse(rr) : null,
-                                    systolicBp: (sBp != '-') ? int.tryParse(sBp) : null,
-                                    spo2: (spO2 != '-') ? int.tryParse(spO2) : null,
-                                    urine: (urine != '-') ? int.tryParse(urine) : null,
-                                  );
-
-                                  Parameters parameters = Parameters(
-                                    patientId: widget.patientID,
-                                    consciousness: conscious,
-                                    heartRate: hr,
-                                    urine: urine,
-                                    spo2: spO2,
-                                    temperature: temp,
-                                    respiratoryRate: rr,
-                                    bloodPressure: '$sBp/$dBp',
-                                    mews: MEWs.toString(),
-                                    cvp: cvp,
-                                    isAssessed: true,
-                                    assessTime: DateTime.now(),
-                                  );
-
-                                  Map<int, String> state = await MEWsService().addMEWs(inspectionNotesID, parameters);
-                                  final navigator = Navigator.of(context);
-                                  if (state.containsKey(200)) {
-                                    if (mounted) {
-                                      Navigator.pop(context);
-                                      showResultDialog(
-                                        // context: context,
-                                        MEWs: MEWs,
-                                        noteID: inspectionNotesID,
-                                        onPop: widget.onPop,
-                                        navigator: navigator,
-                                      );
-                                    }
-
-                                    widget.onPop();
-                                  } else {
-                                    setState(() {
-                                      enableButton = true;
-                                    });
-                                    return;
-                                  }
+                                  createNoteAndMews(showPatientSelector);
                                 }
                                 : () {},
-                        child:
-                            enableButton
-                                ? Text('calculate'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20))
-                                : CircularProgressIndicator(color: Colors.white),
+                        child: Text('calculate'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                       ),
                     ],
                   ),
@@ -558,5 +515,94 @@ class _InstantMEWsFormState extends State<InstantMEWsForm> {
         ],
       ),
     );
+  }
+
+  void createNoteAndMews(bool showPatientSelector) async {
+    DateTime now = DateTime.now();
+
+    // Add new Note in Database collection
+    String patientId = '';
+    if (showPatientSelector) {
+      PatientIdName? pin = ref.read(mewsFormProvider).selectedPatient;
+      if (pin == null) return;
+      patientId = pin.id;
+    } else {
+      if (widget.patientID == null) {
+        return;
+      }
+      patientId = widget.patientID ?? '';
+    }
+
+    InspectionNote newInspection = InspectionNote(patientID: patientId, auditorID: widget.auditorID, time: now);
+    String inspectionNotesID = '';
+
+    try {
+      // Get NoteID from response
+      Map<int, String> status = await MEWsService().addNewInspection(inspectionNote: newInspection);
+      ValidateService(context: context, status: status, showSuccessFlushbar: false).validate();
+      String response = status.values.first;
+
+      Map<String, dynamic> decoded = jsonDecode(response);
+      inspectionNotesID = decoded['inspection_notes_id'];
+    } catch (e) {
+      return;
+    }
+
+    String hr = heartRateController.text.trim();
+    String temp = temperatureController.text.trim();
+    String sBp = sysBloodPressureController.text.trim();
+    String dBp = diaBloodPressureController.text.trim();
+    String spO2 = spo2Controller.text.trim();
+    String rr = respiratoryRateController.text.trim();
+    String urine = urineController.text.trim();
+    String conscious = consciousnessValue;
+    String cvp = cvpController.text.trim();
+
+    hr = (hr == ' ') ? '-' : hr;
+    temp = (temp == ' ') ? '-' : temp;
+    sBp = (sBp == ' ') ? '-' : sBp;
+    dBp = (dBp == ' ') ? '-' : dBp;
+    spO2 = (spO2 == ' ') ? '-' : spO2;
+    rr = (rr == ' ') ? '-' : rr;
+    urine = (urine == ' ') ? '-' : urine;
+    cvp = (cvp == ' ') ? '-' : cvp;
+
+    int MEWs = calculateMEWs(
+      consciousness: conscious,
+      heartRate: (hr != '-') ? int.tryParse(hr) : null,
+      temperature: (temp != '-') ? double.tryParse(temp) : null,
+      respiratoryRate: (rr != '-') ? int.tryParse(rr) : null,
+      systolicBp: (sBp != '-') ? int.tryParse(sBp) : null,
+      spo2: (spO2 != '-') ? int.tryParse(spO2) : null,
+      urine: (urine != '-') ? int.tryParse(urine) : null,
+    );
+
+    Parameters parameters = Parameters(
+      patientId: widget.patientID ?? '',
+      consciousness: conscious,
+      heartRate: hr,
+      urine: urine,
+      spo2: spO2,
+      temperature: temp,
+      respiratoryRate: rr,
+      bloodPressure: '$sBp/$dBp',
+      mews: MEWs.toString(),
+      cvp: cvp,
+      isAssessed: true,
+      assessTime: DateTime.now(),
+    );
+
+    Map<int, String> state = await MEWsService().addMEWs(inspectionNotesID, parameters);
+    final navigator = Navigator.of(context);
+    if (state.containsKey(200)) {
+      if (mounted) {
+        Navigator.pop(context);
+        showResultDialog(MEWs: MEWs, noteID: inspectionNotesID, onPop: widget.onPop, navigator: navigator);
+      }
+
+      widget.onPop();
+    } else {
+      return;
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:tuh_mews/models/patient.dart';
 import 'package:tuh_mews/services/export_services.dart';
 import 'package:tuh_mews/services/validate_service.dart';
@@ -17,6 +18,26 @@ class PatientCardExport extends StatefulWidget {
 }
 
 class _PatientCardExportState extends State<PatientCardExport> {
+  bool _isCanceled = false;
+
+  void _setupCallback() {
+    EasyLoading.addStatusCallback((status) {
+      if (status == EasyLoadingStatus.dismiss) {
+        if (mounted) {
+          setState(() => _isCanceled = true);
+          debugPrint("Individual Export Canceled");
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // Crucial: Clear callbacks when the card is destroyed
+    EasyLoading.removeAllCallbacks();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -80,16 +101,7 @@ class _PatientCardExportState extends State<PatientCardExport> {
           top: 0,
           right: 10,
           bottom: 0,
-          child: ClipRect(
-            child: SizedBox(
-              height: 50,
-              width: 150,
-              child: Opacity(
-                opacity: 1, // Set the opacity to 50%
-                child: Image.asset('assets/images/therapy4.png', fit: BoxFit.contain),
-              ),
-            ),
-          ),
+          child: ClipRect(child: SizedBox(height: 50, width: 150, child: Opacity(opacity: 1, child: Image.asset('assets/images/therapy4.png', fit: BoxFit.contain)))),
         ),
         Positioned(
           top: 0,
@@ -98,11 +110,34 @@ class _PatientCardExportState extends State<PatientCardExport> {
           child: buildExportButton(
             icon: FontAwesomeIcons.fileExport,
             onPressed: () async {
-              EasyLoading.show();
+              final box = context.findRenderObject() as RenderBox?;
+
+              setState(() => _isCanceled = false);
+              _setupCallback();
+
+              EasyLoading.show(status: 'Preparing file...');
               final exportService = ExportServices();
-              Map<int, String> status = await exportService.export([widget.patient.patientId ?? '']);
+
+              Map<int, String> result = await exportService.export([widget.patient.patientId ?? ''], onCheckCancel: () => _isCanceled);
+
+              if (_isCanceled) return;
+
+              EasyLoading.removeAllCallbacks();
               EasyLoading.dismiss();
-              ValidateService(status: status, navigator: Navigator.of(context)).validate();
+
+              if (result.containsKey(200)) {
+                final filePath = result[200]!;
+
+                if (!_isCanceled && mounted) {
+                  await SharePlus.instance.share(
+                    ShareParams(files: [XFile(filePath)], subject: 'Patient Report', sharePositionOrigin: box != null ? (box.localToGlobal(Offset.zero) & box.size) : null),
+                  );
+                }
+              } else {
+                if (!_isCanceled && mounted) {
+                  ValidateService(status: result, context: context).validate();
+                }
+              }
             },
             bgColor: Colors.white,
             iconColor: const Color(0xff4B74D1),

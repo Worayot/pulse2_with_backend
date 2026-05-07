@@ -9,7 +9,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class LoadingScreen extends StatefulWidget {
   final String userId;
   final String password;
-  const LoadingScreen({super.key, required this.userId, required this.password});
+  const LoadingScreen({
+    super.key,
+    required this.userId,
+    required this.password,
+  });
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -18,18 +22,44 @@ class LoadingScreen extends StatefulWidget {
 class _LoadingScreenState extends State<LoadingScreen> {
   final storage = FlutterSecureStorage();
   String name = '';
+  double _progress = 0.0; // Track progress here
 
   Map<String, dynamic>? accountData = {};
 
   @override
   void initState() {
-    _initialize();
     super.initState();
+    _initialize();
   }
 
   Future<void> _initialize() async {
     await fetchUserAccount();
+    setState(() {
+      _progress = 0.3;
+    });
+
     await _savePreferences();
+
+    // Step 3: Short delay so user sees 100% before navigation
+    setState(() {
+      _progress = 1.0;
+    });
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (accountData != null && accountData!.isNotEmpty) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const NavigationPage()),
+        (route) => false,
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    }
   }
 
   Future<void> fetchUserAccount() async {
@@ -37,35 +67,40 @@ class _LoadingScreenState extends State<LoadingScreen> {
     accountData = await userServices.loadAccount(widget.userId);
   }
 
-  // Save encrypted password
-  Future<void> savePassword(String password) async {
-    await storage.write(key: 'password', value: password);
-  }
-
   Future<void> _savePreferences() async {
     if (accountData != null && accountData!.isNotEmpty) {
-      String fullname = accountData!['fullname'] ?? 'N/A'; // Default to 'N/A' if null
-      String nurseId = accountData!['nurse_id'] ?? 'N/A'; // Default to 'N/A' if null
-      String role = accountData!['role'] ?? 'N/A'; // Default to 'N/A' if null
+      String fullname = accountData!['fullname'] ?? 'N/A';
+      String nurseId = accountData!['nurse_id'] ?? 'N/A';
+      String role = accountData!['role'] ?? 'N/A';
 
-      // Save preferences
       await saveStringPreference('fullname', fullname, context);
+      setState(() {
+        _progress = 0.4;
+      });
       await saveStringPreference('nurseID', nurseId, context);
+      setState(() {
+        _progress = 0.5;
+      });
       await saveStringPreference('role', role, context);
-      await savePassword(widget.password);
-
+      setState(() {
+        _progress = 0.6;
+      });
+      await storage.write(key: 'password', value: widget.password);
+      setState(() {
+        _progress = 0.7;
+      });
       setState(() {
         name = fullname;
       });
-
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigationPage()), (route) => false);
-    } else {
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return LoadingBar(context: context, name: name).build();
+    return LoadingBar(
+      context: context,
+      name: name,
+      progress: _progress,
+    ).build();
   }
 }

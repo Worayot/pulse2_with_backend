@@ -26,6 +26,15 @@ class _SwipableTableState extends State<SwipableTable> {
     fetchPatientReport(widget.patientID);
   }
 
+  @override
+  void didUpdateWidget(covariant SwipableTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.date != widget.date) {
+      fetchPatientReport(widget.patientID);
+    }
+  }
+
   void fetchPatientReport(String patientId) async {
     var reportData = await PatientService().getPatientReport(
       patientId: patientId,
@@ -131,6 +140,16 @@ class _SwipableTableState extends State<SwipableTable> {
 
   @override
   Widget build(BuildContext context) {
+    if (_fullReports.isEmpty) {
+      return SizedBox(
+        child: Center(
+          child: Text(
+            "noDataFound".tr(),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ),
+      );
+    }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(

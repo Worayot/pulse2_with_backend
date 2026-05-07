@@ -30,34 +30,36 @@ class CustomAnimatedBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ?? const Color(0xff3362CC);
+    final bgColor = Color(0xff3362CC);
     return SafeArea(
-      bottom: false,
+      bottom: true,
       top: false,
-      child: Container(
-        decoration: BoxDecoration(borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)), color: bgColor),
-        width: double.infinity,
-        height: containerHeight,
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Row(
-          mainAxisAlignment: mainAxisAlignment,
-          children:
-              items.map((item) {
-                var index = items.indexOf(item);
-                return GestureDetector(
-                  onTap: () => onItemSelected(index),
-                  child: _ItemWidget(
-                    item: item,
-                    iconSize: iconSize,
-                    isSelected: index == selectedIndex,
-                    backgroundColor: bgColor,
-                    itemCornerRadius: itemCornerRadius,
-                    animationDuration: animationDuration,
-                    curve: curve,
-                    boxWidth: item.boxWidth,
-                  ),
-                );
-              }).toList(),
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+        child: Container(
+          decoration: BoxDecoration(color: bgColor),
+          width: double.infinity,
+          height: containerHeight,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: mainAxisAlignment,
+            children:
+                items.map((item) {
+                  var index = items.indexOf(item);
+                  return GestureDetector(
+                    onTap: () => onItemSelected(index),
+                    child: _ItemWidget(
+                      item: item,
+                      iconSize: iconSize,
+                      isSelected: index == selectedIndex,
+                      backgroundColor: bgColor,
+                      itemCornerRadius: itemCornerRadius,
+                      animationDuration: animationDuration,
+                      curve: curve,
+                    ),
+                  );
+                }).toList(),
+          ),
         ),
       ),
     );
@@ -72,7 +74,6 @@ class _ItemWidget extends StatelessWidget {
   final double itemCornerRadius;
   final Duration animationDuration;
   final Curve curve;
-  final double boxWidth;
 
   const _ItemWidget({
     required this.item,
@@ -81,7 +82,6 @@ class _ItemWidget extends StatelessWidget {
     required this.animationDuration,
     required this.itemCornerRadius,
     required this.iconSize,
-    required this.boxWidth, // Accept boxWidth from parent
     this.curve = Curves.linear,
   });
 
@@ -92,16 +92,17 @@ class _ItemWidget extends StatelessWidget {
       container: true,
       selected: isSelected,
       child: AnimatedContainer(
-        width: isSelected ? boxWidth : size.width * 0.1,
         height: double.maxFinite,
         duration: animationDuration,
         curve: curve,
         decoration: BoxDecoration(color: isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor, borderRadius: BorderRadius.circular(itemCornerRadius)),
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: AnimatedPadding(
+            duration: animationDuration,
+            curve: curve,
+            padding: EdgeInsets.symmetric(horizontal: isSelected ? 16 : 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 FittedBox(
@@ -111,18 +112,16 @@ class _ItemWidget extends StatelessWidget {
                     child: item.icon,
                   ),
                 ),
-                if (isSelected) SizedBox(width: size.width * 0.025), // Space between icon and text
+                if (isSelected) SizedBox(width: size.width * 0.025),
                 if (isSelected)
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: DefaultTextStyle.merge(
-                        style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: item.textAlign,
-                        child: item.title,
-                      ),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: DefaultTextStyle.merge(
+                      style: TextStyle(color: item.activeColor, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: item.textAlign,
+                      child: item.title,
                     ),
                   ),
               ],
@@ -135,12 +134,11 @@ class _ItemWidget extends StatelessWidget {
 }
 
 class BottomNavyBarItem {
-  BottomNavyBarItem({required this.icon, required this.title, this.activeColor = const Color(0xff407BFF), this.textAlign, this.inactiveColor, required this.boxWidth});
+  BottomNavyBarItem({required this.icon, required this.title, this.activeColor = const Color(0xff407BFF), this.textAlign, this.inactiveColor});
 
   final Widget icon;
   final Widget title;
   final Color activeColor;
   final Color? inactiveColor;
   final TextAlign? textAlign;
-  final double boxWidth;
 }

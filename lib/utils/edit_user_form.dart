@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:tuh_mews/models/user.dart';
 import 'package:tuh_mews/services/logout_service.dart';
 import 'package:tuh_mews/services/user_services.dart';
-import 'package:tuh_mews/utils/Password_validation_widget.dart';
+import 'package:tuh_mews/utils/password_validation_widget.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 import 'package:tuh_mews/utils/info_text_field.dart';
 

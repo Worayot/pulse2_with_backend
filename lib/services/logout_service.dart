@@ -14,9 +14,12 @@ class LogoutService {
   Future<Map<int, String>> logout() async {
     final secureStorage = SecureStorage();
     secureStorage.delete(key: 'session_cookie');
-    secureStorage.delete(key: 'nurseId');
-    secureStorage.delete(key: 'password');
-    secureStorage.delete(key: 'rememberMe');
+
+    if (await secureStorage.read(key: 'rememberMe') != 'true') {
+      secureStorage.delete(key: 'nurseId');
+      secureStorage.delete(key: 'password');
+    }
+
     await AlarmService().stopAllAlarms();
 
     await navigator.pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const LoginPage()), (Route<dynamic> route) => false);
@@ -30,6 +33,7 @@ class LogoutService {
 
     try {
       final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"});
+      secureStorage.delete(key: 'idToken');
 
       return {response.statusCode: response.body};
     } catch (e) {

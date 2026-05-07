@@ -2,6 +2,7 @@
 // Request Permissions for Android 13+
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> requestPermissions() async {
@@ -12,9 +13,9 @@ Future<void> requestPermissions() async {
     }
 
     if (status.isGranted) {
-      print("✅ Notification Permission Granted");
+      debugPrint("✅ Notification Permission Granted");
     } else {
-      print("❌ Notification Permission Denied");
+      debugPrint("❌ Notification Permission Denied");
     }
   }
 }

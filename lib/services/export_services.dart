@@ -1,36 +1,33 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:tuh_mews/services/url.dart';
 
 class ExportServices {
-  Future<Map<int, String>> export(List<String> patientIds) async {
+  Future<Map<int, String>> export(List<String> patientIds, {bool Function()? onCheckCancel}) async {
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
       return {401: "Unauthorized: Invalid or missing token."};
     }
 
-    final url = Uri.parse(
-      '${URL().getServerURL()}/expt-fetch/get_report_excel',
-    );
+    // Check before starting the request
+    if (onCheckCancel != null && onCheckCancel()) return {499: "Canceled"};
+
+    final url = Uri.parse('${URL().getServerURL()}/expt-fetch/get_report_excel');
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode({"patient_ids": patientIds}),
-      );
+      final response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"}, body: jsonEncode({"patient_ids": patientIds}));
+
+      // Check after request finishes (User might have tapped cancel while waiting for the server)
+      if (onCheckCancel != null && onCheckCancel()) return {499: "Canceled"};
 
       if (response.statusCode == 200) {
-        return await _saveAndOpenFile(response.bodyBytes);
+        if (onCheckCancel != null && onCheckCancel()) return {499: "Canceled"};
+        return await _saveFile(response.bodyBytes);
       } else {
         return {401: "Token expired"};
       }
@@ -39,22 +36,18 @@ class ExportServices {
     }
   }
 
-  Future<Map<int, String>> _saveAndOpenFile(List<int> excelData) async {
+  Future<Map<int, String>> _saveFile(List<int> excelData) async {
     try {
       Directory? directory;
-
       if (Platform.isAndroid) {
-        final directories = await getExternalStorageDirectories(
-          type: StorageDirectory.downloads,
-        );
+        final directories = await getExternalStorageDirectories(type: StorageDirectory.downloads);
         directory = directories?.first;
-        if (directory == null) {
-          return {500: "Internal Server Error: Could not get directory."};
-        }
       } else if (Platform.isIOS) {
         directory = await getApplicationDocumentsDirectory();
-      } else {
-        return {500: "Unsupported platform."};
+      }
+
+      if (directory == null) {
+        return {500: "Could not locate directory"};
       }
 
       final uuid = Uuid();
@@ -63,12 +56,7 @@ class ExportServices {
       final file = File(filePath);
       await file.writeAsBytes(excelData);
 
-      final result = await OpenFile.open(filePath);
-      if (result.type == ResultType.done) {
-        return {200: "File saved and opened successfully."};
-      } else {
-        return {500: "Error opening file: ${result.message}"};
-      }
+      return {200: filePath};
     } catch (e) {
       return {500: "Internal Server Error: $e"};
     }

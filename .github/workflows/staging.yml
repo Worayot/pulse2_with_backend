@@ -1,0 +1,100 @@
+name: Staging Deployment
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  android:
+   runs-on: ubuntu-latest
+
+   steps:
+    - uses: actions/checkout@v4
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+
+    - name: Dependencies
+      run: |
+        flutter pub get
+        dart run build_runner build --delete-conflicting-outputs
+
+    - name: Deploy Android
+      env:
+        FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+        FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        cd android
+        echo "$FIREBASE_CREDENTIALS" > firebase-key.json
+        bundle install
+        bundle exec fastlane distribute_staging
+
+  ios:
+   runs-on: macos-latest
+
+   steps:
+    - uses: actions/checkout@v4
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
+
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        cache: true
+
+    - name: Dependencies
+      run: |
+        flutter pub get
+        dart run build_runner build --delete-conflicting-outputs
+
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_16.4.app
+
+    - name: Install CocoaPods
+      run: |
+        cd ios
+        pod install
+
+    - name: Setup SSH for Match
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+    - name: Install signing certificates
+      env:
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+      run: |
+        cd ios
+        bundle install
+        bundle exec fastlane match appstore --readonly
+
+    - name: Deploy iOS
+      env:
+        APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+        APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+        APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        cd ios
+        bundle install
+        bundle exec fastlane distribute_staging
+
+    - name: Show gym logs
+      if: failure()
+      run: |
+        cat ~/Library/Logs/gym/Runner-Runner.log

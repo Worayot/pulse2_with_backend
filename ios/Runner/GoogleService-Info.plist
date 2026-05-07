@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.liworayot</string>
+	<string>com.soften.tuhmews</string>
 	<key>PROJECT_ID</key>
 	<string>mews-project</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,10 +25,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:122811449387:ios:646d37edb837772dc96a6e</string>
+	<string>1:122811449387:ios:aabf219544a38979c96a6e</string>
 	<key>DATABASE_URL</key>
 	<string>https://mews-project-default-rtdb.asia-southeast1.firebasedatabase.app</string>
-	<key>CFBundleDisplayName</key>
-	<string>TUH MEWS</string>
 </dict>
 </plist>

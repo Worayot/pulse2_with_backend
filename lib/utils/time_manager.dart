@@ -1,14 +1,12 @@
-import 'package:alarm/alarm.dart';
-import 'package:alarm/model/volume_settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/mews_services.dart';
 import 'package:timezone/data/latest.dart' as tzdata; // Import for initializeTimeZones
 import 'package:timezone/timezone.dart' as tz; // Import for timezone functionality
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuh_mews/utils/flushbar.dart';
 
 void showTimeManager({
@@ -148,17 +146,25 @@ void showTimeManager({
                                           setState(() {
                                             enableButton = false;
                                           });
-                                          DateTime now = DateTime.now();
-                                          DateTime recordTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute, now.second);
-                                          DateTime notificationTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute, now.second);
 
-                                          if (notificationTime.isBefore(now)) {
-                                            notificationTime = notificationTime.add(Duration(days: 1));
+                                          final now = DateTime.now();
+
+                                          DateTime rawTime = DateTime(now.year, now.month, now.day, selectedHour, selectedMinute, now.second);
+
+                                          if (rawTime.isBefore(now)) {
+                                            rawTime = rawTime.add(const Duration(days: 1));
                                           }
 
-                                          if (recordTime.isBefore(now)) {
-                                            recordTime = recordTime.add(Duration(days: 1));
-                                          }
+                                          final tz.TZDateTime notificationTime = tz.TZDateTime.local(
+                                            rawTime.year,
+                                            rawTime.month,
+                                            rawTime.day,
+                                            rawTime.hour,
+                                            rawTime.minute,
+                                            rawTime.second,
+                                          );
+
+                                          final tz.TZDateTime recordTime = notificationTime;
 
                                           InspectionNote newInspection = InspectionNote(patientID: patientID, auditorID: auditorID, time: recordTime);
 
@@ -166,67 +172,56 @@ void showTimeManager({
                                             Map<int, String> status = await MEWsService().addNewInspection(inspectionNote: newInspection);
 
                                             if (status.containsKey(200)) {
-                                              String desc = "";
                                               String stringToHash = patientID + recordTime.toString();
 
                                               int alarmId = StringTransformer().generateID(stringToHash);
 
-                                              var alarmSettings = AlarmSettings(
+                                              await AlarmService().setAlarm(
                                                 id: alarmId,
                                                 dateTime: notificationTime,
-                                                assetAudioPath: "assets/audio/alarm.mp3",
-                                                loopAudio: false,
-                                                vibrate: true,
-                                                warningNotificationOnKill: true,
-                                                androidFullScreenIntent: true,
-                                                volumeSettings: VolumeSettings.fixed(volume: 0.8, volumeEnforced: true),
-                                                notificationSettings: NotificationSettings(
-                                                  title: 'TUH MEWs',
-                                                  body: '${'remindAssess'.tr()} "$patientName"',
-                                                  stopButton: 'stop'.tr(),
-                                                  icon: 'notification_icon',
-                                                ),
+                                                title: 'TUH MEWs',
+                                                body: '${'remindAssess'.tr()} "$patientName"',
+                                                patientID: patientID,
                                               );
 
-                                              await AlarmService().setAlarm(alarmSettings);
+                                              final diff = notificationTime.difference(tz.TZDateTime.now(tz.local));
 
-                                              desc += '${'successfullySetNotificationFor'.tr()}\n$patientName\n${notificationTime.toString().split('.')[0]}';
+                                              if (diff.inMinutes > 5) {
+                                                final secondNotificationTime = notificationTime.subtract(const Duration(minutes: 5));
 
-                                              // Set alarm 5 minutes before the initial alarm
-                                              if (notificationTime.difference(now).inMinutes > 5) {
-                                                DateTime secondNotificationTime = notificationTime.subtract(const Duration(minutes: 5));
                                                 String secondStringToHash = patientID + secondNotificationTime.toString();
 
                                                 int secondAlarmId = StringTransformer().generateID(secondStringToHash);
 
-                                                final alarmSettingsBefore = alarmSettings.copyWith(
+                                                await AlarmService().setAlarm(
                                                   id: secondAlarmId,
-                                                  dateTime: notificationTime.subtract(const Duration(minutes: 5)),
+                                                  dateTime: secondNotificationTime,
+                                                  title: 'TUH MEWs',
+                                                  body: '${'remindAssess'.tr()} "$patientName"',
+                                                  patientID: patientID,
                                                 );
-                                                await AlarmService().setAlarm(alarmSettingsBefore);
-                                                desc += ', ${secondNotificationTime.toString().split('.')[0]}';
                                               }
+
                                               if (context.mounted) {
                                                 Navigator.of(context).pop();
-                                                FlushbarService().showSuccessMessage(context: context, message: desc, duration: 3);
                                               }
+
                                               onPop();
                                             } else {
                                               setState(() {
                                                 enableButton = true;
                                               });
-                                              if (context.mounted) {
-                                                FlushbarService().showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
-                                                return;
-                                              }
+                                              throw "Failed to add note";
                                             }
                                           } catch (e) {
                                             setState(() {
                                               enableButton = true;
                                             });
+
+                                            debugPrint('Error: $e');
+
                                             if (context.mounted) {
                                               FlushbarService().showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
-                                              return; // Check before popping
                                             }
                                           }
                                         }
@@ -258,62 +253,12 @@ void showTimeManager({
   });
 }
 
-// Function to initialize the timezone database
 Future<void> _loadTimezone() async {
   tzdata.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Bangkok'));
+
+  var status = await Permission.notification.status;
+  if (status.isDenied) {
+    await Permission.notification.request();
+  }
 }
-
-// Save active alarm ID to SharedPreferences
-Future<void> saveAlarmId(int alarmId) async {
-  final prefs = await SharedPreferences.getInstance();
-  List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
-  alarmIds.add(alarmId.toString());
-  await prefs.setStringList('activeAlarms', alarmIds);
-}
-
-// Stop an alarm manually
-Future<void> stopAlarm(int alarmId) async {
-  await Alarm.stop(alarmId);
-  print('Alarm $alarmId stopped');
-
-  // Remove the ID from SharedPreferences
-  final prefs = await SharedPreferences.getInstance();
-  List<String> alarmIds = prefs.getStringList('activeAlarms') ?? [];
-  alarmIds.remove(alarmId.toString());
-  await prefs.setStringList('activeAlarms', alarmIds);
-}
-
-//* Function that will be triggered when the alarm goes off
-// void onAlarmTriggered(int alarmId) async {
-//   // Delete the alarm from preferences when triggered
-//   await deleteAlarmFromPrefs(alarmId);
-
-//   // You can also perform other actions here, such as showing a dialog or notifying the user
-//   print(
-//     "Alarm with ID $alarmId has been triggered and deleted from preferences.",
-//   );
-// }
-
-// Future<void> _deleteAlarm(int id) async {
-//   await Alarm.stop(id);
-//   final prefs = await SharedPreferences.getInstance();
-//   List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
-
-//   savedAlarms.removeWhere((item) {
-//     final data = jsonDecode(item);
-//     return data['id'] == id;
-//   });
-
-//   await prefs.setStringList('scheduled_alarms', savedAlarms);
-//   // _loadAlarms();
-// }
-
-// Future<void> _loadAlarms() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   List<String> savedAlarms = prefs.getStringList('scheduled_alarms') ?? [];
-//   setState(() {
-//     _alarms =
-//         savedAlarms.map((e) => jsonDecode(e) as Map<String, dynamic>).toList();
-//   });
-// }
