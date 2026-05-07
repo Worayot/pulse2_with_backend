@@ -33,12 +33,13 @@ jobs:
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
           APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
         run: |
-          cd ios
-          pod install
-          cd ..
-          # ใช้คำสั่ง build พร้อม flag พิเศษ
-          flutter build ipa --release --export-method=app-store --allow-provisioning-updates --authentication-key-id=$APP_STORE_KEY_ID --authentication-key-issuer-id=$APP_STORE_ISSUER_ID
-
+          echo "$APP_STORE_KEY_CONTENT" > ios/api_key.p8
+          
+          flutter build ipa --release \
+            --export-method=app-store \
+            --authentication-key-id=$APP_STORE_KEY_ID \
+            --authentication-key-issuer-id=$APP_STORE_ISSUER_ID \
+            --authentication-key-path=ios/api_key.p8
       - name: Deploy iOS to TestFlight
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
