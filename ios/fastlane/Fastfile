@@ -1,8 +1,4 @@
-default_platform(:ios)
-
-platform :ios do
-  desc "Build and push to TestFlight"
-  lane :distribute_staging do
+lane :distribute_staging do
     api_key = app_store_connect_api_key(
       key_id: ENV["APP_STORE_KEY_ID"],
       issuer_id: ENV["APP_STORE_ISSUER_ID"],
@@ -10,8 +6,11 @@ platform :ios do
       is_key_content_base64: false
     )
 
-    build_app(scheme: "Runner")
+    build_app(
+      scheme: "Runner",
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates"
+    )
 
     upload_to_testflight(api_key: api_key)
   end
-end
