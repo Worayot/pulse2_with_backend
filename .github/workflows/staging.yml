@@ -79,7 +79,7 @@ jobs:
       run: |
         cd ios
         bundle install
-        bundle exec fastlane match appstore --readonly
+        bundle exec fastlane match appstore --readonly --app_identifier com.soften.tuhmews
 
     - name: Deploy iOS
       env:
