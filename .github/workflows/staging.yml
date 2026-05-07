@@ -64,11 +64,29 @@ jobs:
         cd ios
         pod install
 
+    - name: Setup SSH for Match
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+    - name: Install signing certificates
+      env:
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+      run: |
+        cd ios
+        bundle install
+        bundle exec fastlane match appstore --readonly
+
     - name: Deploy iOS
       env:
         APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
         APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
         APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
       run: |
         cd ios
         bundle install
