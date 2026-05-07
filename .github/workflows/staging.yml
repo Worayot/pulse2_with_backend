@@ -29,6 +29,7 @@ jobs:
       env:
         FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
       run: |
         cd android
         echo "$FIREBASE_CREDENTIALS" > firebase-key.json
@@ -87,6 +88,7 @@ jobs:
         APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
       run: |
         cd ios
         bundle install
