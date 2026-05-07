@@ -22,17 +22,6 @@ jobs:
       - name: Code Generation
         run: dart run build_runner build --delete-conflicting-outputs
 
-      # DEPLOY ANDROID
-      - name: Deploy Android to Firebase
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_CREDENTIALS }}
-        run: |
-          cd android
-          # Save the json key to a file for Fastlane to read
-          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > firebase-key.json
-          bundle install
-          bundle exec fastlane distribute_staging
-        
       # DEPLOY iOS
       - name: Deploy iOS to TestFlight
         env:
@@ -41,5 +30,16 @@ jobs:
           APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
         run: |
           cd ios
+          bundle install
+          bundle exec fastlane distribute_staging
+
+      # DEPLOY ANDROID
+      - name: Deploy Android to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_CREDENTIALS }}
+        run: |
+          cd android
+          # Save the json key to a file for Fastlane to read
+          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > firebase-key.json
           bundle install
           bundle exec fastlane distribute_staging

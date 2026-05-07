@@ -3,7 +3,7 @@ default_platform(:android)
 platform :android do
   desc "Build APK and upload to Firebase"
   lane :distribute_staging do
-    sh("flutter build apk --release")
+    sh("flutter build apk --release --no-codesign")
     
     # 2. อัปโหลดไป Firebase
     firebase_app_distribution(
