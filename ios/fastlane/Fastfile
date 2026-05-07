@@ -9,9 +9,14 @@ platform :ios do
       is_key_content_base64: false
     )
 
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store"
+    )
+
     upload_to_testflight(
       api_key: api_key,
-      ipa: "../build/ios/ipa/Runner.ipa",
       skip_waiting_for_build_processing: true
     )
   end
