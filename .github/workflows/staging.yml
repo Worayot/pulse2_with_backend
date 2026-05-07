@@ -6,10 +6,16 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-latest # GitHub provides the Mac environment
+    runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -17,17 +23,17 @@ jobs:
           channel: 'stable'
 
       - name: Install Dependencies
-        run: flutter pub get
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
 
-      - name: Code Generation
-        run: dart run build_runner build --delete-conflicting-outputs
-
-      - name: Install CocoaPods
+      - name: Build iOS IPA
         run: |
           cd ios
           pod install
+          cd ..
+          flutter build ipa --release --export-method=app-store
 
-      # DEPLOY iOS
       - name: Deploy iOS to TestFlight
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
@@ -35,16 +41,13 @@ jobs:
           APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
         run: |
           cd ios
-          bundle install
           bundle exec fastlane distribute_staging
 
-      # DEPLOY ANDROID
       - name: Deploy Android to Firebase
         env:
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.FIREBASE_CREDENTIALS }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
         run: |
           cd android
-          # Save the json key to a file for Fastlane to read
-          echo "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > firebase-key.json
-          bundle install
+          echo "$FIREBASE_CREDENTIALS" > firebase-key.json
           bundle exec fastlane distribute_staging
