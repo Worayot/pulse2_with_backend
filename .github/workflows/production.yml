@@ -102,4 +102,8 @@ jobs:
       - name: Show gym logs
         if: failure()
         run: |
-          cat ~/Library/Logs/gym/*.log || true
+            echo "========== LAST 200 LINES =========="
+            tail -n 200 ~/Library/Logs/gym/Runner-Runner.log || true
+
+            echo "========== XCODE ERRORS =========="
+            grep -A 20 -B 5 -i "error:" ~/Library/Logs/gym/Runner-Runner.log || true
