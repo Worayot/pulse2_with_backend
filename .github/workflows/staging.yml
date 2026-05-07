@@ -36,48 +36,45 @@ jobs:
         bundle exec fastlane distribute_staging
 
   ios:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
+   runs-on: macos-latest
 
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
+   steps:
+    - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3'
+        bundler-cache: true
 
-      - name: Dependencies
-        run: |
-          flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
-      
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        cache: true
 
-      - name: Build iOS
-        env:
-          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
-          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
-          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
-        run: |
-          cd ios
-          pod install
-          cd ..
-          flutter build ios --release --no-codesign
-    
-      - name: Show gym logs
-        if: failure()
-        run: cat ~/Library/Logs/gym/Runner-Runner.log
-      
-      - name: Deploy iOS
-        env:
-          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
-          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
-          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
-        run: |
-          cd ios
-          bundle install
-          bundle exec fastlane distribute_staging
+    - name: Dependencies
+      run: |
+        flutter pub get
+        dart run build_runner build --delete-conflicting-outputs
+
+    - name: Select Xcode
+      run: sudo xcode-select -s /Applications/Xcode_16.4.app
+
+    - name: Install CocoaPods
+      run: |
+        cd ios
+        pod install
+
+    - name: Deploy iOS
+      env:
+        APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+        APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+        APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+      run: |
+        cd ios
+        bundle install
+        bundle exec fastlane distribute_staging
+
+    - name: Show gym logs
+      if: failure()
+      run: |
+        cat ~/Library/Logs/gym/Runner-Runner.log

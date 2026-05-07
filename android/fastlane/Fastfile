@@ -8,7 +8,7 @@ platform :android do
 
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
-      groups: "TUH MEWS Tester",
+      groups: "tuh-mews-tester",
       apk_path: "../build/app/outputs/flutter-apk/app-release.apk",
       service_credentials_file: "firebase-key.json"
     )
