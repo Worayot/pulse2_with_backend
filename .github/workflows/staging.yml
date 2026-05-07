@@ -5,55 +5,71 @@ on:
       - staging
 
 jobs:
-  deploy:
-    runs-on: macos-latest
+  android:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-          bundler-cache: true
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
 
-      - name: Install Dependencies
+      - name: Dependencies
         run: |
           flutter pub get
           dart run build_runner build --delete-conflicting-outputs
 
-      - name: Build iOS IPA
-        env:
-          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
-          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
-          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
-        run: |
-          echo "$APP_STORE_KEY_CONTENT" > ios/api_key.p8
-          
-          flutter build ipa --release \
-            --export-method=app-store \
-            --authentication-key-id=$APP_STORE_KEY_ID \
-            --authentication-key-issuer-id=$APP_STORE_ISSUER_ID \
-            --authentication-key-path=ios/api_key.p8
-      - name: Deploy iOS to TestFlight
-        env:
-          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
-          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
-          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
-        run: |
-          cd ios
-          bundle exec fastlane distribute_staging
-
-      - name: Deploy Android to Firebase
+      - name: Deploy Android
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
         run: |
           cd android
           echo "$FIREBASE_CREDENTIALS" > firebase-key.json
+          bundle install
+          bundle exec fastlane distribute_staging
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Dependencies
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Build iOS
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+        run: |
+          cd ios
+          pod install
+          cd ..
+          echo "$APP_STORE_KEY_CONTENT" > ios/api_key.p8
+          flutter build ipa --release \
+            --export-method=app-store \
+            --authentication-key-id=$APP_STORE_KEY_ID \
+            --authentication-key-issuer-id=$APP_STORE_ISSUER_ID \
+            --authentication-key-path=ios/api_key.p8
+
+      - name: Deploy iOS
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+        run: |
+          cd ios
+          bundle install
           bundle exec fastlane distribute_staging
