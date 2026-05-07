@@ -28,11 +28,16 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
 
       - name: Build iOS IPA
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
         run: |
           cd ios
           pod install
           cd ..
-          flutter build ipa --release --export-method=app-store
+          # ใช้คำสั่ง build พร้อม flag พิเศษ
+          flutter build ipa --release --export-method=app-store --allow-provisioning-updates --authentication-key-id=$APP_STORE_KEY_ID --authentication-key-issuer-id=$APP_STORE_ISSUER_ID
 
       - name: Deploy iOS to TestFlight
         env:
