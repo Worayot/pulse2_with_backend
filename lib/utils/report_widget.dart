@@ -6,7 +6,11 @@ class ReportWidget extends StatefulWidget {
   final double tableHeight;
   final String patientID;
 
-  const ReportWidget({super.key, required this.tableHeight, required this.patientID});
+  const ReportWidget({
+    super.key,
+    required this.tableHeight,
+    required this.patientID,
+  });
 
   @override
   _ReportWidgetState createState() => _ReportWidgetState();
@@ -41,7 +45,13 @@ class _ReportWidgetState extends State<ReportWidget> {
 
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            child: SizedBox(key: ValueKey<DateTime>(selectedDate), height: _tableHeight, child: SwipableTable(date: selectedDate, patientID: widget.patientID)),
+            child: SizedBox(
+              height: _tableHeight,
+              child: SwipableTable(
+                date: selectedDate,
+                patientID: widget.patientID,
+              ),
+            ),
           ),
         ],
       ),

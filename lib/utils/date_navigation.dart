@@ -1,10 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class DateNavigation extends StatefulWidget {
-  final Function(DateTime) onDateChanged; // Callback function
+  final Function(DateTime) onDateChanged;
 
   const DateNavigation({super.key, required this.onDateChanged});
 
@@ -24,7 +26,9 @@ class _DateNavigationState extends State<DateNavigation> {
       context: context,
       builder: (context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: StatefulBuilder(
             builder: (context, setState) {
               return Padding(
@@ -32,35 +36,70 @@ class _DateNavigationState extends State<DateNavigation> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text("Select Date", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
+                    Text(
+                      "selectDate".tr(),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Gap(10),
 
                     TableCalendar(
+                      locale: Localizations.localeOf(context).toString(),
                       firstDay: DateTime.utc(2020, 1, 1),
                       lastDay: DateTime.utc(2100, 12, 31),
+                      headerStyle: HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                      ),
+                      calendarStyle: CalendarStyle(
+                        // defaultTextStyle: TextStyle(color: Colors.white),
+                        // weekendTextStyle: TextStyle(color: Colors.red),
+                        selectedDecoration: BoxDecoration(
+                          color: Color(0xffC6D8FF),
+
+                          shape: BoxShape.circle,
+                        ),
+                        todayDecoration: BoxDecoration(
+                          color: Color(0xff407BFF),
+                          shape: BoxShape.circle,
+                        ),
+                        selectedTextStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       focusedDay: focusedDay,
                       selectedDayPredicate: (day) {
                         return isSameDay(selectedDay, day);
                       },
-                      onDaySelected: (selectedDay, focusedDay) {
+                      onDaySelected: (newSelectedDay, newFocusedDay) {
                         setState(() {
-                          selectedDay = selectedDay;
-                          focusedDay = focusedDay;
+                          selectedDay = newSelectedDay;
+                          focusedDay = newFocusedDay;
                         });
+
+                        widget.onDateChanged(newSelectedDay);
                       },
                     ),
 
-                    const SizedBox(height: 10),
+                    const Gap(10),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xff407BFF),
+                          ),
                           onPressed: () {
                             Navigator.pop(context, selectedDay);
                           },
-                          child: const Text("OK"),
+                          child: Text(
+                            "ok".tr(),
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ],
                     ),
@@ -104,18 +143,34 @@ class _DateNavigationState extends State<DateNavigation> {
     return Container(
       height: 30,
       width: 150,
-      decoration: BoxDecoration(color: const Color(0xff407bff), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: const Color(0xff407bff),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          InkWell(onTap: _decreaseDate, child: const FaIcon(FontAwesomeIcons.caretLeft, size: 30, color: Colors.white)),
+          InkWell(
+            onTap: _decreaseDate,
+            child: const FaIcon(
+              FontAwesomeIcons.caretLeft,
+              size: 30,
+              color: Colors.white,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: InkWell(
               onTap: () => showCalendarDialog(context),
               child: Text(
                 DateFormat('dd/MM/yyyy').format(selectedDate),
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white, decoration: TextDecoration.underline, decorationColor: Colors.white),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.white,
+                ),
               ),
             ),
           ),
@@ -123,7 +178,14 @@ class _DateNavigationState extends State<DateNavigation> {
             width: 15,
             child: Visibility(
               visible: selectedDate.isBefore(DateTime.now()),
-              child: InkWell(onTap: _increaseDate, child: const FaIcon(FontAwesomeIcons.caretRight, size: 30, color: Colors.white)),
+              child: InkWell(
+                onTap: _increaseDate,
+                child: const FaIcon(
+                  FontAwesomeIcons.caretRight,
+                  size: 30,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],

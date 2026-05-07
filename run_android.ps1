@@ -23,6 +23,14 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+Write-Host "Running build_runner..."
+dart run build_runner build --delete-conflicting-outputs
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "build_runner failed"
+    exit 1
+}
+
 Write-Host "Cleaning Android build..."
 Set-Location android
 

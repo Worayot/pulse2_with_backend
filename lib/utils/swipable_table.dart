@@ -26,13 +26,26 @@ class _SwipableTableState extends State<SwipableTable> {
     fetchPatientReport(widget.patientID);
   }
 
+  @override
+  void didUpdateWidget(covariant SwipableTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.date != widget.date) {
+      fetchPatientReport(widget.patientID);
+    }
+  }
+
   void fetchPatientReport(String patientId) async {
-    var reportData = await PatientService().getPatientReport(patientId: patientId, date: widget.date);
+    var reportData = await PatientService().getPatientReport(
+      patientId: patientId,
+      date: widget.date,
+    );
 
     if (reportData != null) {
       setState(() {
         patientData = reportData;
-        _fullReports = (patientData['full_reports'] ?? []).cast<Map<String, dynamic>>();
+        _fullReports =
+            (patientData['full_reports'] ?? []).cast<Map<String, dynamic>>();
 
         _processReports();
       });
@@ -65,7 +78,11 @@ class _SwipableTableState extends State<SwipableTable> {
 
   Future<String> fetchNoteData(String reportID) async {
     try {
-      var noteDoc = await FirebaseFirestore.instance.collection('inspection_notes').doc(reportID).get();
+      var noteDoc =
+          await FirebaseFirestore.instance
+              .collection('inspection_notes')
+              .doc(reportID)
+              .get();
 
       if (noteDoc.exists) {
         var noteData = noteDoc.data()!;
@@ -78,7 +95,11 @@ class _SwipableTableState extends State<SwipableTable> {
     }
   }
 
-  Widget _buildButtonCell({required int index, required BuildContext context, required String reportID}) {
+  Widget _buildButtonCell({
+    required int index,
+    required BuildContext context,
+    required String reportID,
+  }) {
     return FutureBuilder<String>(
       future: fetchNoteData(reportID),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
@@ -88,12 +109,17 @@ class _SwipableTableState extends State<SwipableTable> {
           return const SizedBox.shrink();
         } else {
           final noteText = snapshot.data;
-          if (noteText != null && noteText.trim().isNotEmpty && noteText.trim() != '-') {
+          if (noteText != null &&
+              noteText.trim().isNotEmpty &&
+              noteText.trim() != '-') {
             return Container(
               height: 35,
               alignment: Alignment.center,
               child: IconButton(
-                icon: const Icon(FontAwesomeIcons.solidBookmark, color: Color(0xffFCAD00)),
+                icon: const Icon(
+                  FontAwesomeIcons.solidBookmark,
+                  color: Color(0xffFCAD00),
+                ),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -115,7 +141,14 @@ class _SwipableTableState extends State<SwipableTable> {
   @override
   Widget build(BuildContext context) {
     if (_fullReports.isEmpty) {
-      return SizedBox(child: Center(child: Text("noDataFound".tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))));
+      return SizedBox(
+        child: Center(
+          child: Text(
+            "noDataFound".tr(),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ),
+      );
     }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -163,7 +196,9 @@ class _SwipableTableState extends State<SwipableTable> {
             ...List.generate(tableData.length, (index) {
               final reportID = _fullReports[index]['report_id'] ?? '';
               return TableRow(
-                decoration: BoxDecoration(color: index.isOdd ? const Color(0xffF5F5F5) : Colors.white),
+                decoration: BoxDecoration(
+                  color: index.isOdd ? const Color(0xffF5F5F5) : Colors.white,
+                ),
                 children: [
                   _buildContainerCell(tableData[index][0], index),
                   _buildContainerCell(tableData[index][1], index),
@@ -175,7 +210,11 @@ class _SwipableTableState extends State<SwipableTable> {
                   _buildContainerCell(tableData[index][7], index),
                   _buildContainerCell(tableData[index][8], index),
                   _buildContainerCell(tableData[index][9], index),
-                  _buildButtonCell(index: index, context: context, reportID: reportID),
+                  _buildButtonCell(
+                    index: index,
+                    context: context,
+                    reportID: reportID,
+                  ),
                 ],
               );
             }),
@@ -199,7 +238,9 @@ class _SwipableTableState extends State<SwipableTable> {
       height: 35,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(color: index.isOdd ? const Color(0xffF5F5F5) : Colors.white),
+      decoration: BoxDecoration(
+        color: index.isOdd ? const Color(0xffF5F5F5) : Colors.white,
+      ),
       child: Text(text),
     );
   }
