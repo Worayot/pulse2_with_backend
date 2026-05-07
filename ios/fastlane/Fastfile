@@ -9,6 +9,12 @@ platform :ios do
       is_key_content_base64: false
     )
 
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "com.soften.tuhmews"
+    )
+
     increment_build_number(
       build_number: ENV["GITHUB_RUN_NUMBER"]
     )
@@ -33,6 +39,12 @@ platform :ios do
       issuer_id: ENV["APP_STORE_ISSUER_ID"],
       key_content: ENV["APP_STORE_KEY_CONTENT"],
       is_key_content_base64: false
+    )
+
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "com.soften.tuhmews"
     )
 
     increment_build_number(
