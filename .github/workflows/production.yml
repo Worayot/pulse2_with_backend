@@ -20,6 +20,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          cache: true
 
       - name: Dependencies
         run: |
@@ -34,7 +35,6 @@ jobs:
         run: |
           cd android
           echo "$FIREBASE_CREDENTIALS" > firebase-key.json
-          bundle install
           bundle exec fastlane distribute_production
 
   ios:
@@ -43,6 +43,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+         fetch-depth: 0
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
@@ -64,14 +66,14 @@ jobs:
       - name: Install CocoaPods
         run: |
           cd ios
-          pod install
+          bundle exec pod install
 
       - name: Setup SSH for Match
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
+          printf "%s" "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
       - name: Install signing certificates
         env:
@@ -79,7 +81,6 @@ jobs:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
         run: |
           cd ios
-          bundle install
           bundle exec fastlane match appstore --readonly --app_identifier com.soften.tuhmews
 
       - name: Deploy iOS (Production)
@@ -92,5 +93,4 @@ jobs:
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
           cd ios
-          bundle install
           bundle exec fastlane distribute_production

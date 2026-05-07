@@ -56,3 +56,5 @@ sec.txt
 /android/build/
 
 .secrets
+
+*.env
