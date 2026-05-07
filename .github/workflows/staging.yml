@@ -76,9 +76,7 @@ jobs:
 
       - name: Install CocoaPods
         working-directory: ios
-        run: |
-          bundle install
-          bundle exec pod install
+        run: pod install
 
       - name: Verify Fastlane Env
         working-directory: ios

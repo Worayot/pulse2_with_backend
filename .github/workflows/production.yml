@@ -75,9 +75,7 @@ jobs:
 
       - name: Install CocoaPods
         working-directory: ios
-        run: |
-          bundle install
-          bundle exec pod install
+        run: pod install
 
       - name: Install signing certificates
         working-directory: ios
