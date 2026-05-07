@@ -12,6 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
@@ -35,16 +36,18 @@ jobs:
         run: |
           cd android
           echo "$FIREBASE_CREDENTIALS" > firebase-key.json
+          bundle install
           bundle exec fastlane distribute_production
 
   ios:
     if: github.event.pull_request.merged == true
-    runs-on: macos-latest
+    runs-on: macos-15
 
     steps:
       - uses: actions/checkout@v4
         with:
-         fetch-depth: 0
+          fetch-depth: 0
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
@@ -61,12 +64,7 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
 
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app
-
-      - name: Install CocoaPods
-        run: |
-          cd ios
-          bundle exec pod install
+        run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Setup SSH for Match
         run: |
@@ -75,15 +73,23 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H github.com >> ~/.ssh/known_hosts
 
+      - name: Install CocoaPods
+        working-directory: ios
+        run: |
+          bundle install
+          bundle exec pod install
+
       - name: Install signing certificates
+        working-directory: ios
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
         run: |
-          cd ios
+          bundle install
           bundle exec fastlane match appstore --readonly --app_identifier com.soften.tuhmews
 
       - name: Deploy iOS (Production)
+        working-directory: ios
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
@@ -92,5 +98,10 @@ jobs:
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
-          cd ios
+          bundle install
           bundle exec fastlane distribute_production
+
+      - name: Show gym logs
+        if: failure()
+        run: |
+          cat ~/Library/Logs/gym/*.log || true
