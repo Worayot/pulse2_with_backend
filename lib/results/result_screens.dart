@@ -2,11 +2,19 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:tuh_mews/helpers/app_localized_rich_text.dart';
 import 'package:tuh_mews/utils/note_adder.dart'; // Assuming this is correct
 
 void showResultDialog({required int MEWs, required String noteID, required VoidCallback onPop, required NavigatorState navigator}) {
   List<dynamic> components = getComponent(MEWs);
   String nursing = components[0];
+
+  Widget nursingWidget = AppLocalizedRichText(
+    translationKey: nursing,
+    style: const TextStyle(fontSize: 18, color: Colors.black),
+    boldStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+  );
+
   String emoji = components[1];
   Color bgColor = components[2];
   String title = components[3];
@@ -66,7 +74,7 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
                           Expanded(
                             child: Scrollbar(
                               thumbVisibility: true,
-                              child: SingleChildScrollView(child: Padding(padding: const EdgeInsets.only(right: 12.0), child: Text(nursing, style: const TextStyle(fontSize: 16)))),
+                              child: SingleChildScrollView(child: Padding(padding: const EdgeInsets.only(right: 12.0), child: nursingWidget)),
                             ),
                           ),
                         ],
@@ -120,34 +128,34 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
   );
 }
 
-List<dynamic> getComponent(int MEWs) {
-  // Process MEWs
+List<dynamic> getComponent(int mews) {
+  // Process mews
   String nursing = "";
   String emoji;
   Color bgColor;
   String title = "";
-  if (MEWs <= 1) {
-    nursing = "nursingLow".tr();
+  if (mews <= 1) {
+    nursing = "nursingLow";
     emoji = "assets/images/emojis/emoji_low.png";
     bgColor = const Color(0xffCEFF9F);
     title = "lowRisk".tr();
-  } else if (MEWs == 2) {
-    nursing = "nursingLowMedium".tr();
+  } else if (mews == 2) {
+    nursing = "nursingLowMedium";
     emoji = "assets/images/emojis/emoji_midlow.png";
     bgColor = const Color(0xffFFF9AD);
-    title = "lowRisk".tr();
-  } else if (MEWs == 3) {
-    nursing = "nursingMedium".tr();
+    title = "lowRisk";
+  } else if (mews == 3) {
+    nursing = "nursingMedium";
     emoji = "assets/images/emojis/emoji_mid.png";
     title = "medRisk".tr();
     bgColor = const Color(0xffFFE897);
-  } else if (MEWs == 4) {
-    nursing = "nursingMediumHigh".tr();
+  } else if (mews == 4) {
+    nursing = "nursingMediumHigh";
     emoji = "assets/images/emojis/emoji_midhigh.png";
     bgColor = const Color(0xffFFD2B8);
     title = "medhighRisk".tr();
-  } else if (MEWs >= 5) {
-    nursing = "nursingHigh".tr();
+  } else if (mews >= 5) {
+    nursing = "nursingHigh";
     emoji = "assets/images/emojis/emoji_high.png";
     bgColor = const Color(0xffFFBE99);
     title = "highRisk".tr();

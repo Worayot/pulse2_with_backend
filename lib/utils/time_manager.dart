@@ -17,10 +17,10 @@ void showTimeManager({
   required String patientID,
   required VoidCallback onPop,
   required String patientName,
+  String? previousMews,
 }) {
-  // Initialize timezone database first
   _loadTimezone().then((_) {
-    if (!context.mounted) return; // Ensure the widget is still available
+    if (!context.mounted) return;
 
     int selectedHour = 0;
     int selectedMinute = 0;
@@ -29,6 +29,12 @@ void showTimeManager({
     FixedExtentScrollController minuteController = FixedExtentScrollController(initialItem: selectedMinute);
 
     bool enableButton = true;
+    int highMewsThreshold = 3;
+
+    String sound = "alarm";
+    if ((int.tryParse(previousMews ?? "0") ?? 0) >= highMewsThreshold) {
+      sound = "alarm2";
+    }
 
     showDialog(
       context: context,
@@ -182,6 +188,7 @@ void showTimeManager({
                                                 title: 'TUH MEWs',
                                                 body: '${'remindAssess'.tr()} "$patientName"',
                                                 patientID: patientID,
+                                                sound: sound,
                                               );
 
                                               final diff = notificationTime.difference(tz.TZDateTime.now(tz.local));
@@ -199,6 +206,7 @@ void showTimeManager({
                                                   title: 'TUH MEWs',
                                                   body: '${'remindAssess'.tr()} "$patientName"',
                                                   patientID: patientID,
+                                                  sound: sound,
                                                 );
                                               }
 

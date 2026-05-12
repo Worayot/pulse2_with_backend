@@ -1,8 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:tuh_mews/helpers/app_localized_rich_text.dart';
 
-void showNursing(BuildContext context, String MEWs) {
+void showNursing(BuildContext context, String mews) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -36,7 +37,7 @@ void showNursing(BuildContext context, String MEWs) {
                 const Gap(4),
 
                 // Content
-                buildNursingDetails(context, MEWs),
+                buildNursingDetails(context, mews),
               ],
             ),
           ),
@@ -46,23 +47,29 @@ void showNursing(BuildContext context, String MEWs) {
   );
 }
 
-Widget buildNursingDetails(BuildContext context, String MEWs) {
+Widget buildNursingDetails(BuildContext context, String mews) {
   // Process MEWs
   String nursing = "";
-  int? MEWs0 = int.tryParse(MEWs);
-  if (MEWs0 == null) {
-    nursing = "nursingInvalid".tr(); // Provide a fallback for invalid MEWs
-  } else if (MEWs0 <= 1) {
-    nursing = "nursingLow".tr();
-  } else if (MEWs0 == 2) {
-    nursing = "nursingLowMedium".tr();
-  } else if (MEWs0 == 3) {
-    nursing = "nursingMedium".tr();
-  } else if (MEWs0 == 4) {
-    nursing = "nursingMediumHigh".tr();
-  } else if (MEWs0 >= 5) {
-    nursing = "nursingHigh".tr();
+  int? mewScore = int.tryParse(mews);
+  if (mewScore == null) {
+    nursing = "";
+  } else if (mewScore <= 1) {
+    nursing = "nursingLow";
+  } else if (mewScore == 2) {
+    nursing = "nursingLowMedium";
+  } else if (mewScore == 3) {
+    nursing = "nursingMedium";
+  } else if (mewScore == 4) {
+    nursing = "nursingMediumHigh";
+  } else if (mewScore >= 5) {
+    nursing = "nursingHigh";
   }
+
+  Widget nursingWidget = AppLocalizedRichText(
+    translationKey: nursing,
+    style: const TextStyle(fontSize: 18, color: Colors.black),
+    boldStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+  );
 
   return Expanded(
     child: Container(
@@ -70,16 +77,11 @@ Widget buildNursingDetails(BuildContext context, String MEWs) {
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
       child: Column(
         children: [
-          FittedBox(fit: BoxFit.scaleDown, child: Row(children: [Text("MEWs : $MEWs", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold))])),
+          FittedBox(fit: BoxFit.scaleDown, child: Row(children: [Text("MEWs : $mews", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold))])),
           const Gap(4),
           Expanded(
             child: Scrollbar(
-              child: SingleChildScrollView(
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(padding: const EdgeInsets.only(right: 12), child: Text(nursing, style: TextStyle(fontSize: 18), textAlign: TextAlign.left, softWrap: true)),
-                ),
-              ),
+              child: SingleChildScrollView(child: Align(alignment: Alignment.topLeft, child: Padding(padding: const EdgeInsets.only(right: 12), child: nursingWidget))),
             ),
           ),
         ],

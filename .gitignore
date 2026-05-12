@@ -60,4 +60,4 @@ sec.txt
 *.env
 
 # For ci stable
-ios/Runner.xcodeproj/project.pbxproj
+/ios/Runner.xcodeproj/project.pbxproj

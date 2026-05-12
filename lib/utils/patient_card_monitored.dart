@@ -314,6 +314,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                             patientID: patientID,
                             onPop: widget.onPop,
                             patientName: fullname,
+                            previousMews: latestMews,
                           );
                         },
                         Colors.white,
