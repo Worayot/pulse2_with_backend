@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tuh_mews/func/get_color.dart';
+import 'package:tuh_mews/models/nursing_component.dart';
 import 'package:tuh_mews/utils/mews_form/mews_forms.dart';
 import 'package:tuh_mews/utils/note_editor.dart';
 import 'package:tuh_mews/utils/nursing.dart';
@@ -104,7 +104,7 @@ class AssessTableRowWidget extends StatelessWidget {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                            return MEWsForms(patientID: patientID, noteID: noteID, onPop: onPop, alarmStringIDs: [stringToHash, secondStringToHash]);
+                            return MEWsForms(patientID: patientID, noteID: noteID, onPop: onPop, relatedAlarmStringIDs: [stringToHash, secondStringToHash]);
                           },
                         );
                       }
@@ -148,10 +148,10 @@ class AssessTableRowWidget extends StatelessWidget {
                       Text(
                         '$MEWs',
                         style: TextStyle(
-                          color: getColor(MEWs),
+                          color: NursingComponent.getColor(MEWs),
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          shadows: [Shadow(color: Colors.black.withOpacity(0.2), offset: Offset(0.8, 0.8), blurRadius: 1)],
+                          shadows: [Shadow(color: Colors.black.withOpacity(0.5), offset: Offset(0.4, 0.4), blurRadius: 2)],
                         ),
                       ),
                     ],

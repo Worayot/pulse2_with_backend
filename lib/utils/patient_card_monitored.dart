@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tuh_mews/func/get_color.dart';
 import 'package:tuh_mews/models/monitored_patient/card_model.dart';
+import 'package:tuh_mews/models/nursing_component.dart';
 import 'package:tuh_mews/utils/action_button.dart';
 import 'package:tuh_mews/utils/circle_with_num.dart';
 import 'package:tuh_mews/utils/assess_table_row.dart';
@@ -270,7 +270,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Padding(padding: const EdgeInsets.only(left: 4.0, right: 12), child: CircleWithNumber(number: latestMews, color: getColor(latestMews))),
+                      Padding(padding: const EdgeInsets.only(left: 4.0, right: 12), child: CircleWithNumber(number: latestMews, color: NursingComponent.getColor(latestMews))),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

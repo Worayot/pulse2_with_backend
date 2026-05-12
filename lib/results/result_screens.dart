@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:tuh_mews/helpers/app_localized_rich_text.dart';
+import 'package:tuh_mews/models/nursing_component.dart';
 import 'package:tuh_mews/utils/note_adder.dart'; // Assuming this is correct
 
 void showResultDialog({required int MEWs, required String noteID, required VoidCallback onPop, required NavigatorState navigator}) {
-  List<dynamic> components = getComponent(MEWs);
-  String nursing = components[0];
+  NursingComponent components = NursingComponent.getComponent(MEWs);
+  String nursing = components.nursing;
 
   Widget nursingWidget = AppLocalizedRichText(
     translationKey: nursing,
@@ -15,9 +16,9 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
     boldStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
   );
 
-  String emoji = components[1];
-  Color bgColor = components[2];
-  String title = components[3];
+  String emoji = components.emoji;
+  Color bgColor = components.bgColor;
+  String title = components.title;
 
   showDialog(
     context: navigator.context,
@@ -60,7 +61,7 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.7), borderRadius: BorderRadius.circular(12.0)),
+                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(12.0)),
 
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,44 +127,4 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
       );
     },
   );
-}
-
-List<dynamic> getComponent(int mews) {
-  // Process mews
-  String nursing = "";
-  String emoji;
-  Color bgColor;
-  String title = "";
-  if (mews <= 1) {
-    nursing = "nursingLow";
-    emoji = "assets/images/emojis/emoji_low.png";
-    bgColor = const Color(0xffCEFF9F);
-    title = "lowRisk".tr();
-  } else if (mews == 2) {
-    nursing = "nursingLowMedium";
-    emoji = "assets/images/emojis/emoji_midlow.png";
-    bgColor = const Color(0xffFFF9AD);
-    title = "lowRisk";
-  } else if (mews == 3) {
-    nursing = "nursingMedium";
-    emoji = "assets/images/emojis/emoji_mid.png";
-    title = "medRisk".tr();
-    bgColor = const Color(0xffFFE897);
-  } else if (mews == 4) {
-    nursing = "nursingMediumHigh";
-    emoji = "assets/images/emojis/emoji_midhigh.png";
-    bgColor = const Color(0xffFFD2B8);
-    title = "medhighRisk".tr();
-  } else if (mews >= 5) {
-    nursing = "nursingHigh";
-    emoji = "assets/images/emojis/emoji_high.png";
-    bgColor = const Color(0xffFFBE99);
-    title = "highRisk".tr();
-  } else {
-    nursing = "Error";
-    emoji = "assets/images/emojis/emoji_high.png";
-    bgColor = const Color.fromARGB(255, 255, 51, 211);
-  }
-
-  return [nursing, emoji, bgColor, title];
 }

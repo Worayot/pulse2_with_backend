@@ -84,7 +84,7 @@ class AboutAppPage extends StatelessWidget {
                                         final bool launched = await launchUrl(url, mode: LaunchMode.externalApplication);
 
                                         if (!launched && context.mounted) {
-                                          FlushbarService().showErrorMessage(context: context, message: 'Could not launch ${url.toString()}');
+                                          FlushbarService.showErrorMessage(context: context, message: 'Could not launch ${url.toString()}');
                                         }
                                       },
                                       child: Text(

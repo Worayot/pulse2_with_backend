@@ -294,7 +294,7 @@ class _ExportPageState extends ConsumerState<ExportPage> {
                                       }
                                     } catch (e) {
                                       if (mounted) {
-                                        FlushbarService().showErrorMessage(context: context, message: 'An unexpected error occurred: $e');
+                                        FlushbarService.showErrorMessage(context: context, message: 'An unexpected error occurred: $e');
                                       }
                                     } finally {
                                       if (mounted) {

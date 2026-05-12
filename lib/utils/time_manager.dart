@@ -229,7 +229,7 @@ void showTimeManager({
                                             debugPrint('Error: $e');
 
                                             if (context.mounted) {
-                                              FlushbarService().showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
+                                              FlushbarService.showErrorMessage(context: context, message: 'failedToSetNotification'.tr());
                                             }
                                           }
                                         }

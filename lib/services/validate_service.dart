@@ -15,13 +15,13 @@ class ValidateService {
 
     if (statusCode == 200) {
       if (showSuccessFlushbar) {
-        FlushbarService().showSuccessMessage(context: context, message: message);
+        FlushbarService.showSuccessMessage(context: context, message: message);
       }
     } else if (statusCode == 401) {
       LogoutService(navigator: Navigator.of(context)).logout();
-      FlushbarService().showErrorMessage(context: context, message: message);
+      FlushbarService.showErrorMessage(context: context, message: message);
     } else {
-      FlushbarService().showErrorMessage(context: context, message: message);
+      FlushbarService.showErrorMessage(context: context, message: message);
     }
   }
 }

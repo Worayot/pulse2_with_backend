@@ -151,7 +151,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             }
           } else {
             if (mounted) {
-              FlushbarService().showErrorMessage(context: context, message: "Failed to create session: ${sessionResponse.body}");
+              FlushbarService.showErrorMessage(context: context, message: "Failed to create session: ${sessionResponse.body}");
             }
 
             setState(() {
@@ -161,7 +161,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         }
       } else {
         if (mounted) {
-          FlushbarService().showErrorMessage(context: context, message: "Login failed: ${response.body}");
+          FlushbarService.showErrorMessage(context: context, message: "Login failed: ${response.body}");
         }
 
         setState(() {
@@ -170,7 +170,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       }
     } catch (e) {
       if (mounted) {
-        FlushbarService().showErrorMessage(context: context, message: '$e');
+        FlushbarService.showErrorMessage(context: context, message: '$e');
       }
 
       setState(() {

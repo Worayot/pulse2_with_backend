@@ -201,11 +201,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                               } else if (statusCode == 401) {
                                 if (mounted) {
                                   LogoutService(navigator: Navigator.of(context)).logout();
-                                  FlushbarService().showErrorMessage(context: context, message: message);
+                                  FlushbarService.showErrorMessage(context: context, message: message);
                                 }
                               } else {
                                 if (mounted) {
-                                  FlushbarService().showErrorMessage(context: context, message: message);
+                                  FlushbarService.showErrorMessage(context: context, message: message);
                                 }
                               }
 
@@ -223,7 +223,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                               if (mounted) {
                                 if (takeOutState) {
                                 } else {
-                                  FlushbarService().showErrorMessage(context: context, message: 'failedToRemovePatient'.tr());
+                                  FlushbarService.showErrorMessage(context: context, message: 'failedToRemovePatient'.tr());
                                 }
                               }
 

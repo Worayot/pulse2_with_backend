@@ -12,8 +12,8 @@ class MEWsForms extends StatefulWidget {
   final String patientID;
   final String noteID;
   final VoidCallback onPop;
-  final List<String> alarmStringIDs;
-  const MEWsForms({super.key, required this.patientID, required this.noteID, required this.onPop, required this.alarmStringIDs});
+  final List<String> relatedAlarmStringIDs;
+  const MEWsForms({super.key, required this.patientID, required this.noteID, required this.onPop, required this.relatedAlarmStringIDs});
 
   @override
   _MEWsFormsState createState() => _MEWsFormsState();
@@ -484,7 +484,7 @@ class _MEWsFormsState extends State<MEWsForms> {
                           );
                           MEWsService().addMEWs(widget.noteID, parameters);
 
-                          for (String alarmStringID in widget.alarmStringIDs) {
+                          for (String alarmStringID in widget.relatedAlarmStringIDs) {
                             int alarmID = StringTransformer().generateID(alarmStringID);
                             AlarmService().stopAlarm(alarmID);
                           }

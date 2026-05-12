@@ -122,11 +122,11 @@ class _EditUserFormState extends State<EditUserForm> {
       } else if (statusCode == 401) {
         if (mounted) {
           LogoutService(navigator: Navigator.of(context)).logout();
-          FlushbarService().showErrorMessage(context: context, message: message);
+          FlushbarService.showErrorMessage(context: context, message: message);
         }
       } else {
         if (mounted) {
-          FlushbarService().showErrorMessage(context: context, message: message);
+          FlushbarService.showErrorMessage(context: context, message: message);
         }
       }
     }

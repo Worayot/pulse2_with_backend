@@ -62,9 +62,9 @@ class _AddPatientFormState extends State<AddPatientForm> {
           Navigator.pop(context);
         } else if (statusCode == 401) {
           LogoutService(navigator: Navigator.of(context)).logout();
-          FlushbarService().showErrorMessage(context: context, message: message);
+          FlushbarService.showErrorMessage(context: context, message: message);
         } else {
-          FlushbarService().showErrorMessage(context: context, message: message);
+          FlushbarService.showErrorMessage(context: context, message: message);
         }
         setState(() {
           _isSubmitting = false; // Set submitting flag back to false after process is complete

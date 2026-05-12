@@ -2,13 +2,11 @@ import 'package:draggable_float_widget/draggable_float_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/patient_related/patient_in_system.dart';
 import 'package:tuh_mews/mainpage/patient_related/export.dart';
 import 'package:tuh_mews/mainpage/patient_related/monitored_patient.dart';
-// import 'package:tuh_mews/mainpage/patient_data/monitored_patient_original.dart';
 import 'package:tuh_mews/mainpage/settings/setting.dart';
 import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
 import 'package:tuh_mews/utils/global_mews_fab.dart';
@@ -25,13 +23,6 @@ class _NavigationPageState extends State<NavigationPage> {
   // Single index to manage navigation
   int _selectedIndex = 0;
   String userId = '';
-
-  Future<void> _loadProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userId = prefs.getString('nurseID') ?? "N/A";
-    });
-  }
 
   // Different pages for each tab
   static final List<Widget> _pages = <Widget>[const PatientInSystem(), const PatientPage(), const ExportPage(), SettingsPage()];

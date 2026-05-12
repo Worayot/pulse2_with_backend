@@ -120,12 +120,12 @@ class _AddUserFormState extends State<AddUserForm> {
         }
       } else if (statusCode == 401) {
         if (mounted) {
-          FlushbarService().showErrorMessage(context: context, message: message);
+          FlushbarService.showErrorMessage(context: context, message: message);
           LogoutService(navigator: Navigator.of(context));
         }
       } else {
         if (mounted) {
-          FlushbarService().showErrorMessage(context: context, message: message);
+          FlushbarService.showErrorMessage(context: context, message: message);
         }
       }
     }

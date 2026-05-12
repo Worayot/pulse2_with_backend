@@ -151,18 +151,18 @@ class _EditPatientFormState extends State<EditPatientForm> {
       if (updateStatusCode == 200) {
         if (mounted) {
           Navigator.pop(context);
-          FlushbarService().showSuccessMessage(context: context, title: 'success'.tr(), message: "successfullyUpdatedPatientData".tr(), duration: 2);
+          FlushbarService.showSuccessMessage(context: context, title: 'success'.tr(), message: "successfullyUpdatedPatientData".tr(), duration: 2);
         } else if (updateStatusCode == 401) {
           if (mounted) {
             LogoutService(navigator: Navigator.of(context)).logout();
-            FlushbarService().showErrorMessage(context: context, message: '$updateStatusCode ${updateStatus.values.first}');
+            FlushbarService.showErrorMessage(context: context, message: '$updateStatusCode ${updateStatus.values.first}');
           }
         } else {
           setState(() {
             enableSaveButton = true;
           });
           if (mounted) {
-            FlushbarService().showErrorMessage(context: context, message: "failedToUpdatePatientData".tr());
+            FlushbarService.showErrorMessage(context: context, message: "failedToUpdatePatientData".tr());
           }
         }
       } else {
@@ -170,7 +170,7 @@ class _EditPatientFormState extends State<EditPatientForm> {
           enableSaveButton = true;
         });
         if (mounted) {
-          FlushbarService().showErrorMessage(context: context, message: "failedToUpdatePatientData".tr());
+          FlushbarService.showErrorMessage(context: context, message: "failedToUpdatePatientData".tr());
         }
       }
     }
@@ -288,13 +288,13 @@ class _EditPatientFormState extends State<EditPatientForm> {
 
                               if ((deleteStatusCode == 200) && mounted) {
                                 Navigator.pop(context);
-                                FlushbarService().showSuccessMessage(context: context, message: "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}");
+                                FlushbarService.showSuccessMessage(context: context, message: "${"successfullyDeletedPatientData".tr()}\n ${widget.name} ${widget.surname}");
                               } else if (deleteStatusCode == 401) {
                                 LogoutService(navigator: Navigator.of(context)).logout();
-                                FlushbarService().showErrorMessage(context: context, message: deleteStatusMessage);
+                                FlushbarService.showErrorMessage(context: context, message: deleteStatusMessage);
                               } else {
                                 if (mounted) {
-                                  FlushbarService().showErrorMessage(context: context, message: "failedToDeletePatientData".tr());
+                                  FlushbarService.showErrorMessage(context: context, message: "failedToDeletePatientData".tr());
                                 }
                               }
                             } else {}
