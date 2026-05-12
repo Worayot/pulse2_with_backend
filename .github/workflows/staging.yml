@@ -52,6 +52,7 @@ jobs:
         with:
           ruby-version: "3.3"
           bundler-cache: true
+          working-directory: ios
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
