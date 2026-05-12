@@ -80,7 +80,6 @@ flutter:
     - assets/images/flags/
     - assets/images/emojis/
     - assets/quotes/quotes.json
-    - assets/audio/alarm.mp3
   fonts:
     - family: SpaceGrotesk
       fonts:
