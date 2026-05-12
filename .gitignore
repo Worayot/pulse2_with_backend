@@ -58,3 +58,6 @@ sec.txt
 .secrets
 
 *.env
+
+# For ci stable
+ios/Runner.xcodeproj/project.pbxproj
