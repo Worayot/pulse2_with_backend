@@ -58,3 +58,6 @@ sec.txt
 .secrets
 
 *.env
+
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
