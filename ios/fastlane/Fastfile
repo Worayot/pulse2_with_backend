@@ -23,7 +23,7 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
-      clean: true,
+      clean: false,
       xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGNING_REQUIRED=YES",
       export_options: {
         provisioningProfiles: {
@@ -60,7 +60,7 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
-      clean: true,
+      clean: false,
       xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGNING_REQUIRED=YES",
       export_options: {
         provisioningProfiles: {

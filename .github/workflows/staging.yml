@@ -88,6 +88,9 @@ jobs:
           bundle install
           bundle exec fastlane env
 
+      - name: Flutter Build iOS
+        run: flutter build ios --release --no-codesign
+
       - name: Deploy iOS
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
