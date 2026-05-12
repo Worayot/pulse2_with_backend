@@ -1,0 +1,57 @@
+default_platform(:ios)
+
+platform :ios do
+  lane :distribute_staging do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_KEY_ID"],
+      issuer_id: ENV["APP_STORE_ISSUER_ID"],
+      key_content: ENV["APP_STORE_KEY_CONTENT"],
+      is_key_content_base64: false
+    )
+
+    increment_build_number(
+      build_number: ENV["GITHUB_RUN_NUMBER"]
+    )
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      clean: true,
+      skip_profile_detection: false
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  lane :distribute_production do
+    api_key = app_store_connect_api_key(
+      key_id: ENV["APP_STORE_KEY_ID"],
+      issuer_id: ENV["APP_STORE_ISSUER_ID"],
+      key_content: ENV["APP_STORE_KEY_CONTENT"],
+      is_key_content_base64: false
+    )
+
+    increment_build_number(
+      build_number: ENV["GITHUB_RUN_NUMBER"]
+    )
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      clean: true
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      skip_metadata: true,
+      skip_screenshots: true,
+      submit_for_review: true,
+      automatic_release: false
+    )
+  end
+end
