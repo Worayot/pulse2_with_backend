@@ -79,16 +79,15 @@ jobs:
         run: pod install
 
       - name: Verify Fastlane Env
-        working-directory: ios
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
         run: |
+          cd ios
           bundle install
           bundle exec fastlane env
 
       - name: Deploy iOS
-        working-directory: ios
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
@@ -99,6 +98,7 @@ jobs:
           MATCH_APP_IDENTIFIER: "com.soften.tuhmews"
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
+          cd ios
           bundle install
           bundle exec fastlane distribute_staging
 

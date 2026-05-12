@@ -31,10 +31,9 @@ void showTimeManager({
     bool enableButton = true;
     int highMewsThreshold = 3;
 
-    String sound = "alarm";
-    if ((int.tryParse(previousMews ?? "0") ?? 0) >= highMewsThreshold) {
-      sound = "alarm2";
-    }
+    final previousScore = int.tryParse(previousMews ?? '') ?? 0;
+
+    final sound = previousScore >= highMewsThreshold ? 'alarm2' : 'alarm';
 
     showDialog(
       context: context,
