@@ -64,10 +64,6 @@ class FirebasePatientService {
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // PRIVATE STREAM HELPERS
-  // ---------------------------------------------------------------------------
-
   /// Stream A: Real-time Patient Data
   Stream<Map<String, dynamic>?> _fetchPatientStream(String patientId) {
     return _firestore.collection('patients').doc(patientId).snapshots().map((doc) {
@@ -126,13 +122,19 @@ class PatientService {
     final db = FirebaseFirestore.instance;
     final auth = FirebaseAuth.instance;
 
-    // 1. Check for authenticated user (replaces token check)
     if (auth.currentUser == null) {
       return {401: "User is not authenticated."};
     }
 
     try {
+      final duplicatePatient = await db.collection("patients").where("fullname", isEqualTo: patientData.fullname.trim()).limit(1).get();
+
+      if (duplicatePatient.docs.isNotEmpty) {
+        return {409: "Patient with same fullname already exists."};
+      }
+
       Map<String, dynamic> patientMap = patientData.toJson();
+
       patientMap['created_at'] = FieldValue.serverTimestamp();
 
       final docRef = await db.collection("patients").add(patientMap);

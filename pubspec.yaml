@@ -56,6 +56,8 @@ dependencies:
   cloud_functions: ^5.6.2
   flutter_timezone: ^5.0.2
   google_fonts: ^8.1.0
+  excel: ^4.0.6
+  file_picker: ^11.0.2
 
 dev_dependencies:
   change_app_package_name: ^1.5.0
