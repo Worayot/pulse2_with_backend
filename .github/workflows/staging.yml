@@ -102,7 +102,7 @@ jobs:
         run: flutter build ios --release --no-codesign
 
       - name: Deploy iOS
-        timeout-minutes: 30        # ← add here too
+        timeout-minutes: 90
         working-directory: ios
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
