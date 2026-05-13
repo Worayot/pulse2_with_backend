@@ -74,6 +74,15 @@ jobs:
             echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
             chmod 600 ~/.ssh/id_ed25519
             ssh-keyscan github.com >> ~/.ssh/known_hosts
+      
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
 
       - name: Install CocoaPods
         working-directory: ios
@@ -89,9 +98,12 @@ jobs:
           bundle exec fastlane env
 
       - name: Flutter Build iOS
+        timeout-minutes: 30
         run: flutter build ios --release --no-codesign
 
       - name: Deploy iOS
+        timeout-minutes: 30        # ← add here too
+        working-directory: ios
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
           APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
@@ -102,7 +114,6 @@ jobs:
           MATCH_APP_IDENTIFIER: "com.soften.tuhmews"
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
-          cd ios
           bundle install
           bundle exec fastlane distribute_staging
 
