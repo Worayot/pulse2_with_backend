@@ -70,11 +70,11 @@ jobs:
 
       - name: Setup SSH for Match
         run: |
-            mkdir -p ~/.ssh
-            echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
-            chmod 600 ~/.ssh/id_ed25519
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-      
+          mkdir -p ~/.ssh
+          echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
       - name: Cache CocoaPods
         uses: actions/cache@v4
         with:
@@ -83,26 +83,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pods-
 
-
       - name: Install CocoaPods
         working-directory: ios
         run: pod install
 
-      - name: Verify Fastlane Env
+      - name: Flutter Build & Archive IPA
+        timeout-minutes: 60
         env:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          MATCH_GIT_URL: "git@github.com:Worayot/ios-certificates.git"
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
         run: |
-          cd ios
-          bundle install
-          bundle exec fastlane env
+          flutter build ipa --release --no-codesign
 
-      - name: Flutter Build iOS
+      - name: Sign & Upload to TestFlight
         timeout-minutes: 30
-        run: flutter build ios --release --no-codesign
-
-      - name: Deploy iOS
-        timeout-minutes: 90
         working-directory: ios
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
@@ -120,8 +117,7 @@ jobs:
       - name: Show gym logs
         if: failure()
         run: |
-            echo "========== LAST 200 LINES =========="
-            tail -n 200 ~/Library/Logs/gym/Runner-Runner.log || true
-
-            echo "========== XCODE ERRORS =========="
-            grep -A 20 -B 5 -i "error:" ~/Library/Logs/gym/Runner-Runner.log || true
+          echo "========== LAST 200 LINES =========="
+          tail -n 200 ~/Library/Logs/gym/Runner-Runner.log || true
+          echo "========== XCODE ERRORS =========="
+          grep -A 20 -B 5 -i "error:" ~/Library/Logs/gym/Runner-Runner.log || true
