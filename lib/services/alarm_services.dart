@@ -22,7 +22,7 @@ class AlarmService {
   bool _isRestoring = false;
 
   // Bumped to v5 to ensure fresh system settings for sound support
-  final String alarmChannel = 'alarm_channel_v5';
+  final String alarmChannel = 'alarm_channel_v6';
 
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -150,7 +150,7 @@ class AlarmService {
       body: 'Your alarm is set for ${scheduled.toString()}',
       notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(alarmChannel, 'Confirmation', importance: Importance.max, priority: Priority.high, playSound: false),
-        iOS: const DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        iOS: const DarwinNotificationDetails(presentAlert: true, presentSound: false),
       ),
     );
 
@@ -253,14 +253,14 @@ class AlarmService {
     debugPrint("All alarms for patient $patientId have been removed.");
   }
 
-  Future<void> showTestNotification() async {
+  Future<void> showTestNotification({String sound = 'alarm'}) async {
     debugPrint("🚀 Triggering Instant Test Notification (v21.0.0)");
 
     final DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true, // Update app icon badge
       presentSound: true, // Play the sound
-      sound: 'alarm.mp3',
+      sound: '$sound.mp3',
       interruptionLevel: InterruptionLevel.active,
     );
 
