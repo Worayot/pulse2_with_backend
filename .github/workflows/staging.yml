@@ -87,12 +87,8 @@ jobs:
         working-directory: ios
         run: pod install
 
-      - name: Flutter Build iOS
-        timeout-minutes: 45
-        run: flutter build ios --release --no-codesign
-
       - name: Sign & Upload to TestFlight
-        timeout-minutes: 45
+        timeout-minutes: 60
         working-directory: ios
         env:
           APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
