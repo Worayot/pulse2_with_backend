@@ -2,7 +2,7 @@ name: tuh_mews
 description: "TUH MEWS Project"
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.2+18
+version: 1.1.2+50
 
 environment:
   sdk: ^3.7.0
