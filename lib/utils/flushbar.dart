@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class FlushbarService {
-  void showCustomFlushbar({
+  static void showCustomFlushbar({
     required BuildContext context,
     required String title,
     required String message,
@@ -27,28 +27,19 @@ class FlushbarService {
     ).show(context);
   }
 
-  void showSuccessMessage({
-    required BuildContext context,
-    String? title,
-    required String message,
-    int? duration,
-  }) {
+  static void showSuccessMessage({required BuildContext context, String? title, required String message, int? duration}) {
     showCustomFlushbar(
       context: context,
       title: title ?? 'success'.tr(),
       message: message,
+      backgroundColor: Colors.white10,
       titleColor: Colors.green,
       messageColor: Colors.black,
-      backgroundColor: Color(0xffD1FFBD),
       duration: duration ?? 2,
     );
   }
 
-  void showErrorMessage({
-    required BuildContext context,
-    String? title,
-    required String message,
-  }) {
+  static void showErrorMessage({required BuildContext context, String? title, required String message}) {
     showCustomFlushbar(
       context: context,
       title: title ?? 'error'.tr(),

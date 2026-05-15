@@ -5,6 +5,8 @@ import 'package:tuh_mews/utils/custom_header.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageSelectPage extends StatefulWidget {
+  const LanguageSelectPage({super.key});
+
   @override
   _LanguageSelectPageState createState() => _LanguageSelectPageState();
 }
@@ -30,8 +32,7 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
         context.setLocale(_selectedLocale!); // Apply the saved locale
       });
     } else {
-      _selectedLocale =
-          context.locale; // Set to current locale if no saved data
+      _selectedLocale = context.locale; // Set to current locale if no saved data
     }
   }
 
@@ -61,10 +62,7 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
             const SizedBox(height: 16),
             Container(
               height: size.height * 0.72,
-              decoration: BoxDecoration(
-                color: const Color(0xFFB2C2E5),
-                borderRadius: BorderRadius.circular(12),
-              ),
+              decoration: BoxDecoration(color: const Color(0xFFB2C2E5), borderRadius: BorderRadius.circular(12)),
               child: Stack(
                 children: [
                   Column(
@@ -77,20 +75,9 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                           padding: const EdgeInsets.only(left: 16.0, top: 16),
                           child: Row(
                             children: [
-                              const Icon(
-                                FontAwesomeIcons.backward,
-                                color: Colors.black,
-                                size: 25,
-                              ),
+                              const Icon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
                               const SizedBox(width: 10),
-                              Text(
-                                'back'.tr(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
+                              Text('back'.tr(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
                             ],
                           ),
                         ),
@@ -99,13 +86,7 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                       const SizedBox(height: 8),
                       Center(
                         // Center the header text
-                        child: Text(
-                          'language'.tr(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: Text('language'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(height: 16),
                       // Buttons for selecting language
@@ -117,122 +98,58 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                             Stack(
                               children: [
                                 ElevatedButton(
-                                  onPressed:
-                                      () => _onLanguageSelected(
-                                        const Locale('th', 'TH'),
-                                      ), // Change to Thai
+                                  onPressed: () => _onLanguageSelected(const Locale('th', 'TH')), // Change to Thai
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ), // Adjust height
+                                    padding: const EdgeInsets.symmetric(vertical: 14), // Adjust height
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        15,
-                                      ), // Radius 15
+                                      borderRadius: BorderRadius.circular(15), // Radius 15
                                     ),
-                                    backgroundColor:
-                                        _selectedLocale?.languageCode == 'th'
-                                            ? const Color(0xff407BFF)
-                                            : Colors.grey[300],
+                                    backgroundColor: _selectedLocale?.languageCode == 'th' ? const Color(0xff407BFF) : Colors.grey[300],
                                   ),
                                   child: Align(
-                                    alignment:
-                                        Alignment
-                                            .centerLeft, // Align text to the left
+                                    alignment: Alignment.centerLeft, // Align text to the left
                                     child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 8.0,
-                                      ), // Add padding
+                                      padding: const EdgeInsets.only(left: 8.0), // Add padding
                                       child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 12.0,
-                                        ),
+                                        padding: const EdgeInsets.only(left: 12.0),
                                         child: Text(
                                           'ไทย',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color:
-                                                _selectedLocale?.languageCode ==
-                                                        'th'
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: TextStyle(fontSize: 16, color: _selectedLocale?.languageCode == 'th' ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  right: 1,
-                                  bottom: 0,
-                                  child: IgnorePointer(
-                                    child: Image.asset(
-                                      "assets/images/flags/thai_flag.png",
-                                    ),
-                                  ),
-                                ),
+                                Positioned(right: 1, bottom: 0, child: IgnorePointer(child: Image.asset("assets/images/flags/thai_flag.png"))),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Stack(
                               children: [
                                 ElevatedButton(
-                                  onPressed:
-                                      () => _onLanguageSelected(
-                                        const Locale('en', 'US'),
-                                      ), // Change to English
+                                  onPressed: () => _onLanguageSelected(const Locale('en', 'US')), // Change to English
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                    ), // Adjust height
+                                    padding: const EdgeInsets.symmetric(vertical: 14), // Adjust height
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        15,
-                                      ), // Radius 15
+                                      borderRadius: BorderRadius.circular(15), // Radius 15
                                     ),
-                                    backgroundColor:
-                                        _selectedLocale?.languageCode == 'en'
-                                            ? const Color(0xff407BFF)
-                                            : Colors.grey[300],
+                                    backgroundColor: _selectedLocale?.languageCode == 'en' ? const Color(0xff407BFF) : Colors.grey[300],
                                   ),
                                   child: Align(
-                                    alignment:
-                                        Alignment
-                                            .centerLeft, // Align text to the left
+                                    alignment: Alignment.centerLeft, // Align text to the left
                                     child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 8.0,
-                                      ), // Add padding
+                                      padding: const EdgeInsets.only(left: 8.0), // Add padding
                                       child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 12.0,
-                                        ),
+                                        padding: const EdgeInsets.only(left: 12.0),
                                         child: Text(
                                           'English',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color:
-                                                _selectedLocale?.languageCode ==
-                                                        'en'
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          style: TextStyle(fontSize: 16, color: _selectedLocale?.languageCode == 'en' ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  right: 1,
-                                  bottom: 0,
-                                  child: IgnorePointer(
-                                    child: Image.asset(
-                                      "assets/images/flags/eng_flag.png",
-                                    ),
-                                  ),
-                                ),
+                                Positioned(right: 1, bottom: 0, child: IgnorePointer(child: Image.asset("assets/images/flags/eng_flag.png"))),
                               ],
                             ),
                           ],
@@ -243,13 +160,7 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                   Positioned(
                     right: -5,
                     bottom: 0,
-                    child: IgnorePointer(
-                      child: Image.asset(
-                        "assets/images/med_care.png",
-                        // height: size.width * 0.75,
-                        // width: size.width * 0.75,
-                      ),
-                    ),
+                    child: IgnorePointer(child: FittedBox(fit: BoxFit.scaleDown, child: Image.asset("assets/images/med_care.png", height: 400, width: 400))),
                   ),
                 ],
               ),

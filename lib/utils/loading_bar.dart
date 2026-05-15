@@ -1,12 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter/widgets.dart';
 
 class LoadingBar {
   final BuildContext context;
   final String name;
-  LoadingBar({required this.context, required this.name});
+  final double progress;
+
+  LoadingBar({
+    required this.context,
+    required this.name,
+    required this.progress,
+  });
 
   Widget build() {
     Size size = MediaQuery.of(context).size;
@@ -34,19 +38,24 @@ class LoadingBar {
                             padding: const EdgeInsets.all(10.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(50),
-                              child: const LinearProgressIndicator(
+                              child: LinearProgressIndicator(
                                 minHeight: 10,
-                                valueColor: AlwaysStoppedAnimation<Color>(
+                                value: progress, // Assign the value here
+                                valueColor: const AlwaysStoppedAnimation<Color>(
                                   Color(0xff1125A4),
                                 ),
-                                backgroundColor: Color(0xffB0D3EF),
+                                backgroundColor: const Color(0xffB0D3EF),
                               ),
                             ),
                           ),
                         ),
                       ),
-                      Positioned(
-                        left: 50,
+                      // Animating the turtle position based on progress
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 300),
+                        left:
+                            (size.width / 1.3) * progress -
+                            30, // Adjust -30 based on turtle width
                         bottom: 10,
                         child: ClipRect(
                           child: Image.asset(

@@ -1,0 +1,116 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Dependencies
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Deploy Android
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          cd android
+          echo "$FIREBASE_CREDENTIALS" > firebase-key.json
+          bundle install
+          bundle exec fastlane distribute_staging
+
+  ios:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Dependencies
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 'latest-stable'
+
+      - name: Setup SSH for Match
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: ios/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: pod install
+
+      - name: Sign & Upload to TestFlight
+        timeout-minutes: 60
+        working-directory: ios
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          MATCH_GIT_URL: "git@github.com:Worayot/ios-certificates.git"
+          MATCH_APP_IDENTIFIER: "com.soften.tuhmews"
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          FLUTTER_BUILD_MODE: release
+          FLUTTER_ROOT: ${{ env.FLUTTER_ROOT }}
+        run: |
+          bundle install
+          bundle exec fastlane distribute_staging
+
+      - name: Show gym logs
+        if: failure()
+        run: |
+          echo "========== LAST 200 LINES =========="
+          tail -n 200 ~/Library/Logs/gym/Runner-Runner.log || true
+          echo "========== XCODE ERRORS =========="
+          grep -A 20 -B 5 -i "error:" ~/Library/Logs/gym/Runner-Runner.log || true

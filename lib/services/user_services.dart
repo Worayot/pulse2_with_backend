@@ -1,89 +1,38 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:http/http.dart' as http;
 import 'package:tuh_mews/services/session_service.dart';
 import 'package:tuh_mews/services/url.dart';
 import '../models/user.dart';
+import 'package:bcrypt/bcrypt.dart';
 
 class UserServices {
-  //* Tested
   Future<Map<String, dynamic>?> loadAccount(String userId) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken == null) {
-      print('No token found');
-    }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/sett-fetch/account_load/$userId',
-    );
-
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // print("Successfully received response: ${response.body}");
-        return jsonDecode(response.body); // Return parsed JSON data
-      } else {
-        // print("Failed to receive data: ${response.body}");
-        return null; // Return null if failed
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        return null;
       }
+
+      final docRef = FirebaseFirestore.instance.collection('users').doc(userId);
+      final docSnap = await docRef.get();
+
+      if (!docSnap.exists) {
+        return null;
+      }
+
+      final data = docSnap.data();
+      final result = {"id": docSnap.id, ...?data};
+
+      return result;
     } catch (e) {
-      // print("Error getting account data: $e");
       return null;
-    }
-  }
-
-  //! Not tested, Won't be used
-  Future<bool> getUsersList(String userId) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken != null) {
-      print('ID Token: $idToken');
-    } else {
-      print('No token found');
-      return false;
-    }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/sett-fetch/users_load/$userId',
-    );
-
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        // body: jsonEncode(parameters),
-      );
-
-      if (response.statusCode == 200) {
-        print("Successfully received note: ${response.body}");
-        return true; // Success
-      } else {
-        print("Failed to receive note: ${response.body}");
-        return false; // Failure
-      }
-    } catch (e) {
-      print("Error getting note: $e");
-      return false;
     }
   }
 
   //* Tested
   Future<Map<int, String>> addUser(User user) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
@@ -92,14 +41,7 @@ class UserServices {
     final url = Uri.parse('${URL().getServerURL()}/authenticate/signup');
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode(user),
-      );
+      final response = await http.post(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"}, body: jsonEncode(user));
 
       return {response.statusCode: response.body};
     } catch (e) {
@@ -107,84 +49,84 @@ class UserServices {
     }
   }
 
-  //? May not be used.
-  Future<Map<int, String>> getUserData(String userId) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken == null) {
-      return {401: 'No token found'};
-    }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/sett-fetch/get_user_data/$userId',
-    );
-
+  // Tested
+  Future<Map<int, String>> saveUserData({required User newUserData, required String uid}) async {
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-      );
+      final userMap = newUserData.toJson();
 
-      return {response.statusCode: response.body};
-    } catch (e) {
-      return {500: 'Error getting user data: $e'};
-    }
-  }
+      if (userMap['password'] != null && userMap['password'].toString().isNotEmpty) {
+        final password = userMap['password'].toString();
 
-  //* Tested
-  Future<Map<int, String>> saveUserData({
-    required User newUserData,
-    required String uid,
-  }) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-    String? idToken = await SessionService().getIdToken();
+        final String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
 
-    if (idToken == null) {
-      return {401: 'No token found'};
-    }
-    final url = Uri.parse('${URL().getServerURL()}/sett-fetch/save_user/$uid');
+        userMap['password'] = hashed;
+      }
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode(newUserData.toJson()),
-      );
-      return {response.statusCode: response.body};
+      final usersRef = FirebaseFirestore.instance.collection('users');
+      final query = await usersRef.where('nurse_id', isEqualTo: uid).limit(1).get();
+
+      if (query.docs.isEmpty) {
+        return {404: 'User not found'};
+      }
+
+      final userDoc = query.docs.first.reference;
+      await userDoc.update(userMap);
+
+      return {200: 'User updated successfully'};
     } catch (e) {
       return {500: 'Error saving user data: $e'};
     }
   }
 
+  Future<Map<int, String>> updateUserData({required User newUserData, required String uid}) async {
+    try {
+      final userMap = newUserData.toJson();
+
+      // Check if user actually provided a new password
+      final password = userMap['password']?.toString();
+
+      if (password != null && password.trim().isNotEmpty) {
+        final hashed = BCrypt.hashpw(password, BCrypt.gensalt());
+        userMap['password'] = hashed;
+      } else {
+        userMap.remove('password');
+      }
+
+      final usersRef = FirebaseFirestore.instance.collection('users');
+      final query = await usersRef.where('nurse_id', isEqualTo: uid).limit(1).get();
+
+      if (query.docs.isEmpty) {
+        return {404: 'User not found'};
+      }
+
+      final userDoc = query.docs.first.reference;
+      await userDoc.update(userMap);
+
+      return {200: 'User updated successfully'};
+    } catch (e) {
+      return {500: 'Error updating user data: $e'};
+    }
+  }
+
   //* Tested
   Future<Map<int, String>> deleteUser(String userId) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
     String? idToken = await SessionService().getIdToken();
 
     if (idToken == null) {
-      return {401: 'No token found'};
+      return {401: 'Unauthorized: No token found'};
     }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/sett-fetch/del_user/$userId',
-    );
+
+    final url = Uri.parse('${URL().getServerURL()}/sett-fetch/del_user/$userId');
 
     try {
-      final response = await http.delete(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-      );
+      final response = await http.delete(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"});
+
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map && decoded.containsKey('message')) {
+          return {response.statusCode: decoded['message'].toString()};
+        }
+      } catch (_) {}
 
       return {response.statusCode: response.body};
     } catch (e) {

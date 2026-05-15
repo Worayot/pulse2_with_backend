@@ -1,0 +1,109 @@
+name: Production Deployment
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [production]
+
+jobs:
+  android:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Dependencies
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Deploy Android (Production)
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_PROD }}
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          cd android
+          echo "$FIREBASE_CREDENTIALS" > firebase-key.json
+          bundle install
+          bundle exec fastlane distribute_production
+
+  ios:
+    if: github.event.pull_request.merged == true
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Dependencies
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Setup SSH for Match
+        run: |
+            mkdir -p ~/.ssh
+            echo "${{ secrets.MATCH_SSH_KEY }}" > ~/.ssh/id_ed25519
+            chmod 600 ~/.ssh/id_ed25519
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: pod install
+
+      - name: Install signing certificates
+        working-directory: ios
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+        run: |
+          bundle install
+          bundle exec fastlane match appstore --readonly --app_identifier com.soften.tuhmews
+
+      - name: Deploy iOS (Production)
+        working-directory: ios
+        env:
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_KEY_CONTENT: ${{ secrets.APP_STORE_KEY_CONTENT }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          bundle install
+          bundle exec fastlane distribute_production
+
+      - name: Show gym logs
+        if: failure()
+        run: |
+            echo "========== LAST 200 LINES =========="
+            tail -n 200 ~/Library/Logs/gym/Runner-Runner.log || true
+
+            echo "========== XCODE ERRORS =========="
+            grep -A 20 -B 5 -i "error:" ~/Library/Logs/gym/Runner-Runner.log || true

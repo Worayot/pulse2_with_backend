@@ -1,9 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class DateNavigation extends StatefulWidget {
-  final Function(DateTime) onDateChanged; // Callback function
+  final Function(DateTime) onDateChanged;
 
   const DateNavigation({super.key, required this.onDateChanged});
 
@@ -15,18 +18,124 @@ class DateNavigation extends StatefulWidget {
 class _DateNavigationState extends State<DateNavigation> {
   DateTime selectedDate = DateTime.now();
 
+  Future<void> showCalendarDialog(BuildContext context) async {
+    DateTime focusedDay = DateTime.now();
+    DateTime? selectedDay;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "selectDate".tr(),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Gap(10),
+
+                    TableCalendar(
+                      locale: Localizations.localeOf(context).toString(),
+                      firstDay: DateTime.utc(2020, 1, 1),
+                      lastDay: DateTime.utc(2100, 12, 31),
+                      headerStyle: HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                      ),
+                      calendarStyle: CalendarStyle(
+                        // defaultTextStyle: TextStyle(color: Colors.white),
+                        // weekendTextStyle: TextStyle(color: Colors.red),
+                        selectedDecoration: BoxDecoration(
+                          color: Color(0xffC6D8FF),
+
+                          shape: BoxShape.circle,
+                        ),
+                        todayDecoration: BoxDecoration(
+                          color: Color(0xff407BFF),
+                          shape: BoxShape.circle,
+                        ),
+                        selectedTextStyle: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      focusedDay: focusedDay,
+                      selectedDayPredicate: (day) {
+                        return isSameDay(selectedDay, day);
+                      },
+                      onDaySelected: (newSelectedDay, newFocusedDay) {
+                        setState(() {
+                          selectedDay = newSelectedDay;
+                          focusedDay = newFocusedDay;
+                        });
+
+                        widget.onDateChanged(newSelectedDay);
+                      },
+                    ),
+
+                    const Gap(10),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xff407BFF),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context, selectedDay);
+                          },
+                          child: Text(
+                            "ok".tr(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    ).then((selectedDate) {
+      if (selectedDate != null) {
+        debugPrint("Selected date: $selectedDate");
+        _setDate(selectedDate);
+      }
+    });
+  }
+
   void _decreaseDate() {
     setState(() {
       selectedDate = selectedDate.subtract(const Duration(days: 1));
     });
-    widget.onDateChanged(selectedDate); // Notify parent widget with new date
+    widget.onDateChanged(selectedDate);
   }
 
   void _increaseDate() {
     setState(() {
       selectedDate = selectedDate.add(const Duration(days: 1));
     });
-    widget.onDateChanged(selectedDate); // Notify parent widget with new date
+    widget.onDateChanged(selectedDate);
+  }
+
+  void _setDate(DateTime date) {
+    setState(() {
+      selectedDate = date;
+    });
   }
 
   @override
@@ -51,14 +160,17 @@ class _DateNavigationState extends State<DateNavigation> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              DateFormat('dd/MM/yyyy').format(selectedDate),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                decoration: TextDecoration.underline,
-                decorationColor: Colors.white,
+            child: InkWell(
+              onTap: () => showCalendarDialog(context),
+              child: Text(
+                DateFormat('dd/MM/yyyy').format(selectedDate),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  decoration: TextDecoration.underline,
+                  decorationColor: Colors.white,
+                ),
               ),
             ),
           ),

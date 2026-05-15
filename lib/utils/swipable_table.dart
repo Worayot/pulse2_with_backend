@@ -1,13 +1,9 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/services/patient_services.dart';
 import 'package:tuh_mews/utils/note_viewer.dart';
-import 'package:intl/intl.dart';
-import 'package:tuh_mews/utils/report_widget.dart';
 
 class SwipableTable extends StatefulWidget {
   final DateTime date;
@@ -30,68 +26,54 @@ class _SwipableTableState extends State<SwipableTable> {
     fetchPatientReport(widget.patientID);
   }
 
+  @override
+  void didUpdateWidget(covariant SwipableTable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.date != widget.date) {
+      fetchPatientReport(widget.patientID);
+    }
+  }
+
   void fetchPatientReport(String patientId) async {
-    var reportData = await PatientService().getPatientReport(patientId);
+    var reportData = await PatientService().getPatientReport(
+      patientId: patientId,
+      date: widget.date,
+    );
 
     if (reportData != null) {
       setState(() {
         patientData = reportData;
         _fullReports =
-            (patientData['full_reports'] ?? [])
-                .cast<Map<String, dynamic>>(); // Ensure it's a list of maps
-        _sortFullReportsByTime();
-        filterDataByDate(widget.date);
+            (patientData['full_reports'] ?? []).cast<Map<String, dynamic>>();
+
+        _processReports();
       });
     } else {
-      print('Failed to fetch patient report');
+      debugPrint('Failed to fetch patient report');
     }
   }
 
-  void _sortFullReportsByTime() {
-    _fullReports.sort((a, b) {
-      DateTime timeA = DateTime.parse(
-        a['time'] ?? '',
-      ).toUtc().add(const Duration(hours: 7));
-      DateTime timeB = DateTime.parse(
-        b['time'] ?? '',
-      ).toUtc().add(const Duration(hours: 7));
-      return timeA.compareTo(timeB);
-    });
-  }
+  void _processReports() {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
 
-  void filterDataByDate(DateTime selectedDate) {
-    setState(() {
-      tableData =
-          _fullReports
-              .where((report) {
-                DateTime reportDate = DateTime.parse(
-                  report['time'] ?? '',
-                ).toUtc().add(const Duration(hours: 7));
-                return reportDate.year == selectedDate.year &&
-                    reportDate.month == selectedDate.month &&
-                    reportDate.day == selectedDate.day;
-              })
-              .map((report) {
-                DateTime reportDate = DateTime.parse(
-                  report['time'] ?? '',
-                ).toUtc().add(const Duration(hours: 7));
-                List<String> timeParts = reportDate.toString().split(' ');
+    tableData =
+        _fullReports.map((report) {
+          final DateTime assessedTime = report['assessed_time'];
 
-                return [
-                  ('${timeParts[0]} ${timeParts[1].split('.')[0]}').toString(),
-                  (report['consciousness'] ?? '').toString(),
-                  (report['temperature'] ?? '').toString(),
-                  (report['heart_rate'] ?? '').toString(),
-                  (report['respiratory_rate'] ?? '').toString(),
-                  (report['blood_pressure'] ?? '').toString(),
-                  (report['spo2'] ?? '').toString(),
-                  (report['urine'] ?? '').toString(),
-                  (report['mews'] ?? '').toString(),
-                  (report['cvp'] ?? '').toString(),
-                ];
-              })
-              .toList();
-    });
+          return [
+            formatter.format(assessedTime),
+            (report['consciousness'] ?? '-').toString(),
+            (report['temperature'] ?? '-').toString(),
+            (report['heart_rate'] ?? '-').toString(),
+            (report['respiratory_rate'] ?? '-').toString(),
+            (report['blood_pressure'] ?? '-').toString(),
+            (report['spo2'] ?? '-').toString(),
+            (report['urine'] ?? '-').toString(),
+            (report['mews'] ?? '-').toString(),
+            (report['cvp'] ?? '-').toString(),
+          ];
+        }).toList();
   }
 
   Future<String> fetchNoteData(String reportID) async {
@@ -109,7 +91,6 @@ class _SwipableTableState extends State<SwipableTable> {
       }
       return "";
     } catch (e) {
-      print("Error fetching note data: $e");
       return "";
     }
   }
@@ -123,9 +104,9 @@ class _SwipableTableState extends State<SwipableTable> {
       future: fetchNoteData(reportID),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox.shrink(); // Or a small loading indicator
+          return const SizedBox.shrink();
         } else if (snapshot.hasError) {
-          return const SizedBox.shrink(); // Or an error indicator
+          return const SizedBox.shrink();
         } else {
           final noteText = snapshot.data;
           if (noteText != null &&
@@ -159,6 +140,16 @@ class _SwipableTableState extends State<SwipableTable> {
 
   @override
   Widget build(BuildContext context) {
+    if (_fullReports.isEmpty) {
+      return SizedBox(
+        child: Center(
+          child: Text(
+            "noDataFound".tr(),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ),
+      );
+    }
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(

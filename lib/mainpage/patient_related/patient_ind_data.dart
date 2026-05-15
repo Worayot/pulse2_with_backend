@@ -1,8 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tuh_mews/utils/info_box.dart';
-import 'package:tuh_mews/utils/report_widget.dart';
 
 class PatientIndData extends StatefulWidget {
   final String age;
@@ -10,7 +8,7 @@ class PatientIndData extends StatefulWidget {
   final String hn;
   final String bedNum;
   final String ward;
-  final String MEWs;
+  final String mews;
   final String time;
 
   const PatientIndData({
@@ -21,7 +19,7 @@ class PatientIndData extends StatefulWidget {
     required this.bedNum,
     required this.ward,
     required this.time,
-    required this.MEWs,
+    required this.mews,
   });
 
   @override
@@ -40,7 +38,6 @@ class _PatientIndDataState extends State<PatientIndData> {
     return Padding(
       padding: const EdgeInsets.only(right: 16, left: 16.0, top: 60),
       child: SingleChildScrollView(
-        // Wrapping with SingleChildScrollView to handle overflow
         child: Column(
           children: [
             Column(
@@ -117,7 +114,7 @@ class _PatientIndDataState extends State<PatientIndData> {
                         ),
                       ),
                     ),
-                    description(widget.time, widget.MEWs),
+                    description(widget.time, widget.mews),
                   ],
                 ),
               ],
@@ -151,7 +148,7 @@ class _PatientIndDataState extends State<PatientIndData> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8),
                 child: Text(
                   "${"latestMEWsScore".tr()} ",
                   style: const TextStyle(fontWeight: FontWeight.bold),

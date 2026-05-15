@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Patient {
-  final String? createdAt;
+  final DateTime? createdAt;
   final String age;
   final String bedNumber;
   final String fullname;
@@ -19,31 +21,27 @@ class Patient {
     this.patientId,
   });
 
-  // Factory constructor to create a Patient instance from JSON data
-  factory Patient.fromJson(Map<String, dynamic> json) {
+  factory Patient.fromJson(Map<String, dynamic> json, [String? documentId]) {
     return Patient(
-      createdAt: json['created_at'],
+      createdAt: (json['created_at'] as Timestamp?)?.toDate(),
       age: json['age'],
       bedNumber: json['bed_number'],
       fullname: json['fullname'],
       gender: json['gender'],
       ward: json['ward'],
       hospitalNumber: json['hospital_number'],
-      patientId: json['patient_id'],
+      patientId: documentId,
     );
   }
 
-  // Convert a Patient instance to JSON (for sending to the server)
   Map<String, dynamic> toJson() {
     return {
-      'created_at': createdAt,
       'age': age,
       'bed_number': bedNumber,
       'fullname': fullname,
       'gender': gender,
       'ward': ward,
       'hospital_number': hospitalNumber,
-      'patient_id': patientId,
     };
   }
 

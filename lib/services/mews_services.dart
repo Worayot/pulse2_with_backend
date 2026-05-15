@@ -1,137 +1,134 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/note.dart';
 import 'package:tuh_mews/models/parameters.dart';
-import 'package:tuh_mews/services/session_service.dart';
-import 'package:tuh_mews/services/url.dart';
 
 class MEWsService {
-  //! Not used
-  Future<Map<int, String>> getNoteByMEWsId(String mewsId) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken == null) {
-      print('No token found');
-      return {401: 'No token found'}; // Return a map with status code
-    }
-
-    final url = Uri.parse(
-      '${URL().getServerURL()}/home-fetch/delete-patient/$mewsId',
-    );
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-      );
-
-      return {
-        response.statusCode: response.body,
-      }; // Return map with status code and body
-    } catch (e) {
-      return {500: 'Error getting note: $e'}; // Return map for error
-    }
-  }
-
   //* Used
   Future<Map<int, String>> addMEWs(String noteID, Parameters parameters) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
+    final db = FirebaseFirestore.instance;
+    final auth = FirebaseAuth.instance;
 
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken == null) {
-      return {401: 'No token found'};
+    if (auth.currentUser == null) {
+      return {401: "User is not authenticated."};
     }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/noti-fetch/add_mews/$noteID',
-    );
+
+    final noteRef = db.collection("inspection_notes").doc(noteID);
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode(parameters),
-      );
+      final noteDoc = await noteRef.get();
+      if (!noteDoc.exists) {
+        return {404: "Inspection note not found"};
+      }
 
-      return {response.statusCode: response.body};
+      final noteData = noteDoc.data() as Map<String, dynamic>;
+      final String? mewsId = noteData['mews_id'] as String?;
+
+      final mewsMap = parameters.toJson();
+      final utcTime = mewsMap['assessed_time'];
+      final batch = db.batch();
+
+      String resultantMewsId;
+
+      if (mewsId != null && mewsId.isNotEmpty) {
+        final mewRef = db.collection("mews").doc(mewsId);
+        batch.update(mewRef, mewsMap);
+        batch.update(noteRef, {"time": utcTime});
+        resultantMewsId = mewsId;
+      } else {
+        final newMewRef = db.collection("mews").doc();
+        batch.set(newMewRef, mewsMap);
+        batch.update(noteRef, {"mews_id": newMewRef.id, "time": utcTime});
+        resultantMewsId = newMewRef.id;
+      }
+
+      await batch.commit();
+
+      return {200: resultantMewsId};
     } catch (e) {
-      return {500: 'Error adding MEWS: $e'};
+      return {500: 'Failed to save MEWS data: $e'};
     }
   }
 
   //* Used
-  Future<Map<int, String>> addNote({
-    required String noteID,
-    required Note note,
-  }) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
-    String? idToken = await SessionService().getIdToken();
+  Future<Map<int, String>> addNote({required String noteID, required Note note}) async {
+    final db = FirebaseFirestore.instance;
+    final auth = FirebaseAuth.instance;
 
-    if (idToken == null) {
-      // print('No token found');
-      return {401: 'No token found'};
+    if (auth.currentUser == null) {
+      return {401: "User is not authenticated."};
     }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/noti-fetch/add_notes/$noteID',
-    );
+
+    final docRef = db.collection('inspection_notes').doc(noteID);
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode({...note.toJson()}),
-      );
+      final noteData = note.toJson();
+      await docRef.update(noteData);
 
-      return {response.statusCode: response.body};
+      return {
+        200: jsonEncode({"message": "Note updated successfully", "note_id": noteID}),
+      };
+    } on FirebaseException catch (e) {
+      if (e.code == 'not-found') {
+        return {404: "Inspection note document not found."};
+      } else if (e.code == 'permission-denied') {
+        return {403: "Permission denied."};
+      } else {
+        return {500: "Firebase error: ${e.message}"};
+      }
     } catch (e) {
-      return {500: 'Error getting note: $e'};
+      return {500: "Error updating note: $e"};
     }
   }
 
   //* Used
-  Future<Map<int, String>> addNewInspection({
-    required InspectionNote inspectionNote,
-  }) async {
-    // final _storage = FlutterSecureStorage();
-    // String? idToken = await _storage.read(key: 'id_token');
+  Future<Map<int, String>> addNewInspection({required InspectionNote inspectionNote}) async {
+    final db = FirebaseFirestore.instance;
+    final auth = FirebaseAuth.instance;
 
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken == null) {
-      return {401: 'No token found'};
+    if (auth.currentUser == null) {
+      return {401: "User is not authenticated."};
     }
-    final url = Uri.parse(
-      '${URL().getServerURL()}/noti-fetch/set_inspection_time/',
-    );
 
     try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $idToken",
-        },
-        body: jsonEncode({...inspectionNote.toJson()}),
-      );
+      final noteRef = db.collection("inspection_notes").doc();
+      final mewRef = db.collection("mews").doc();
 
-      return {response.statusCode: response.body};
+      final noteData = {...inspectionNote.toJson(), 'mews_id': mewRef.id, 'text': '-'};
+
+      final mewData = {
+        "blood_pressure": "-",
+        "consciousness": "-",
+        "cvp": "-",
+        "heart_rate": "-",
+        "mews": "-",
+        "patient_id": inspectionNote.patientID,
+        "respiratory_rate": "-",
+        "spo2": "-",
+        "temperature": "-",
+        "urine": "-",
+        "is_assessed": false,
+      };
+
+      final batch = db.batch();
+
+      batch.set(noteRef, noteData);
+      batch.set(mewRef, mewData);
+      await batch.commit();
+
+      return {
+        200: jsonEncode({"message": "inspection_notes added successfully", "inspection_notes_id": noteRef.id}),
+      };
+    } on FirebaseException catch (e) {
+      if (e.code == 'permission-denied') {
+        return {403: "Permission denied."};
+      } else {
+        return {500: "Firebase error: ${e.message}"};
+      }
     } catch (e) {
-      return {500: 'Error adding inspection: $e'};
+      return {500: "Error adding inspection: $e"};
     }
   }
 }
