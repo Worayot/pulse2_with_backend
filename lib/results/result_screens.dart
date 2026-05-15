@@ -23,107 +23,116 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
   showDialog(
     context: navigator.context,
     builder: (context) {
-      return Card(
-        margin: const EdgeInsets.all(16),
-        color: bgColor,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Stack(
-          children: [
-            Positioned(bottom: 0, right: 0, child: IgnorePointer(child: Opacity(opacity: 0.5, child: Image.asset(emoji)))),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Row(
+      return Stack(
+        children: [
+          Card(
+            margin: const EdgeInsets.all(16),
+            color: bgColor,
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
                     children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Center(child: Text("finishedCalculating".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text("\t\t${"totalScore".tr()}: $MEWs", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(12.0)),
-
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                          const Gap(16),
-
-                          Text("${"nursing".tr()} :", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                          const Gap(12),
-
                           Expanded(
-                            child: Scrollbar(
-                              thumbVisibility: true,
-                              child: SingleChildScrollView(child: Padding(padding: const EdgeInsets.only(right: 12.0), child: nursingWidget)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Center(child: Text("finishedCalculating".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22))),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                  const Gap(16),
-                  Align(
-                    alignment: AlignmentGeometry.bottomRight,
-                    child: GestureDetector(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return NoteAdder(noteID: noteID, onPop: onPop);
-                          },
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(color: const Color(0xFF565656), borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(FontAwesomeIcons.solidPenToSquare, color: Colors.white, size: 16),
-                            const Gap(8),
-                            Text('addNote'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text("\t\t${"totalScore".tr()}: $MEWs", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 35)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                          decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(12.0)),
+
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              const Gap(16),
+
+                              Text("${"nursing".tr()} :", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              const Gap(12),
+
+                              Expanded(
+                                child: Scrollbar(
+                                  thumbVisibility: true,
+                                  child: SingleChildScrollView(child: Padding(padding: const EdgeInsets.only(right: 12.0), child: nursingWidget)),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
+                      const Gap(16),
+                    ],
+                  ),
+                ),
+
+                Positioned(
+                  top: 15,
+                  right: 15,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.close, color: Colors.black, size: 30),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(bottom: 0, right: 0, child: IgnorePointer(child: Padding(padding: const EdgeInsets.all(16.0), child: Opacity(opacity: 0.5, child: Image.asset(emoji))))),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Align(
+              alignment: Alignment.bottomRight,
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return NoteAdder(noteID: noteID, onPop: onPop);
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 24, 40),
+                  child: Container(
+                    decoration: BoxDecoration(color: const Color(0xFF565656), borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(FontAwesomeIcons.solidPenToSquare, color: Colors.white, size: 16),
+                        const Gap(8),
+                        Text('addNote'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-
-            Positioned(
-              top: 15,
-              right: 15,
-              child: InkWell(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: const Icon(Icons.close, color: Colors.black, size: 30),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       );
     },
   );

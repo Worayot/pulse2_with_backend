@@ -33,7 +33,6 @@ class _PatientCardExportState extends State<PatientCardExport> {
 
   @override
   void dispose() {
-    // Crucial: Clear callbacks when the card is destroyed
     EasyLoading.removeAllCallbacks();
     super.dispose();
   }
@@ -47,62 +46,67 @@ class _PatientCardExportState extends State<PatientCardExport> {
           color: const Color(0xffE0EAFF),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.symmetric(vertical: 8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+          child: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                right: 0,
+                bottom: 0,
+                child: ClipRect(child: SizedBox(height: 50, width: 150, child: Opacity(opacity: 1, child: Image.asset('assets/images/therapy4.png', fit: BoxFit.contain)))),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.patient.fullname, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          const SizedBox(width: 2),
-                          if (widget.patient.gender == "Male")
-                            const Icon(
-                              Icons.male, // For male
-                              color: Colors.blue,
-                              size: 26.0,
-                            ),
-                          if (widget.patient.gender == "Female")
-                            const Icon(
-                              Icons.female, // For female
-                              color: Colors.pink,
-                              size: 26.0,
-                            ),
-                          const SizedBox(width: 3),
-                          Text("(${widget.patient.age} ${"yrs".tr()})", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                          Row(
+                            children: [
+                              Text(widget.patient.fullname, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(width: 2),
+                              if (widget.patient.gender == "Male")
+                                const Icon(
+                                  Icons.male, // For male
+                                  color: Colors.blue,
+                                  size: 26.0,
+                                ),
+                              if (widget.patient.gender == "Female")
+                                const Icon(
+                                  Icons.female, // For female
+                                  color: Colors.pink,
+                                  size: 26.0,
+                                ),
+                              const SizedBox(width: 3),
+                              Text("(${widget.patient.age} ${"yrs".tr()})", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text('${"ward".tr()} ', style: const TextStyle(fontSize: 11)),
+                              Text(widget.patient.ward, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                              Text(' ${"bedNo".tr()} ', style: const TextStyle(fontSize: 11)),
+                              Text(widget.patient.bedNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text('${"hnNo".tr()} ', style: const TextStyle(fontSize: 11)),
+                              Text(widget.patient.hospitalNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, overflow: TextOverflow.clip), maxLines: 1),
+                            ],
+                          ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Text('${"ward".tr()} ', style: const TextStyle(fontSize: 11)),
-                          Text(widget.patient.ward, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                          Text(' ${"bedNo".tr()} ', style: const TextStyle(fontSize: 11)),
-                          Text(widget.patient.bedNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text('${"hnNo".tr()} ', style: const TextStyle(fontSize: 11)),
-                          Text(widget.patient.hospitalNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, overflow: TextOverflow.clip), maxLines: 1),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        Positioned(
-          top: 0,
-          right: 10,
-          bottom: 0,
-          child: ClipRect(child: SizedBox(height: 50, width: 150, child: Opacity(opacity: 1, child: Image.asset('assets/images/therapy4.png', fit: BoxFit.contain)))),
-        ),
+
         Positioned(
           top: 0,
           bottom: 0,

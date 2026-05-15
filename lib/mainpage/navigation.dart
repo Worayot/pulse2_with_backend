@@ -8,18 +8,19 @@ import 'package:tuh_mews/mainpage/patient_related/patient_in_system.dart';
 import 'package:tuh_mews/mainpage/patient_related/export.dart';
 import 'package:tuh_mews/mainpage/patient_related/monitored_patient.dart';
 import 'package:tuh_mews/mainpage/settings/setting.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
 import 'package:tuh_mews/utils/global_mews_fab.dart';
 import 'package:tuh_mews/utils/navbar.dart';
 
-class NavigationPage extends StatefulWidget {
+class NavigationPage extends ConsumerStatefulWidget {
   const NavigationPage({super.key});
 
   @override
   _NavigationPageState createState() => _NavigationPageState();
 }
 
-class _NavigationPageState extends State<NavigationPage> {
+class _NavigationPageState extends ConsumerState<NavigationPage> {
   // Single index to manage navigation
   int _selectedIndex = 0;
   String userId = '';
@@ -38,7 +39,7 @@ class _NavigationPageState extends State<NavigationPage> {
   }
 
   Future<void> _checkAuthentication() async {
-    final isAuthenticated = await AuthenticationState().isAuthenticated();
+    final isAuthenticated = await ref.read(authenticationProvider).isAuthenticated();
     if (!isAuthenticated) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
     }
@@ -46,8 +47,11 @@ class _NavigationPageState extends State<NavigationPage> {
 
   @override
   void initState() {
-    _checkAuthentication();
     super.initState();
+
+    Future.microtask(() {
+      _checkAuthentication();
+    });
   }
 
   @override
