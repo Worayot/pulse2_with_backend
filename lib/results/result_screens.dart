@@ -32,8 +32,8 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: Stack(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 64),
                   child: Column(
                     children: [
                       Row(
@@ -56,11 +56,11 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const Gap(8),
 
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+                          padding: const EdgeInsets.fromLTRB(16, 16, 0, 48),
                           decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: BorderRadius.circular(12.0)),
 
                           child: Column(
@@ -115,7 +115,7 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
                   );
                 },
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 24, 40),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 16, 16),
                   child: Container(
                     decoration: BoxDecoration(color: const Color(0xFF565656), borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
