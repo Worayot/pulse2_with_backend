@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tuh_mews/func/calculate_mews.dart';
+import 'package:tuh_mews/func/mews_input_validator.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/models/patient_id_name.dart';
@@ -557,6 +558,13 @@ class _InstantMEWsFormState extends ConsumerState<InstantMEWsForm> {
     String urine = urineController.text.trim();
     String conscious = consciousnessValue;
     String cvp = cvpController.text.trim();
+
+    bool proceed =
+        await MewsInputValidator.proceedTemperatureInput(context: context, temp: temp) && await MewsInputValidator.proceedHeartRateInput(context: context, heartRate: hr);
+
+    if (!proceed) {
+      return;
+    }
 
     hr = (hr == ' ') ? '-' : hr;
     temp = (temp == ' ') ? '-' : temp;

@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-Future<bool> showWarningDialog(BuildContext context) async {
+Future<bool> showWarningDialog(BuildContext context, {String? content}) async {
   return await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Warning".tr()),
-            content: Text("proceed?".tr()),
+            content: Text(content ?? "proceed?".tr()),
             actions: [
               TextButton(
                 onPressed: () {

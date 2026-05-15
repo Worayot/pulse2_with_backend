@@ -125,6 +125,10 @@
   "oClock": "o'clock",
   "ofDate": "",
   "ok": "OK",
+  "outOfRange" : {
+    "heartRate": "Heart rate is out of range (30-200 bpm).",
+    "temperature": "Temperature is out of range (30-45 °C)."
+  },
   "overallMEWS": "Overall MEWS :",
   "pain": "Responds to pain",
   "password": "Password",

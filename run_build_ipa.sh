@@ -29,11 +29,10 @@ dart run build_runner build --delete-conflicting-outputs
 echo "📦 Installing CocoaPods..."
 cd ios
 pod install
-# pod install --repo-update
 cd ..
 
 echo "🏗️ Building IPA (Release)..."
-flutter build ipa --release
+flutter build ipa --release || exit 1
 
 echo "📦 Checking output..."
 ls -lh build/ios/ipa/ || echo "⚠️ IPA folder not found"

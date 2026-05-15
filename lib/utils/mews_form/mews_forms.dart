@@ -2,11 +2,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tuh_mews/func/calculate_mews.dart';
+import 'package:tuh_mews/func/mews_input_validator.dart';
 import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/parameters.dart';
 import 'package:tuh_mews/results/result_screens.dart';
 import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/mews_services.dart';
+import 'package:tuh_mews/utils/warning_dialog.dart';
 
 class MEWsForms extends StatefulWidget {
   final String patientID;
@@ -423,9 +425,7 @@ class _MEWsFormsState extends State<MEWsForms> {
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor: const Color(0xFF3362CC),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15), // Set border radius here
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                         ),
                         onPressed: () async {
                           String hr = heartRateController.text.trim();
@@ -437,6 +437,14 @@ class _MEWsFormsState extends State<MEWsForms> {
                           String urine = urineController.text.trim();
                           String conscious = consciousnessValue;
                           String cvp = cvpController.text.trim();
+
+                          bool proceed =
+                              await MewsInputValidator.proceedTemperatureInput(context: context, temp: temp) &&
+                              await MewsInputValidator.proceedHeartRateInput(context: context, heartRate: hr);
+
+                          if (!proceed) {
+                            return;
+                          }
 
                           hr = (hr == ' ') ? '-' : hr;
                           temp = (temp == ' ') ? '-' : temp;
