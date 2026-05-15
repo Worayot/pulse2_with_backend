@@ -3,24 +3,20 @@ import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/navigation.dart';
 import 'package:tuh_mews/services/user_services.dart';
+import 'package:tuh_mews/state/secure_storage/secure_storage.dart';
 import 'package:tuh_mews/utils/loading_bar.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoadingScreen extends StatefulWidget {
   final String userId;
   final String password;
-  const LoadingScreen({
-    super.key,
-    required this.userId,
-    required this.password,
-  });
+  const LoadingScreen({super.key, required this.userId, required this.password});
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  final storage = FlutterSecureStorage();
+  final secureStorage = SecureStorage();
   String name = '';
   double _progress = 0.0; // Track progress here
 
@@ -40,7 +36,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     await _savePreferences();
 
-    // Step 3: Short delay so user sees 100% before navigation
     setState(() {
       _progress = 1.0;
     });
@@ -48,17 +43,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (accountData != null && accountData!.isNotEmpty) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const NavigationPage()),
-        (route) => false,
-      );
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigationPage(isFreshLogin: true)), (route) => false);
     } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
     }
   }
 
@@ -85,11 +72,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
       setState(() {
         _progress = 0.6;
       });
-      await storage.write(key: 'password', value: widget.password);
+      await secureStorage.write(key: 'password', value: widget.password);
       setState(() {
         _progress = 0.7;
-      });
-      setState(() {
         name = fullname;
       });
     }
@@ -97,10 +82,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return LoadingBar(
-      context: context,
-      name: name,
-      progress: _progress,
-    ).build();
+    return LoadingBar(context: context, name: name, progress: _progress).build();
   }
 }

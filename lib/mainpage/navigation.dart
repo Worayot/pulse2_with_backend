@@ -14,7 +14,8 @@ import 'package:tuh_mews/utils/global_mews_fab.dart';
 import 'package:tuh_mews/utils/navbar.dart';
 
 class NavigationPage extends ConsumerStatefulWidget {
-  const NavigationPage({super.key});
+  final bool isFreshLogin;
+  const NavigationPage({super.key, this.isFreshLogin = false});
 
   @override
   _NavigationPageState createState() => _NavigationPageState();
@@ -49,9 +50,11 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
   void initState() {
     super.initState();
 
-    Future.microtask(() {
-      _checkAuthentication();
-    });
+    if (!widget.isFreshLogin) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkAuthentication();
+      });
+    }
   }
 
   @override

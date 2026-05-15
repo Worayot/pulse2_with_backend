@@ -103,9 +103,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       await secureStorage.write(key: 'password', value: _passwordController.text.trim());
       await secureStorage.write(key: 'rememberMe', value: rememberMe.toString());
     } else {
-      secureStorage.delete(key: 'nurseId');
-      secureStorage.delete(key: 'password');
-      secureStorage.delete(key: 'rememberMe');
+      await secureStorage.delete(key: 'nurseId');
+      await secureStorage.delete(key: 'password');
+      await secureStorage.delete(key: 'rememberMe');
     }
 
     setState(() {
