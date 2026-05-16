@@ -15,7 +15,8 @@ import 'package:tuh_mews/utils/navbar.dart';
 
 class NavigationPage extends ConsumerStatefulWidget {
   final bool isFreshLogin;
-  const NavigationPage({super.key, this.isFreshLogin = false});
+  final String? sessionCookie;
+  const NavigationPage({super.key, this.isFreshLogin = false, this.sessionCookie});
 
   @override
   _NavigationPageState createState() => _NavigationPageState();
@@ -41,7 +42,7 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
 
   Future<void> _checkAuthentication() async {
     final isAuthenticated = await ref.read(authenticationProvider).isAuthenticated();
-    if (!isAuthenticated) {
+    if (!isAuthenticated && widget.sessionCookie == null) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
     }
   }

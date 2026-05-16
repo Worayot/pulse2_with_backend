@@ -16,7 +16,7 @@ class AuthenticationService {
   AuthenticationService(this.secureStorage);
 
   Future<bool> isAuthenticated() async {
-    final sessionCookie = await secureStorage.read(key: 'session_cookie') ?? '';
+    final String sessionCookie = await secureStorage.read(key: 'session_cookie') ?? '';
 
     return sessionCookie.isNotEmpty;
   }

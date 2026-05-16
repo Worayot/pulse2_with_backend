@@ -136,18 +136,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
           if (sessionResponse.statusCode == 200) {
             final sessionData = jsonDecode(sessionResponse.body);
+            final sessionCookie = sessionData['session_cookie'];
             try {
-              await secureStorage.write(key: 'session_cookie', value: sessionData['session_cookie'], expiry: Duration(days: 7));
+              await secureStorage.write(key: 'session_cookie', value: sessionCookie, expiry: Duration(days: 7));
+              if (mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoadingScreen(userId: _nurseIDController.text, password: _passwordController.text, sessionCookie: sessionCookie)),
+                  (Route<dynamic> route) => false,
+                );
+              }
             } catch (e) {
               rethrow;
-            }
-
-            if (mounted) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => LoadingScreen(userId: _nurseIDController.text, password: _passwordController.text)),
-                (Route<dynamic> route) => false,
-              );
             }
           } else {
             if (mounted) {

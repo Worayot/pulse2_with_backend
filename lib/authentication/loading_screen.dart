@@ -9,7 +9,8 @@ import 'package:tuh_mews/utils/loading_bar.dart';
 class LoadingScreen extends StatefulWidget {
   final String userId;
   final String password;
-  const LoadingScreen({super.key, required this.userId, required this.password});
+  final String? sessionCookie;
+  const LoadingScreen({super.key, required this.userId, required this.password, this.sessionCookie});
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -43,7 +44,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (accountData != null && accountData!.isNotEmpty) {
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const NavigationPage(isFreshLogin: true)), (route) => false);
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigationPage(isFreshLogin: true, sessionCookie: widget.sessionCookie)), (route) => false);
     } else {
       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
     }
