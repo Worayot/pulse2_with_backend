@@ -1,27 +1,29 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/mainpage/navigation.dart';
+import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return FutureBuilder<bool>(
+      future: ref.read(authenticationProvider).isAuthenticated(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
         if (!snapshot.hasData) {
-          return LoginPage();
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
-        return NavigationPage();
+        final isAuthenticated = snapshot.data!;
+
+        if (isAuthenticated) {
+          return const NavigationPage();
+        }
+
+        return const LoginPage();
       },
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/navigation.dart';
 import 'package:tuh_mews/services/user_services.dart';
@@ -43,11 +42,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     await Future.delayed(const Duration(milliseconds: 500));
 
-    if (accountData != null && accountData!.isNotEmpty) {
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigationPage(isFreshLogin: true, sessionCookie: widget.sessionCookie)), (route) => false);
-    } else {
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
-    }
+    // if (accountData != null && accountData!.isNotEmpty) {
+    //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigationPage()), (route) => false);
+    // } else {
+    //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginPage()), (route) => false);
+    // }
+
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => NavigationPage()), (route) => false);
   }
 
   Future<void> fetchUserAccount() async {
