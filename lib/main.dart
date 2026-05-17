@@ -31,7 +31,6 @@ void main() async {
 
   await EasyLocalization.ensureInitialized();
 
-  // 📱 Lock orientation
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
