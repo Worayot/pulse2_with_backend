@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-Widget buildActionButton(IconData icon, VoidCallback onPressed, Color bgColor, Color iconColor, {double fontSize = 22, double buttonSize = 40}) {
+Widget buildActionButton(FaIconData icon, VoidCallback onPressed, Color bgColor, Color iconColor, {double fontSize = 22, double buttonSize = 40}) {
   return SizedBox(
     width: buttonSize,
     height: buttonSize,
     child: ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(shape: const CircleBorder(), backgroundColor: bgColor, padding: const EdgeInsets.only(left: 0), elevation: 0),
-      child: Center(child: Icon(icon, size: fontSize, color: iconColor)),
+      child: Center(child: FaIcon(icon, size: fontSize, color: iconColor)),
     ),
   );
 }
 
-Widget buildExportButton({IconData? icon, required VoidCallback onPressed, required Color bgColor, required Color iconColor}) {
+Widget buildExportButton({FaIconData? icon, required VoidCallback onPressed, required Color bgColor, required Color iconColor}) {
   return SizedBox(
     width: 45,
     height: 45,
@@ -21,7 +22,7 @@ Widget buildExportButton({IconData? icon, required VoidCallback onPressed, requi
       style: ElevatedButton.styleFrom(shape: const CircleBorder(), backgroundColor: bgColor, padding: const EdgeInsets.only(left: 2), elevation: 0),
       child:
           icon != null
-              ? Center(child: Icon(icon, size: 25, color: iconColor))
+              ? Center(child: FaIcon(icon, size: 25, color: iconColor))
               : const Center(
                 child: SizedBox(
                   // Wrap the indicator with SizedBox

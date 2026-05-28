@@ -77,7 +77,11 @@ class _AdminPageState extends State<AdminPage> {
                   Navigator.pop(context);
                 },
                 child: Row(
-                  children: [const Icon(FontAwesomeIcons.backward), const SizedBox(width: 8), Text('back'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))],
+                  children: [
+                    const FaIcon(FontAwesomeIcons.backward),
+                    const SizedBox(width: 8),
+                    Text('back'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  ],
                 ),
               ),
               const Gap(8),
@@ -90,6 +94,7 @@ class _AdminPageState extends State<AdminPage> {
                       onChanged: _filterUsers,
                       controller: _searchController,
                       decoration: InputDecoration(
+                        prefixIconConstraints: const BoxConstraints(minWidth: 60),
                         hintText: "${"search".tr()}...",
                         suffixIcon:
                             _searchController.text.isNotEmpty
@@ -104,7 +109,7 @@ class _AdminPageState extends State<AdminPage> {
                                 )
                                 : null,
                         border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15)), borderSide: BorderSide.none),
-                        prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                        prefixIcon: Padding(padding: const EdgeInsets.only(left: 16.0), child: const FaIcon(FontAwesomeIcons.magnifyingGlass, color: Colors.black)),
                         filled: true,
                         fillColor: const Color(0xffCADBFF),
                         labelStyle: const TextStyle(color: Colors.black),
@@ -128,7 +133,7 @@ class _AdminPageState extends State<AdminPage> {
                       decoration: BoxDecoration(color: const Color(0xff407bff), borderRadius: BorderRadius.circular(16)),
                       child: Row(
                         children: [
-                          const Icon(FontAwesomeIcons.personCirclePlus, size: 26, color: Colors.white),
+                          const FaIcon(FontAwesomeIcons.personCirclePlus, size: 26, color: Colors.white),
                           const Gap(8),
                           Text("addUser".tr(), textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.bold), softWrap: true),
                         ],

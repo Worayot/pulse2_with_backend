@@ -56,7 +56,7 @@ class _ToggleIconButtonState extends State<ToggleIconButton> {
                 }
                 : () {},
         style: ElevatedButton.styleFrom(shape: const CircleBorder(), backgroundColor: Colors.white, padding: const EdgeInsets.only(left: 2), elevation: 0),
-        child: Center(child: Icon(_isPlus ? FontAwesomeIcons.plus : FontAwesomeIcons.minus, size: 25, color: _isPlus ? const Color(0xff3362CC) : Colors.red)),
+        child: Center(child: FaIcon(_isPlus ? FontAwesomeIcons.plus : FontAwesomeIcons.minus, size: 25, color: _isPlus ? const Color(0xff3362CC) : Colors.red)),
       ),
     );
   }

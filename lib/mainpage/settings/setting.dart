@@ -43,18 +43,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<List<Map<String, String>>> loadQuotes() async {
     try {
-      final String response = await rootBundle.loadString(
-        'assets/quotes/quotes.json',
-      );
+      final String response = await rootBundle.loadString('assets/quotes/quotes.json');
       final List<dynamic> data = json.decode(response);
 
       // Ensure every dynamic map is safely cast to Map<String, String>
       return data.map((item) {
         if (item is Map<String, dynamic>) {
-          return {
-            'quote': item['quote'].toString(),
-            'author': item['author'].toString(),
-          };
+          return {'quote': item['quote'].toString(), 'author': item['author'].toString()};
         } else {
           throw const FormatException("Invalid JSON format");
         }
@@ -68,10 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: const SafeArea(bottom: false, child: Header()),
-        toolbarHeight: size.height * 0.13,
-      ),
+      appBar: AppBar(title: const SafeArea(bottom: false, child: Header()), toolbarHeight: size.height * 0.13),
       body: Stack(
         children: [
           Padding(
@@ -82,33 +74,18 @@ class _SettingsPageState extends State<SettingsPage> {
                 _buildSettingsTile(
                   title: 'profileSetting'.tr(),
                   leadingIcon: FontAwesomeIcons.solidAddressBook,
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ProfileSettingsPage(),
-                        ),
-                      ),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileSettingsPage())),
                 ),
                 _buildSettingsTile(
                   title: 'aboutApp'.tr(),
                   leadingIcon: FontAwesomeIcons.circleInfo,
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AboutAppPage()),
-                      ),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AboutAppPage())),
                 ),
                 _buildSettingsTile(
                   title: 'language'.tr(),
                   leadingIcon: FontAwesomeIcons.globe,
                   onTap: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LanguageSelectPage(),
-                      ),
-                    );
+                    await Navigator.push(context, MaterialPageRoute(builder: (context) => LanguageSelectPage()));
                     setState(() {});
                   },
                 ),
@@ -117,12 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: 'adminFeature'.tr(),
                     leadingIcon: FontAwesomeIcons.userTie,
                     onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminPage(),
-                        ),
-                      );
+                      await Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPage()));
                     },
                   ),
                 _buildSettingsTile(
@@ -133,9 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     bool shouldProceed = await showWarningDialog(context);
                     if (shouldProceed) {
                       if (mounted) {
-                        LogoutService(
-                          navigator: Navigator.of(context),
-                        ).logout();
+                        LogoutService(navigator: Navigator.of(context)).logout();
                       }
                     } else {
                       return;
@@ -152,18 +122,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     } else if (snapshot.hasError) {
-                      return Text(
-                        'Error loading quotes: ${snapshot.error}',
-                        style: const TextStyle(color: Colors.red),
-                      );
+                      return Text('Error loading quotes: ${snapshot.error}', style: const TextStyle(color: Colors.red));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Text('No quotes found.');
                     }
 
                     final loadedQuotes = snapshot.data!;
                     final random = Random();
-                    final selectedQuote =
-                        loadedQuotes[random.nextInt(loadedQuotes.length)];
+                    final selectedQuote = loadedQuotes[random.nextInt(loadedQuotes.length)];
 
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -180,31 +146,15 @@ class _SettingsPageState extends State<SettingsPage> {
                                     children: [
                                       TextSpan(
                                         text: '"',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          height: size.height * 0.002,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: size.height * 0.002, overflow: TextOverflow.ellipsis),
                                       ),
                                       TextSpan(
                                         text: selectedQuote['quote']![0],
-                                        style: TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.bold,
-                                          height: size.height * 0.002,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, height: size.height * 0.002, overflow: TextOverflow.ellipsis),
                                       ),
                                       TextSpan(
-                                        text:
-                                            '${selectedQuote['quote']!.substring(1)}"',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          height: size.height * 0.002,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        text: '${selectedQuote['quote']!.substring(1)}"',
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: size.height * 0.002, overflow: TextOverflow.ellipsis),
                                       ),
                                     ],
                                   ),
@@ -213,14 +163,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               SizedBox(height: size.height * 0.01),
                               SizedBox(
                                 width: size.width * 0.45,
-                                child: Text(
-                                  selectedQuote['author']!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 13,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
+                                child: Text(selectedQuote['author']!, style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13, overflow: TextOverflow.ellipsis)),
                               ),
                             ],
                           ),
@@ -249,19 +192,11 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSettingsTile({
-    required String title,
-    required IconData leadingIcon,
-    required VoidCallback onTap,
-    Color? color,
-  }) {
+  Widget _buildSettingsTile({required String title, required FaIconData leadingIcon, required VoidCallback onTap, Color? color}) {
     return ListTile(
       title: Text(title, style: TextStyle(color: color ?? Colors.black)),
       leading: FaIcon(leadingIcon, color: color ?? const Color(0xff3362CC)),
-      trailing: FaIcon(
-        FontAwesomeIcons.arrowRight,
-        color: color ?? Colors.black,
-      ),
+      trailing: FaIcon(FontAwesomeIcons.arrowRight, color: color ?? Colors.black),
       onTap: onTap,
     );
   }

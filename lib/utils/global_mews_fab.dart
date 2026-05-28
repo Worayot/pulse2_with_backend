@@ -22,7 +22,7 @@ class GlobalMewsFAB extends StatelessWidget {
           },
         );
       },
-      child: const Icon(FontAwesomeIcons.calculator, color: Colors.white, size: 28),
+      child: const FaIcon(FontAwesomeIcons.calculator, color: Colors.white, size: 28),
     );
   }
 }

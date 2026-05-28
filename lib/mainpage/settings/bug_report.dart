@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 class BugReportPage extends StatelessWidget {
   final formUrl = Uri.parse("https://forms.gle/X17oKE7Y2cJGFBPA7");
 
+  BugReportPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -27,22 +29,10 @@ class BugReportPage extends StatelessWidget {
                 children: [
                   Container(
                     height: 570,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFB2C2E5),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    decoration: BoxDecoration(color: const Color(0xFFB2C2E5), borderRadius: BorderRadius.circular(12)),
                     child: Stack(
                       children: [
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: IgnorePointer(
-                            child: Image.asset(
-                              "assets/images/doctor.png",
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
+                        Positioned(bottom: 0, right: 0, child: IgnorePointer(child: Image.asset("assets/images/doctor.png", fit: BoxFit.contain))),
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Column(
@@ -54,33 +44,14 @@ class BugReportPage extends StatelessWidget {
                                 },
                                 child: Row(
                                   children: [
-                                    const Icon(
-                                      FontAwesomeIcons.backward,
-                                      color: Colors.black,
-                                      size: 25,
-                                    ),
+                                    const FaIcon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
                                     const SizedBox(width: 10),
-                                    Text(
-                                      'back'.tr(),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                    Text('back'.tr(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
                                   ],
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Center(
-                                child: Text(
-                                  'bugReport'.tr(),
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                              Center(child: Text('bugReport'.tr(), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
                               const SizedBox(height: 16),
                               // White container
                               Container(
@@ -93,23 +64,14 @@ class BugReportPage extends StatelessWidget {
                                       color: Colors.grey.withOpacity(0.3),
                                       spreadRadius: 2,
                                       blurRadius: 5,
-                                      offset: const Offset(
-                                        0,
-                                        3,
-                                      ), // Position of the shadow
+                                      offset: const Offset(0, 3), // Position of the shadow
                                     ),
                                   ],
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      "Link",
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                    Text("Link", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                     const SizedBox(height: 10),
                                     Center(
                                       child: ElevatedButton(
@@ -121,37 +83,18 @@ class BugReportPage extends StatelessWidget {
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(
-                                            0xffC6D8FF,
-                                          ),
+                                          backgroundColor: const Color(0xffC6D8FF),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ), // Set border radius to 12
+                                            borderRadius: BorderRadius.circular(12), // Set border radius to 12
                                           ),
                                         ),
-                                        child: Text(
-                                          'Go to Link',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        child: Text('Go to Link', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
-                                    Text(
-                                      'contactDev'.tr(),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                    Text('contactDev'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                     const SizedBox(height: 10),
-                                    Text(
-                                      "contactDevContent".tr(),
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
+                                    Text("contactDevContent".tr(), style: const TextStyle(fontSize: 14)),
                                   ],
                                 ),
                               ),

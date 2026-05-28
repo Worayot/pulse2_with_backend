@@ -42,7 +42,7 @@ class AboutAppPage extends StatelessWidget {
                                 },
                                 child: Row(
                                   children: [
-                                    const Icon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
+                                    const FaIcon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
                                     const SizedBox(width: 10),
                                     Text('back'.tr(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
                                   ],

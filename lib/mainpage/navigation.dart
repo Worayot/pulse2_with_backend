@@ -86,25 +86,25 @@ class _NavigationPageState extends ConsumerState<NavigationPage> {
               onItemSelected: _onItemTapped,
               items: <BottomNavyBarItem>[
                 BottomNavyBarItem(
-                  icon: Icon(FontAwesomeIcons.hospitalUser, size: iconSize),
+                  icon: FaIcon(FontAwesomeIcons.hospitalUser, size: iconSize),
                   title: FittedBox(fit: BoxFit.scaleDown, child: Text("\t${'patientsInSystem'.tr()}", style: TextStyle(fontSize: fontSize))),
                   activeColor: const Color(0xffFEFEFE),
                   inactiveColor: const Color(0xffC6D8FF),
                 ),
                 BottomNavyBarItem(
-                  icon: Icon(FontAwesomeIcons.clipboardUser, size: iconSize),
+                  icon: FaIcon(FontAwesomeIcons.clipboardUser, size: iconSize),
                   title: FittedBox(fit: BoxFit.scaleDown, child: Text("\t${'patientInMonitoring'.tr()}", style: TextStyle(fontSize: fontSize))),
                   activeColor: const Color(0xffFEFEFE),
                   inactiveColor: const Color(0xffC6D8FF),
                 ),
                 BottomNavyBarItem(
-                  icon: Icon(FontAwesomeIcons.fileArrowDown, size: iconSize),
+                  icon: FaIcon(FontAwesomeIcons.fileArrowDown, size: iconSize),
                   title: FittedBox(fit: BoxFit.scaleDown, child: Text('data'.tr(), style: TextStyle(fontSize: fontSize))),
                   activeColor: const Color(0xffFEFEFE),
                   inactiveColor: const Color(0xffC6D8FF),
                 ),
                 BottomNavyBarItem(
-                  icon: Icon(FontAwesomeIcons.gear, size: iconSize),
+                  icon: FaIcon(FontAwesomeIcons.gear, size: iconSize),
                   title: FittedBox(fit: BoxFit.scaleDown, child: Text('settings'.tr(), style: TextStyle(fontSize: fontSize))),
                   activeColor: const Color(0xffFEFEFE),
                   inactiveColor: const Color(0xffC6D8FF),

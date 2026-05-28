@@ -75,7 +75,7 @@ class _LanguageSelectPageState extends State<LanguageSelectPage> {
                           padding: const EdgeInsets.only(left: 16.0, top: 16),
                           child: Row(
                             children: [
-                              const Icon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
+                              const FaIcon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
                               const SizedBox(width: 10),
                               Text('back'.tr(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
                             ],

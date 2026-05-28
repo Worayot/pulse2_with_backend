@@ -122,7 +122,7 @@ void showResultDialog({required int MEWs, required String noteID, required VoidC
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(FontAwesomeIcons.solidPenToSquare, color: Colors.white, size: 16),
+                        const FaIcon(FontAwesomeIcons.solidPenToSquare, color: Colors.white, size: 16),
                         const Gap(8),
                         Text('addNote'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                       ],

@@ -199,10 +199,9 @@ class _ExportPageState extends ConsumerState<ExportPage> {
                         controller: _searchController,
                         decoration: InputDecoration(
                           hintText: "${"search".tr()}...",
-
                           border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)), borderSide: BorderSide.none),
-
-                          prefixIcon: const Icon(FontAwesomeIcons.magnifyingGlass, color: Colors.black),
+                          prefixIcon: Padding(padding: const EdgeInsets.only(left: 16.0), child: const FaIcon(FontAwesomeIcons.magnifyingGlass, color: Colors.black)),
+                          prefixIconConstraints: const BoxConstraints(minWidth: 60),
                           suffixIcon:
                               _fullnameFilter.isNotEmpty
                                   ? IconButton(
@@ -242,7 +241,7 @@ class _ExportPageState extends ConsumerState<ExportPage> {
                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: const Color(0xff407BFF)),
                         child: Row(
                           children: [
-                            const Icon(FontAwesomeIcons.filter, color: Color(0xffCADBFF)),
+                            const FaIcon(FontAwesomeIcons.filter, color: Color(0xffCADBFF)),
                             const SizedBox(width: 5),
                             Text('filterData'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                           ],

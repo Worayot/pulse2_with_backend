@@ -241,7 +241,7 @@ void showFilterDialog({
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(backgroundColor: Colors.red, shape: const CircleBorder()),
-                                      child: Icon(FontAwesomeIcons.arrowsRotate, color: Colors.white),
+                                      child: FaIcon(FontAwesomeIcons.arrowsRotate, color: Colors.white),
                                     ),
                                     const Gap(4),
 

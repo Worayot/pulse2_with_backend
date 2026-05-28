@@ -111,7 +111,7 @@ class _PatientReportTableState extends State<PatientReportTable> {
               height: 35,
               alignment: Alignment.center,
               child: IconButton(
-                icon: const Icon(FontAwesomeIcons.solidBookmark, color: Color(0xffFCAD00)),
+                icon: const FaIcon(FontAwesomeIcons.solidBookmark, color: Color(0xffFCAD00)),
                 onPressed: () {
                   showDialog(
                     context: context,

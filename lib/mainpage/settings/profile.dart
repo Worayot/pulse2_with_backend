@@ -130,7 +130,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                             },
                             child: Row(
                               children: [
-                                const Icon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
+                                const FaIcon(FontAwesomeIcons.backward, color: Colors.black, size: 25),
                                 const SizedBox(width: 10),
                                 Text('back'.tr(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
                               ],
@@ -201,7 +201,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                             );
                                                             _saveName('name', _nameController.text);
                                                           },
-                                                          icon: const Icon(FontAwesomeIcons.chevronRight),
+                                                          icon: const FaIcon(FontAwesomeIcons.chevronRight),
                                                           color: Colors.black,
                                                         ),
                                                       )
@@ -263,7 +263,7 @@ class _ProfileSettingsPageState extends State<ProfileSettingsPage> {
                                                             );
                                                           },
 
-                                                          icon: const Icon(FontAwesomeIcons.chevronRight),
+                                                          icon: const FaIcon(FontAwesomeIcons.chevronRight),
                                                           color: Colors.black,
                                                         ),
                                                       )
