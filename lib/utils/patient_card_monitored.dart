@@ -190,7 +190,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Stack(
         children: [
-          // Expanded Content Layer (Background)
           Positioned(
             child: Padding(
               padding: const EdgeInsets.only(top: 10),
@@ -198,60 +197,77 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
                   onTap: () => setState(() => isExpanded = !isExpanded),
-                  child: AnimatedContainer(
+                  child: AnimatedSize(
                     duration: const Duration(milliseconds: 250),
                     curve: Curves.easeInOut,
-                    padding: const EdgeInsets.only(top: 16),
-                    height: _calculateExpandedHeight(size),
-                    width: double.infinity,
-                    decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
-                    child: SingleChildScrollView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(height: 75),
-                          if (isExpanded)
-                            ..._groupedRows.entries.map((entry) {
-                              String dateHeader = entry.key;
-                              List<Map<String, dynamic>> rows = entry.value;
-                              // debugPrint(rows.toString());
-
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                    child:
+                        isExpanded
+                            ? Container(
+                              padding: const EdgeInsets.only(top: 80),
+                              decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
+                              child: Column(
                                 children: [
-                                  // --- DATE SECTION HEADER ---
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+                                  IgnorePointer(
                                     child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [Text("details".tr()), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)],
+                                    ),
+                                  ),
+                                  SingleChildScrollView(
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text(
-                                          dateHeader,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                            shadows: [Shadow(color: Colors.black.withOpacity(0.2), offset: const Offset(0.5, 0.5), blurRadius: 1)],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(child: Divider(color: Colors.white, thickness: 1, height: 1)),
+                                        if (isExpanded)
+                                          ..._groupedRows.entries.map((entry) {
+                                            String dateHeader = entry.key;
+                                            List<Map<String, dynamic>> rows = entry.value;
+
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                // --- DATE SECTION HEADER ---
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        dateHeader,
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontSize: 14,
+                                                          shadows: [Shadow(color: Colors.black.withOpacity(0.2), offset: const Offset(0.5, 0.5), blurRadius: 1)],
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Expanded(child: Divider(color: Colors.white, thickness: 1, height: 1)),
+                                                    ],
+                                                  ),
+                                                ),
+
+                                                // --- ROWS FOR THIS DATE ---
+                                                ...rows.map((row) {
+                                                  return AssessTableRowWidget(combinedData: row, myUserID: myUserID, patientID: patientID, onPop: widget.onPop);
+                                                }),
+                                                const SizedBox(height: 8), // Gap between groups
+                                              ],
+                                            );
+                                          }),
+                                        const SizedBox(height: 10),
                                       ],
                                     ),
                                   ),
-
-                                  // --- ROWS FOR THIS DATE ---
-                                  ...rows.map((row) {
-                                    return AssessTableRowWidget(combinedData: row, myUserID: myUserID, patientID: patientID, onPop: widget.onPop);
-                                  }),
-                                  const SizedBox(height: 8), // Gap between groups
                                 ],
-                              );
-                            }),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
-                    ),
+                              ),
+                            )
+                            : IgnorePointer(
+                              child: Container(
+                                padding: const EdgeInsets.only(top: 80),
+                                decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
+                                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text("details".tr()), Icon(Icons.expand_more)]),
+                              ),
+                            ),
                   ),
                 ),
               ),
@@ -324,16 +340,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                   ),
                 ),
               ],
-            ),
-          ),
-
-          // Expand Arrow Indicator
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 85,
-            child: IgnorePointer(
-              child: Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('assess'.tr()), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)])),
             ),
           ),
         ],

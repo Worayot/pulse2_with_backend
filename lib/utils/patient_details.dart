@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:tuh_mews/models/patient.dart';
-import 'package:tuh_mews/utils/report_widget.dart';
+import 'package:tuh_mews/utils/patient_report_widget.dart';
 
 void showPatientDetails(BuildContext context, Patient patient) {
   final screenHeight = MediaQuery.of(context).size.height;
@@ -70,7 +70,7 @@ void showPatientDetails(BuildContext context, Patient patient) {
                           displayData(context, "bedNumber".tr(), patient.bedNumber),
                           displayData(context, "hn".tr(), patient.hospitalNumber),
                           displayData(context, "ward".tr(), patient.ward),
-                          SizedBox(height: screenHeight * 0.6, child: ReportWidget(tableHeight: screenHeight * 0.5, patientID: patient.patientId ?? '')),
+                          SizedBox(height: screenHeight * 0.6, child: PatientReportWidget(tableHeight: screenHeight * 0.5, patientID: patient.patientId ?? '')),
                         ],
                       ),
                     ),

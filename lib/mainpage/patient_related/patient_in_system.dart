@@ -263,7 +263,6 @@ class _PatientInSystemState extends ConsumerState<PatientInSystem> {
                       }
 
                       return ListView.separated(
-                        padding: const EdgeInsets.only(top: 8),
                         itemCount: filteredPatients.length,
                         separatorBuilder: (BuildContext context, int index) {
                           return const Gap(8);

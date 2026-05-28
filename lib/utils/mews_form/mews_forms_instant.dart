@@ -559,8 +559,7 @@ class _InstantMEWsFormState extends ConsumerState<InstantMEWsForm> {
     String conscious = consciousnessValue;
     String cvp = cvpController.text.trim();
 
-    bool proceed =
-        await MewsInputValidator.proceedTemperatureInput(context: context, temp: temp) && await MewsInputValidator.proceedHeartRateInput(context: context, heartRate: hr);
+    bool proceed = await MewsInputValidator().validateInput(ctx: context, temp: temp, heartRate: hr);
 
     if (!proceed) {
       return;

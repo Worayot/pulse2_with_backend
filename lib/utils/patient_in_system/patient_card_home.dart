@@ -110,26 +110,46 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
 
     return Stack(
       children: [
-        Positioned(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isExpanded = !isExpanded;
-                  });
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeInOut,
-                  padding: const EdgeInsets.only(top: 16),
-                  height: isExpanded ? 380 : 82,
-                  width: double.infinity,
-                  decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
-                  child: isExpanded ? PatientIndData(age: age, gender: gender.tr(), hn: hn, bedNum: bedNum, ward: ward, mews: mews, time: formattedTime) : const SizedBox(),
-                ),
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
+              child: AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+
+                child:
+                    isExpanded
+                        ? Container(
+                          decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 60.0),
+                                child: IgnorePointer(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [Text("details".tr()), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)],
+                                  ),
+                                ),
+                              ),
+                              PatientIndData(age: age, gender: gender.tr(), hn: hn, bedNum: bedNum, ward: ward, mews: mews, time: formattedTime),
+                            ],
+                          ),
+                        )
+                        : IgnorePointer(
+                          child: Container(
+                            padding: const EdgeInsets.only(top: 60),
+                            decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text("details".tr()), Icon(Icons.expand_more)]),
+                          ),
+                        ),
               ),
             ),
           ),
@@ -271,26 +291,6 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-
-        Positioned(
-          top: 69, // Adjust the position to fit your layout
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              InkWell(
-                child: Text("details".tr()),
-                onTap: () {
-                  setState(() {
-                    isExpanded = !isExpanded;
-                  });
-                },
-              ),
-              IgnorePointer(child: Icon(isExpanded ? Icons.expand_less : Icons.expand_more)),
             ],
           ),
         ),
