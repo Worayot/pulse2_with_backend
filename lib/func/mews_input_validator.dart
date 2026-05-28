@@ -15,7 +15,8 @@ class MewsInputValidator {
     validateTemperatureInput(context: ctx, temp: temp);
     validateHeartRateInput(context: ctx, heartRate: heartRate);
 
-    return await showWarningDialog(ctx, content: _warningMessage.trim());
+    _warningMessage = _warningMessage.trim();
+    return _warningMessage.isEmpty ? true : await showWarningDialog(ctx, content: _warningMessage);
   }
 
   void proceedMewsInputReturnWarnMessage({required BuildContext context, required bool condition, required String warning}) async {
