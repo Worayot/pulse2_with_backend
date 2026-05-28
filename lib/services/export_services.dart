@@ -1,9 +1,8 @@
-import 'dart:io';
+import 'dart:typed_data';
+import 'package:file_saver/file_saver.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
 import 'package:tuh_mews/services/session_service.dart';
 import 'dart:convert';
-import 'package:uuid/uuid.dart';
 import 'package:tuh_mews/services/url.dart';
 
 class ExportServices {
@@ -38,25 +37,11 @@ class ExportServices {
 
   Future<Map<int, String>> _saveFile(List<int> excelData) async {
     try {
-      Directory? directory;
-      if (Platform.isAndroid) {
-        final directories = await getExternalStorageDirectories(type: StorageDirectory.downloads);
-        directory = directories?.first;
-      } else if (Platform.isIOS) {
-        directory = await getApplicationDocumentsDirectory();
-      }
+      final fileName = 'patient_report_${DateTime.now().millisecondsSinceEpoch}';
 
-      if (directory == null) {
-        return {500: "Could not locate directory"};
-      }
+      final savedPath = await FileSaver.instance.saveFile(name: fileName, bytes: Uint8List.fromList(excelData), fileExtension: 'xlsx', mimeType: MimeType.microsoftExcel);
 
-      final uuid = Uuid();
-      final uniqueFileName = 'all_patients_report_${uuid.v4()}.xlsx';
-      final filePath = '${directory.path}/$uniqueFileName';
-      final file = File(filePath);
-      await file.writeAsBytes(excelData);
-
-      return {200: filePath};
+      return {200: savedPath};
     } catch (e) {
       return {500: "Internal Server Error: $e"};
     }
