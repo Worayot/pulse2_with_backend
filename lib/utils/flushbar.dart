@@ -32,7 +32,7 @@ class FlushbarService {
       context: context,
       title: title ?? 'success'.tr(),
       message: message,
-      backgroundColor: Colors.white10,
+      backgroundColor: Colors.white,
       titleColor: Colors.green,
       messageColor: Colors.black,
       duration: duration ?? 2,
