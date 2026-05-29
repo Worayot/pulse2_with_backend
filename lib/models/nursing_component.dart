@@ -27,7 +27,7 @@ class NursingComponent {
       nursing = "nursingLowMedium";
       emoji = "assets/images/emojis/emoji_midlow.png";
       bgColor = const Color(0xffffff55);
-      title = "lowRisk";
+      title = "lowRisk".tr();
     } else if (mews == 3) {
       nursing = "nursingMedium";
       emoji = "assets/images/emojis/emoji_mid.png";
