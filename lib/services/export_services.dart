@@ -38,8 +38,11 @@ class ExportServices {
   Future<Map<int, String>> _saveFile(List<int> excelData) async {
     try {
       final fileName = 'patient_report_${DateTime.now().millisecondsSinceEpoch}';
+      final savedPath = await FileSaver.instance.saveAs(name: fileName, bytes: Uint8List.fromList(excelData), fileExtension: 'xlsx', mimeType: MimeType.microsoftExcel);
 
-      final savedPath = await FileSaver.instance.saveFile(name: fileName, bytes: Uint8List.fromList(excelData), fileExtension: 'xlsx', mimeType: MimeType.microsoftExcel);
+      if (savedPath == null) {
+        return {499: "User canceled the save dialog"};
+      }
 
       return {200: savedPath};
     } catch (e) {

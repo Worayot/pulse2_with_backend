@@ -90,31 +90,34 @@ class _AdminPageState extends State<AdminPage> {
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      onChanged: _filterUsers,
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        prefixIconConstraints: const BoxConstraints(minWidth: 60),
-                        hintText: "${"search".tr()}...",
-                        suffixIcon:
-                            _searchController.text.isNotEmpty
-                                ? IconButton(
-                                  icon: const Icon(Icons.clear),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    setState(() {
-                                      _searchText = '';
-                                    });
-                                  },
-                                )
-                                : null,
-                        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15)), borderSide: BorderSide.none),
-                        prefixIcon: Padding(padding: const EdgeInsets.only(left: 16.0), child: const FaIcon(FontAwesomeIcons.magnifyingGlass, color: Colors.black)),
-                        filled: true,
-                        fillColor: const Color(0xffCADBFF),
-                        labelStyle: const TextStyle(color: Colors.black),
+                    child: SizedBox(
+                      height: 55,
+                      child: TextField(
+                        onChanged: _filterUsers,
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          prefixIconConstraints: const BoxConstraints(minWidth: 60),
+                          hintText: "${"search".tr()}...",
+                          suffixIcon:
+                              _searchController.text.isNotEmpty
+                                  ? IconButton(
+                                    icon: const Icon(Icons.clear),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      setState(() {
+                                        _searchText = '';
+                                      });
+                                    },
+                                  )
+                                  : null,
+                          border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(15)), borderSide: BorderSide.none),
+                          prefixIcon: Padding(padding: const EdgeInsets.only(left: 16.0), child: const FaIcon(FontAwesomeIcons.magnifyingGlass, color: Colors.black)),
+                          filled: true,
+                          fillColor: const Color(0xffCADBFF),
+                          labelStyle: const TextStyle(color: Colors.black),
+                        ),
+                        style: const TextStyle(color: Colors.black),
                       ),
-                      style: const TextStyle(color: Colors.black),
                     ),
                   ),
                   const Gap(8),

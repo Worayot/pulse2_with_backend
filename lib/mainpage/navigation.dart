@@ -2,14 +2,12 @@ import 'package:draggable_float_widget/draggable_float_widget.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:tuh_mews/authentication/login.dart';
 import 'package:tuh_mews/func/pref/pref.dart';
 import 'package:tuh_mews/mainpage/patient_related/patient_in_system.dart';
 import 'package:tuh_mews/mainpage/patient_related/export.dart';
 import 'package:tuh_mews/mainpage/patient_related/monitored_patient.dart';
 import 'package:tuh_mews/mainpage/settings/setting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
 import 'package:tuh_mews/utils/global_mews_fab.dart';
 import 'package:tuh_mews/utils/navbar.dart';
 

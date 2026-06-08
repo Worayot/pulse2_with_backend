@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tuh_mews/authentication/login.dart';
+import 'package:tuh_mews/authentication/login/screen/login.dart';
 import 'package:tuh_mews/mainpage/navigation.dart';
 import 'package:tuh_mews/state/authentication_state/authentication_state.dart';
 

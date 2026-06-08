@@ -133,4 +133,36 @@ class UserServices {
       return {500: 'Error deleting user: $e'};
     }
   }
+
+  Future<Map<int, String>> changePassword({required String uid, required String currentPassword, required String newPassword}) async {
+    try {
+      final usersRef = FirebaseFirestore.instance.collection('users');
+      final query = await usersRef.where('nurse_id', isEqualTo: uid).limit(1).get();
+
+      if (query.docs.isEmpty) {
+        return {404: 'User not found'};
+      }
+
+      final userDoc = query.docs.first;
+      final userData = userDoc.data();
+      final storedHashedPassword = userData['password'] as String?;
+
+      if (storedHashedPassword == null || storedHashedPassword.isEmpty) {
+        return {500: 'Account configuration error: No password set'};
+      }
+
+      final isMatch = BCrypt.checkpw(currentPassword, storedHashedPassword);
+      if (!isMatch) {
+        return {401: 'Incorrect current password'};
+      }
+
+      final newHashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+
+      await userDoc.reference.update({'password': newHashedPassword});
+
+      return {200: 'Password changed successfully'};
+    } catch (e) {
+      return {500: 'Error changing password: $e'};
+    }
+  }
 }

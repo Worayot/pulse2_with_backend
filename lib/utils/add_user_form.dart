@@ -154,129 +154,133 @@ class _AddUserFormState extends State<AddUserForm> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(
+            Flexible(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Expanded(
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              child: InfoTextField(
+                                fontSize: 14,
+                                title: "name".tr(),
+                                controller: nameController,
+                                boxColor: const Color(0xffE0EAFF),
+                                minWidth: 140,
+                                hintText: "fillInName".tr(),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: SizedBox(
+                              child: InfoTextField(
+                                title: "surname".tr(),
+                                fontSize: 14,
+                                controller: surnameController,
+                                boxColor: const Color(0xffE0EAFF),
+                                minWidth: 140,
+                                hintText: "fillInSurname".tr(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(padding: const EdgeInsets.only(left: 8.0), child: Row(children: [Text('role'.tr(), style: const TextStyle(fontWeight: FontWeight.bold))])),
+                      const SizedBox(height: 4),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: SizedBox(
-                          child: InfoTextField(
-                            fontSize: 14,
-                            title: "name".tr(),
-                            controller: nameController,
-                            boxColor: const Color(0xffE0EAFF),
-                            minWidth: 140,
-                            hintText: "fillInName".tr(),
+                          width: double.infinity,
+                          height: 40,
+                          child: DropdownButtonFormField<String>(
+                            initialValue: selectedRole.isNotEmpty ? selectedRole : null,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xffE0EAFF),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                              hintText: selectedRole.isEmpty ? 'selectRole'.tr() : "",
+                              hintStyle: TextStyle(fontSize: 14),
+                            ),
+                            items: [
+                              DropdownMenuItem(value: "nurse", child: Text("nurse".tr(), style: TextStyle(color: Colors.black, fontSize: 14))),
+                              DropdownMenuItem(value: "admin", child: Text("admin".tr(), style: TextStyle(color: Colors.black, fontSize: 14))),
+                            ],
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedRole = value ?? '';
+                              });
+                            },
                           ),
                         ),
                       ),
-                      Expanded(
-                        child: SizedBox(
-                          child: InfoTextField(
-                            title: "surname".tr(),
-                            fontSize: 14,
-                            controller: surnameController,
-                            boxColor: const Color(0xffE0EAFF),
-                            minWidth: 140,
-                            hintText: "fillInSurname".tr(),
+                      SizedBox(
+                        width: double.infinity,
+                        child: InfoTextField(
+                          title: "nurseID".tr(),
+                          fontSize: 14,
+                          controller: nurseIDController,
+                          boxColor: const Color(0xffE0EAFF),
+                          minWidth: 140,
+                          hintText: "fillInNurseID".tr(),
+                          padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
+                        ),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: InfoTextField(
+                          title: "password".tr(),
+                          fontSize: 14,
+                          controller: passwordController,
+                          focusNode: focusNode,
+                          boxColor: const Color(0xffE0EAFF),
+                          minWidth: 140,
+                          hintText: "fillInPassword".tr(),
+                          obscure: true,
+                          showToggle: true,
+                          onChanged: (val) {
+                            setState(() {
+                              password = val;
+                            });
+                          },
+                        ),
+                      ),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 200),
+                          opacity: (_isEditingPassword && password.trim().isNotEmpty) ? 1 : 0,
+                          child: (_isEditingPassword && password.trim().isNotEmpty) ? PasswordValidationWidget(password: password) : const SizedBox.shrink(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton.icon(
+                          onPressed: submitData,
+                          label:
+                              !_isSubmitting
+                                  ? Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white))
+                                  : CircularProgressIndicator(color: Colors.white),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff407BFF),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12), // Set border radius
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  Padding(padding: const EdgeInsets.only(left: 8.0), child: Row(children: [Text('role'.tr(), style: const TextStyle(fontWeight: FontWeight.bold))])),
-                  const SizedBox(height: 4),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: DropdownButtonFormField<String>(
-                        initialValue: selectedRole.isNotEmpty ? selectedRole : null,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color(0xffE0EAFF),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          hintText: selectedRole.isEmpty ? 'selectRole'.tr() : "",
-                          hintStyle: TextStyle(fontSize: 14),
-                        ),
-                        items: [
-                          DropdownMenuItem(value: "nurse", child: Text("nurse".tr(), style: TextStyle(color: Colors.black, fontSize: 14))),
-                          DropdownMenuItem(value: "admin", child: Text("admin".tr(), style: TextStyle(color: Colors.black, fontSize: 14))),
-                        ],
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedRole = value ?? '';
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: InfoTextField(
-                      title: "nurseID".tr(),
-                      fontSize: 14,
-                      controller: nurseIDController,
-                      boxColor: const Color(0xffE0EAFF),
-                      minWidth: 140,
-                      hintText: "fillInNurseID".tr(),
-                      padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: InfoTextField(
-                      title: "password".tr(),
-                      fontSize: 14,
-                      controller: passwordController,
-                      focusNode: focusNode,
-                      boxColor: const Color(0xffE0EAFF),
-                      minWidth: 140,
-                      hintText: "fillInPassword".tr(),
-                      obscure: true,
-                      showToggle: true,
-                      onChanged: (val) {
-                        setState(() {
-                          password = val;
-                        });
-                      },
-                    ),
-                  ),
-                  AnimatedSize(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeOut,
-                    child: AnimatedOpacity(
-                      duration: const Duration(milliseconds: 200),
-                      opacity: (_isEditingPassword && password.trim().isNotEmpty) ? 1 : 0,
-                      child: (_isEditingPassword && password.trim().isNotEmpty) ? PasswordValidationWidget(password: password) : const SizedBox.shrink(),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton.icon(
-                      onPressed: submitData,
-                      label:
-                          !_isSubmitting
-                              ? Text('save'.tr(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white))
-                              : CircularProgressIndicator(color: Colors.white),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff407BFF),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // Set border radius
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ],
