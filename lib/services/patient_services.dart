@@ -2,13 +2,10 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
 import 'package:tuh_mews/models/monitored_patient/card_model.dart';
 import 'package:tuh_mews/models/patient_id_name.dart';
 import 'package:tuh_mews/models/patient_user_link.dart';
 import 'package:tuh_mews/services/alarm_services.dart';
-import 'package:tuh_mews/services/session_service.dart';
-import 'package:tuh_mews/services/url.dart';
 import '../models/patient.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -25,39 +22,30 @@ class FirebasePatientService {
     });
   }
 
-  /// Stream monitored patients linked to the given user ID (Real-time & Reactive)
   Stream<List<PatientModel>> fetchMonitoredPatients(String userId) {
     return _firestore.collection('patient_user_links').where('user_id', isEqualTo: userId).snapshots().switchMap((linkSnapshot) {
-      // 1. If no links, return empty list immediately
       if (linkSnapshot.docs.isEmpty) {
         return Stream.value([]);
       }
 
-      // 2. Map each link to a Stream of the fully assembled PatientModel
       List<Stream<PatientModel?>> patientStreams =
           linkSnapshot.docs.map((doc) {
             Map<String, dynamic> linkData = doc.data();
             String patientId = linkData['patient_id'];
 
-            // Stream A: Patient Details (uses helper below)
             var detailsStream = _fetchPatientStream(patientId);
 
-            // Stream B: Inspection Notes with MEWS (uses helper below)
             var notesStream = _fetchInspectionNotesStream(patientId);
 
-            // 3. Combine Link + Patient + Notes
             return Rx.combineLatest2<Map<String, dynamic>?, List<Map<String, dynamic>>, PatientModel?>(detailsStream, notesStream, (patientDetails, inspectionNotes) {
-              // If patient details are missing (e.g. deleted), return null so we can filter it out
               if (patientDetails == null) return null;
 
-              // Merge data exactly like before
               Map<String, dynamic> fullData = {...linkData, 'patient_details': patientDetails, 'inspection_notes': inspectionNotes};
 
               return PatientModel.fromMap(fullData);
             });
           }).toList();
 
-      // 4. Combine all patients into one list and filter out nulls
       return CombineLatestStream.list(patientStreams).map((list) {
         return list.whereType<PatientModel>().toList();
       });
@@ -246,83 +234,29 @@ class PatientService {
     }
   }
 
-  Future<Map<String, dynamic>> getMonitoredPatient(String userId) async {
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken == null) {
-      return {"status": 401, "message": "Unauthorized: No token found", "data": null};
-    }
-
-    final url = Uri.parse('${URL().getServerURL()}/home-fetch/get-links-by-user/$userId');
-
-    try {
-      final response = await http.get(url, headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"});
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> decoded = jsonDecode(response.body);
-        return {"status": 200, "message": decoded["message"] ?? "Links retrieved successfully", "data": decoded["data"]};
-      } else {
-        String errorMessage;
-
-        try {
-          final Map<String, dynamic> err = jsonDecode(response.body);
-          errorMessage = err["detail"] ?? response.body;
-        } catch (_) {
-          errorMessage = response.body;
-        }
-
-        return {"status": response.statusCode, "message": errorMessage, "data": null};
-      }
-    } catch (e) {
-      return {"status": 500, "message": "Error fetching monitored patient: $e", "data": null};
-    }
-  }
-
   Future<Map<int, String>> takeIn({required PatientUserLink link}) async {
-    String? idToken = await SessionService().getIdToken();
-
-    if (idToken == null) {
-      return {401: 'Unauthorized: No token found'};
-    }
-
-    final url = Uri.parse('${URL().getServerURL()}/home-fetch/take-in/');
-
     try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json", "Authorization": "Bearer $idToken"},
-        body: jsonEncode(link.toJson()), // convert your model to JSON
-      );
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-      try {
-        final Map<String, dynamic> decoded = jsonDecode(response.body);
-        final message = decoded["message"] ?? "Operation completed";
-        return {response.statusCode: message};
-      } catch (_) {
-        // fallback if response is not JSON
-        return {response.statusCode: response.body};
-      }
+      final docId = '${link.userID}_${link.patientID}';
+
+      await firestore.collection('patient_user_links').doc(docId).set(link.toJson());
+
+      return {200: 'Patient linked successfully'};
     } catch (e) {
       return {500: 'Error taking in patient: $e'};
     }
   }
 
   Future<bool> takeOut({required String userId, required String patientId}) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
     try {
-      CollectionReference linkCollection = firestore.collection('patient_user_links');
+      final docId = '${userId}_$patientId';
 
-      QuerySnapshot querySnapshot = await linkCollection.where('user_id', isEqualTo: userId).where('patient_id', isEqualTo: patientId).get();
+      await FirebaseFirestore.instance.collection('patient_user_links').doc(docId).delete();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        await linkCollection.doc(querySnapshot.docs.first.id).delete();
+      AlarmService().cancelAlarmsByPatientId(patientId: patientId);
 
-        AlarmService().cancelAlarmsByPatientId(patientId: patientId);
-        return true;
-      } else {
-        return false;
-      }
+      return true;
     } catch (e) {
       return false;
     }
