@@ -264,6 +264,7 @@ class PatientService {
 
   //* Tested
   Future<Map<String, dynamic>?> getPatientReport({required String patientId, required DateTime date}) async {
+    debugPrint("Fetching with date $date");
     Map<String, dynamic> response = {};
     try {
       final DocumentSnapshot patientDocSnapshot = await FirebaseFirestore.instance.collection('patients').doc(patientId).get();
@@ -277,8 +278,12 @@ class PatientService {
         }
       }
 
-      DateTime queryDateStart = DateTime.utc(date.year, date.month, date.day);
-      DateTime queryDateEnd = queryDateStart.add(const Duration(days: 1));
+      final localStart = DateTime(date.year, date.month, date.day);
+
+      final localEnd = localStart.add(const Duration(days: 1));
+
+      final queryDateStart = localStart.toUtc();
+      final queryDateEnd = localEnd.toUtc();
       debugPrint("Fetching patient id $patientId date start $queryDateStart date end $queryDateEnd");
       final QuerySnapshot mewsSnapshot =
           await FirebaseFirestore.instance
@@ -317,6 +322,8 @@ class PatientService {
       for (var report in fullReports) {
         if (report['assessed_time'] is Timestamp) {
           report['assessed_time'] = (report['assessed_time'] as Timestamp).toDate();
+
+          debugPrint("Got report with timestamp: ${report['assessed_time']}");
         }
       }
 

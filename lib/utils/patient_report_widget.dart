@@ -18,6 +18,7 @@ class _PatientReportWidgetState extends State<PatientReportWidget> {
   DateTime selectedDate = DateTime.now();
 
   void _updateSelectedDate(DateTime newDate) {
+    debugPrint("Set to $newDate");
     setState(() {
       selectedDate = newDate;
     });
