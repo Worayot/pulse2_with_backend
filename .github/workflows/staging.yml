@@ -19,7 +19,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          flutter-version: '3.44.8'
           cache: true
 
       - name: Dependencies
@@ -66,7 +66,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          cache: true
+          flutter-version: '3.44.8'
 
       - name: Install Dependencies
         run: |
