@@ -135,7 +135,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                 child: IgnorePointer(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [Text("details".tr()), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)],
+                                    children: [Text("details".tr(), textScaler: const TextScaler.linear(1.0)), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)],
                                   ),
                                 ),
                               ),
@@ -147,7 +147,10 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                           child: Container(
                             padding: const EdgeInsets.only(top: 60),
                             decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
-                            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text("details".tr()), Icon(Icons.expand_more)]),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [Text("details".tr(), textScaler: const TextScaler.linear(1.0)), Icon(Icons.expand_more)],
+                            ),
                           ),
                         ),
               ),
@@ -185,10 +188,11 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                               children: [
                                 Text(
                                   "$name $surname",
+                                  textScaler: const TextScaler.linear(1.0),
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    shadows: [Shadow(color: Colors.black.withOpacity(0.25), offset: const Offset(0.8, 0.8), blurRadius: 1)],
+                                    shadows: [Shadow(color: Colors.black.withValues(alpha: 0.25), offset: const Offset(0.8, 0.8), blurRadius: 1)],
                                   ),
                                 ),
                                 RichText(
@@ -199,7 +203,7 @@ class _HomeExpandableCardsState extends State<HomeExpandableCards> {
                                     ],
                                   ),
                                 ),
-                                Text(nextTimeText, style: const TextStyle(fontSize: 11)),
+                                Text(nextTimeText, style: const TextStyle(fontSize: 11), textScaler: const TextScaler.linear(1.0)),
                                 const SizedBox(height: 2),
                               ],
                             ),

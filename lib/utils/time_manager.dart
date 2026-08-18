@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tuh_mews/func/string_transformer.dart';
 import 'package:tuh_mews/models/inspection_note.dart';
@@ -54,7 +55,7 @@ void showTimeManager({
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(left: 15.0),
-                              child: Text("notifications".tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              child: Text("notifications".tr(), textScaler: const TextScaler.linear(1.0), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                             ),
                             const Spacer(),
                             IconButton(
@@ -87,7 +88,7 @@ void showTimeManager({
                                   shape: BoxShape.rectangle,
                                   color: const Color(0xffC6D8FF),
                                   borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.15), offset: const Offset(0.5, 0.25), blurRadius: 1, spreadRadius: 1)],
+                                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.15), offset: const Offset(0.5, 0.25), blurRadius: 1, spreadRadius: 1)],
                                 ),
                               ),
                             ),
@@ -95,7 +96,10 @@ void showTimeManager({
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Padding(padding: const EdgeInsets.only(top: 60.0), child: Text("setTimer".tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500))),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 60.0),
+                                child: Text("setTimer".tr(), textScaler: const TextScaler.linear(1.0), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                              ),
                               const SizedBox(height: 40),
                               Center(
                                 child: SizedBox(
@@ -116,12 +120,18 @@ void showTimeManager({
                                           },
                                           childDelegate: ListWheelChildLoopingListDelegate(
                                             children: List<Widget>.generate(24, (index) {
-                                              return Center(child: Text(index.toString().padLeft(2, '0'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)));
+                                              return Center(
+                                                child: Text(
+                                                  index.toString().padLeft(2, '0'),
+                                                  textScaler: const TextScaler.linear(1.0),
+                                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                                ),
+                                              );
                                             }),
                                           ),
                                         ),
                                       ),
-                                      const Text(":", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                      const Text(":", textScaler: TextScaler.linear(1.0), style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                                       Expanded(
                                         child: ListWheelScrollView.useDelegate(
                                           controller: minuteController,
@@ -133,17 +143,23 @@ void showTimeManager({
                                           },
                                           childDelegate: ListWheelChildLoopingListDelegate(
                                             children: List<Widget>.generate(60, (index) {
-                                              return Center(child: Text(index.toString().padLeft(2, '0'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)));
+                                              return Center(
+                                                child: Text(
+                                                  index.toString().padLeft(2, '0'),
+                                                  textScaler: const TextScaler.linear(1.0),
+                                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                                ),
+                                              );
                                             }),
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 30),
+                                      const Gap(30),
                                     ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 30),
+                              Gap(30),
                               ElevatedButton(
                                 onPressed:
                                     enableButton
@@ -240,7 +256,11 @@ void showTimeManager({
                                 ),
                                 child:
                                     enableButton
-                                        ? Text("setNotification".tr(), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black))
+                                        ? Text(
+                                          "setNotification".tr(),
+                                          textScaler: const TextScaler.linear(1.0),
+                                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                                        )
                                         : CircularProgressIndicator(color: Colors.white),
                               ),
                               const SizedBox(height: 10),

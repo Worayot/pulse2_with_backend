@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CircleWithNumber extends StatelessWidget {
-  final dynamic number; // The number to be displayed in the circle
-  final Color color; // The color of the circle
+  final dynamic number;
+  final Color color;
 
-  // Constructor for initializing the number and color
   const CircleWithNumber({required this.number, required this.color, super.key});
 
   @override
@@ -12,26 +11,18 @@ class CircleWithNumber extends StatelessWidget {
     bool isNoneMEWs = number == "-";
 
     return Container(
-      width: 50, // Circle width
-      height: 50, // Circle height
-      decoration: BoxDecoration(
-        color: isNoneMEWs ? Colors.white : color, // Background color of the circle
-        shape: BoxShape.circle, // Making the container circular
-      ),
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(color: isNoneMEWs ? Colors.white : color, shape: BoxShape.circle),
       child: Center(
         child: Text(
-          '$number', // Displaying the number
+          '$number',
+          textScaler: const TextScaler.linear(1.0),
           style: TextStyle(
-            color: isNoneMEWs ? Colors.black : Colors.white, // White color for the text
-            fontSize: 22, // Font size for the number
+            color: isNoneMEWs ? Colors.black : Colors.white,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                color: Colors.black.withOpacity(0.5), // Shadow color with opacity
-                offset: const Offset(0.75, 0.75), // Horizontal and vertical offset
-                blurRadius: 8, // Blur radius
-              ),
-            ], // Bold number
+            shadows: [Shadow(color: Colors.black.withValues(alpha: 0.5), offset: const Offset(0.75, 0.75), blurRadius: 8)],
           ),
         ),
       ),

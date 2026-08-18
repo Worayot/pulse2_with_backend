@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:tuh_mews/models/monitored_patient/card_model.dart';
 import 'package:tuh_mews/models/nursing_component.dart';
 import 'package:tuh_mews/utils/action_button.dart';
@@ -154,24 +155,6 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
     });
   }
 
-  double _calculateExpandedHeight(Size size) {
-    if (!isExpanded) return 101;
-
-    // Base padding/header
-    double height = 75.0 + 10.0;
-
-    // Add height for rows
-    // Standard row height (screenHeight * 0.033) + padding (~12)
-    double rowHeight = (size.height * 0.033) + 12;
-    height += _allProcessedRows.length * rowHeight;
-
-    // Add height for section headers (approx 35px per group)
-    height += _groupedRows.length * 35;
-
-    // Add extra buffer just in case
-    return height + 20;
-  }
-
   @override
   Widget build(BuildContext context) {
     // Access data directly from the Model
@@ -210,7 +193,7 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                                   IgnorePointer(
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [Text("details".tr()), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)],
+                                      children: [Text("details".tr(), textScaler: const TextScaler.linear(1.0)), Icon(isExpanded ? Icons.expand_less : Icons.expand_more)],
                                     ),
                                   ),
                                   SingleChildScrollView(
@@ -233,11 +216,12 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                                                     children: [
                                                       Text(
                                                         dateHeader,
+                                                        textScaler: const TextScaler.linear(1.0),
                                                         style: TextStyle(
                                                           color: Colors.white,
                                                           fontWeight: FontWeight.bold,
                                                           fontSize: 14,
-                                                          shadows: [Shadow(color: Colors.black.withOpacity(0.2), offset: const Offset(0.5, 0.5), blurRadius: 1)],
+                                                          shadows: [Shadow(color: Colors.black.withValues(alpha: 0.2), offset: const Offset(0.5, 0.5), blurRadius: 1)],
                                                         ),
                                                       ),
                                                       const SizedBox(width: 8),
@@ -265,7 +249,10 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                               child: Container(
                                 padding: const EdgeInsets.only(top: 80),
                                 decoration: BoxDecoration(color: const Color(0xff98B1E8), borderRadius: BorderRadius.circular(16)),
-                                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text("details".tr()), Icon(Icons.expand_more)]),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [Text("details".tr(), textScaler: const TextScaler.linear(1.0)), Icon(Icons.expand_more)],
+                                ),
                               ),
                             ),
                   ),
@@ -291,10 +278,11 @@ class _MonitoredPatientCardState extends State<MonitoredPatientCard> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(fullname, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                            Text("nextInspectionTime".tr(), style: TextStyle(fontSize: 16)),
-                            const SizedBox(height: 2),
+                            Text(fullname, textScaler: const TextScaler.linear(1.0), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text("nextInspectionTime".tr(), textScaler: const TextScaler.linear(1.0), style: TextStyle(fontSize: 16)),
+                            const Gap(2),
                             Text.rich(
+                              textScaler: const TextScaler.linear(1.0),
                               TextSpan(
                                 style: const TextStyle(fontSize: 16),
                                 children: [TextSpan(text: _latestTimeText), TextSpan(text: _countdownText, style: TextStyle(fontSize: 14, color: Colors.grey[600]))],

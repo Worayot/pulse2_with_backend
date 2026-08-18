@@ -6,7 +6,6 @@ import 'package:gap/gap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuh_mews/func/filter_patient.dart';
 import 'package:tuh_mews/models/patient_filter_state.dart';
-import 'package:tuh_mews/services/alarm_services.dart';
 import 'package:tuh_mews/services/fetch_mews.dart';
 import 'package:tuh_mews/mainpage/patient_related/no_patient_screen.dart';
 import 'package:tuh_mews/utils/patient_in_system/home_card_data.dart';
